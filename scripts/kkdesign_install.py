@@ -17,7 +17,8 @@ ROOT = Path(__file__).resolve().parent.parent
 ADAPTERS = {'codex': '.agents', 'claude-code': '.claude'}
 SINGLE_FILES = ('SKILL.md', 'manifest.json', 'requirements.txt', 'LICENSE')
 DIRECTORIES = ('agents', 'references', 'docs', 'schemas', 'templates', 'examples')
-SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'materialize_example.py')
+SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
+           'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py')
 
 
 def canonical(path):

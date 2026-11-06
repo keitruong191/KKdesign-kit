@@ -2,10 +2,10 @@
 
 Portable design-system execution foundations for **Codex and Claude Code**.
 
-**Status: B1 / installation preview (`0.2.0a1`).** One canonical `kkdesign-kit`
-skill now ships with a command menu, portable resources, packaging, and a
-conservative installer for Codex and Claude Code. `package` works; DS scanning,
-design/review/prototype execution and lesson authoring remain planned B2/B3 work.
+**Status: B2 / project-kit preview (`0.3.0a1`).** The installable `kkdesign-kit`
+skill now initializes and refreshes project kits from declared Figma, Git and
+local sources, with reviewable plans, scoped profile drafts and recovery.
+Design/review/prototype execution and lesson authoring remain planned B3 work.
 
 ## Install the skill
 
@@ -23,10 +23,29 @@ Claude Code. Bare invocation shows the seven-command menu and actual availabilit
 See [installation and lifecycle](docs/installation.md) for update, rollback,
 uninstall, conflicts, platform prerequisites and artifact building.
 
-Live CLI discovery, menu and bundled-resource reads passed in isolated user and
-project installs on Codex `0.167.0` and Claude Code `2.1.308` (macOS).
-[Compatibility and evidence](docs/compatibility.md) distinguish those runs from
-cross-platform installer tests and unverified design-tool environments.
+Live CLI discovery passed in isolated user/project installs on Codex `0.167.0`
+and Claude Code `2.1.308` (macOS). B2 init/refresh execution passed in project
+scope on both; real Figma capture ingestion and committed Git lifecycle checks
+are recorded separately in [compatibility and evidence](docs/compatibility.md).
+Linux/Windows live execution and Figma import/render behavior remain unverified.
+
+## Initialize and refresh a project kit
+
+Install the dependencies in `requirements.txt` outside the installed skill.
+Declare sources using the [exact supported formats](docs/source-adapters.md).
+Then stage, inspect and explicitly authorize a plan:
+
+```sh
+python scripts/kkdesign_project.py init --project /chosen/project --sources /chosen/project/sources.json
+python scripts/kkdesign_project.py plan --project /chosen/project --plan <PLAN_ID>
+python scripts/kkdesign_project.py apply --project /chosen/project --plan <PLAN_ID>
+python scripts/kkdesign_project.py validate --project /chosen/project
+python scripts/kkdesign_project.py refresh --project /chosen/project --sources /chosen/project/sources.json
+```
+
+Existing product context, profiles, lesson IDs and task history are preserved.
+See [project lifecycle, context provenance and recovery](docs/project-kits.md).
+Provider metadata validation is not live Figma import/render or product approval.
 
 ## Run the foundation preview
 
@@ -59,7 +78,7 @@ See [contracts](docs/contracts.md), [profile provenance](docs/product-profiles.m
 
 ## Boundaries
 
-The DS provider and design destination are independent. Future source adapters can scan Figma, a Git revision or a local folder; a Git-sourced token does not require a Figma component key. No provider scan runs in this B1 preview.
+The DS provider and design destination are independent. Source adapters scan explicitly supported Figma, Git or local inputs; a Git-sourced token does not require a Figma component key. Capture limitations are part of the registry, not filled with invented values.
 
 The public repository contains generic code and invented examples only. Project-specific DS snapshots, product profiles, screenshots and task evidence stay in their respective projects. No credentials, global hook changes, external publication or Figma access are required to run this preview.
 

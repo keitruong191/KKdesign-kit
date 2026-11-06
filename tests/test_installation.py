@@ -79,18 +79,25 @@ class InstallationTests(unittest.TestCase):
         # Modify checkout-style source rather than an integrity-protected artifact.
         (source / 'bundle.json').unlink()
         manifest = json.loads((source / 'manifest.json').read_text())
-        manifest['version'] = '0.2.0a2'
+        manifest['version'] = '99.0.0'
         (source / 'manifest.json').write_text(json.dumps(manifest))
+        old_skill = (ROOT / 'SKILL.md').read_bytes()
+        new_skill = old_skill + b'\nUpdated release content.\n'
+        (source / 'SKILL.md').write_bytes(new_skill)
         for harness in kit.ADAPTERS:
             for scope in ('user', 'project'):
                 with self.subTest(harness=harness, scope=scope):
                     self.act('install', harness, scope)
                     with self.assertRaisesRegex(ValueError, 'update explicitly'):
                         self.act('install', harness, scope, source)
-                    self.assertEqual(self.act('update', harness, scope, source)['version'], '0.2.0a2')
+                    self.act('update', harness, scope, source)
+                    target, _ = kit.locations(harness, scope, self.home, self.project)
+                    self.assertEqual((target / 'SKILL.md').read_bytes(), new_skill)
                     self.assertEqual(self.act('update', harness, scope, source)['status'], 'unchanged')
-                    self.assertEqual(self.act('rollback', harness, scope)['version'], '0.2.0a1')
-                    self.assertEqual(self.act('rollback', harness, scope)['version'], '0.2.0a2')
+                    self.act('rollback', harness, scope)
+                    self.assertEqual((target / 'SKILL.md').read_bytes(), old_skill)
+                    self.act('rollback', harness, scope)
+                    self.assertEqual((target / 'SKILL.md').read_bytes(), new_skill)
                     self.act('uninstall', harness, scope)
 
     def test_unmanaged_and_modified_files_are_never_erased(self):

@@ -1,11 +1,11 @@
 ---
 name: kkdesign-kit
-description: Inspect KKdesign-kit capabilities, show its design-system command menu, package the portable kit, or consult its bundled design contracts. Use for explicit KKdesign-kit requests; design execution and DS scanning are not yet available in this B1 preview.
+description: Initialize and refresh project design kits from Figma, Git or local sources, inspect KKdesign-kit capabilities, package the portable kit, or consult bundled design contracts. Design execution and prototypes are separate, unavailable B3 workflows.
 ---
 
 # KKdesign-kit
 
-This is the B1 installation preview, sharing Stage-A contracts across Codex and
+This is the B2 project-kit preview, sharing Stage-A contracts across Codex and
 Claude Code. No installed Hoangsa, Impeccable, MCP server, or hook is required.
 
 Resolve every bundled path relative to the directory containing THIS SKILL.md,
@@ -24,11 +24,12 @@ For a named command, read the same reference and follow only that command's rout
 For unknown commands, show the menu and explain that the command is unknown.
 
 - `package`: implemented; read [references/packaging.md](references/packaging.md).
-- `init`, `refresh`: unavailable until B2. Say so without scanning sources or
-  creating DESIGN.md.
+- `init`, `refresh`: implemented; read [references/project-kit.md](references/project-kit.md).
+  Scan only declared sources, stage and inspect the plan, then apply only with
+  the user's authorization. Preserve product context, lessons and task history.
 - `design`, `review`, `prototype`: unavailable until B3. Say so without claiming
   a design, audit, prototype, or design-tool execution has occurred.
-- `learn`: unavailable in B1; future lesson-authoring workflow. Existing offline
+- `learn`: unavailable until B3; future lesson-authoring workflow. Existing offline
   lesson indexing is a foundation utility, not this command's implementation.
 
 Load [docs/contracts.md](docs/contracts.md) only for a contract question;

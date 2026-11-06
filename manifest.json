@@ -1,9 +1,9 @@
 {
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
-  "version": "0.2.0a1",
-  "stage": "B1",
-  "status": "installation-preview",
+  "version": "0.3.0a1",
+  "stage": "B2",
+  "status": "project-kit-preview",
   "targets": [
     "codex",
     "claude-code"
@@ -20,11 +20,14 @@
     "installation-inspection",
     "update",
     "rollback",
-    "uninstall"
+    "uninstall",
+    "init",
+    "refresh",
+    "source-adapters",
+    "source-migration",
+    "project-recovery"
   ],
   "planned": [
-    "init-scan",
-    "refresh",
     "design",
     "review",
     "prototype",
@@ -55,19 +58,19 @@
     "macOS": {
       "codex": {
         "version": "0.167.0",
-        "user": "discovery-menu-resource-pass",
-        "project": "discovery-menu-resource-pass"
+        "user": "B1-discovery-menu-resource-pass; B2-runtime-unverified",
+        "project": "B2-init-refresh-validation-pass"
       },
       "claude-code": {
         "version": "2.1.308",
-        "user": "discovery-menu-resource-pass",
-        "project": "discovery-menu-resource-pass"
+        "user": "B1-discovery-menu-resource-pass; B2-runtime-unverified",
+        "project": "B2-init-refresh-validation-pass"
       }
     },
     "linux": "installer CI configured; live harness unverified",
     "windows": "installer CI configured; live harness unverified",
     "otherHarnessVersions": "unverified",
-    "designTools": "not-tested; outside-B1"
+    "designTools": "source-read-only; import/render and design execution unverified"
   },
-  "runtimeEvidence": "docs/evidence/b1-harness-smoke.json"
+  "runtimeEvidence": "docs/evidence/b2-verification.json"
 }
