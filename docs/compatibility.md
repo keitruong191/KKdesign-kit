@@ -1,7 +1,7 @@
 # Compatibility and observed evidence
 
-B1 (`0.2.0a1`) ships one canonical `SKILL.md`, technical identifier `kkdesign-kit`
-and Codex display name **KKdesign-kit**. Claude Code uses that same frontmatter
+B2 (`0.3.0a1`) retains one canonical `SKILL.md`, technical identifier `kkdesign-kit`
+and Codex display name **KKdesign-kit**. Claude Code uses the same frontmatter
 and native skill/slash-command handling. See [installation](installation.md).
 
 The discovery paths were checked against the official
@@ -10,6 +10,54 @@ The discovery paths were checked against the official
 Compatibility below is limited to the versions actually run, not all later or
 earlier releases. Desktop sync, cloud sessions and managed enterprise policies
 are unverified.
+
+## B2 project workflow evidence
+
+| Environment / path | Observed scope |
+|---|---|
+| Codex CLI 0.167.0, macOS 26.5 arm64 | Project-installed package: real init, inspected/applicable plans, apply, changed refresh, validation and unchanged refresh |
+| Claude Code 2.1.308, macOS 26.5 arm64 | Same project workflow through native skill activation |
+| Python 3.9.6, committed Git source | CLI init, revision diff, authorized refresh, missing access, migration, replacement, recovery, rollback and relocated-kit validation |
+| Authenticated Figma Plugin API capture | Real private-source read, bounded native export, adapter init/apply/validate and unchanged refresh |
+| Direct Figma REST with a personal access token | HTTP behavior covered by synthetic fixtures; live PAT transport unverified |
+| B2 user-scope harness execution, Linux/Windows live execution, other harness versions | Unverified; B1 user-scope discovery evidence is historical, not a B2 execution claim |
+
+[B2 verification](evidence/b2-verification.json) records reviewed outcomes and
+private-transcript hashes. [Before/after sample](evidence/b2-init-refresh-sample.json)
+uses only a synthetic committed Git source. Failed attempts are not passes.
+
+Figma evidence is not a unit fixture: the bundled read-only exporter ran through
+an authenticated Figma connector, and its complete private result was ingested
+by the Figma adapter. The scoped capture contains two selected roots, seventeen
+nodes and two components. Styles are two of 732; variables are two of 917. There
+were 68 unavailable property reads, no missing selected nodes and no truncated
+values. Those limits remain explicit `partial` coverage, not a claim that the
+entire DS was scanned. The Plugin API did not expose a REST revision/time; the
+adapter records `unknown` revision and a content hash. No Figma node/prototype
+mutations, live imports, render verification or external publication occurred.
+Private file/node IDs, DS values and captures are not bundled in this repository.
+
+The B2 runner is source-only, opt-in and separate from the B1 discovery probe:
+
+```sh
+python scripts/smoke_project_harness.py --harness codex --codex-auth-file "/private/auth/auth.json" --output "/private/results/b2-codex"
+python scripts/smoke_project_harness.py --harness claude-code --claude-credentials-file "/private/auth/claude-credentials.json" --output "/private/results/b2-claude"
+```
+
+Run it with the dependency-equipped Python environment; `--python` can select
+another interpreter without resolving away its virtual-environment symlink.
+It installs an extracted package in an isolated project/home, removes the source
+extraction, asks the actual harness to execute the installed CLI, then independently
+checks preserved PRODUCT.md, changed token value and generated-kit validation.
+Read the raw transcript as well: model success text alone is insufficient.
+Recovery checks additionally kill a real writer process after its registry swap
+and verify restoration of the prior valid kit. Windows uses a process-handle
+liveness query, never `os.kill(pid, 0)`; its live behavior remains unverified here.
+
+## Historical B1 installation evidence
+
+The following table and `b1-harness-smoke.json` describe release `0.2.0a1`;
+they do not establish B2 init/refresh behavior.
 
 | Layer / environment | User scope | Project scope |
 |---|---|---|
@@ -46,15 +94,13 @@ python -m venv .venv
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/materialize_example.py --output .demo
 .venv/bin/python scripts/kkdesign_core.py validate --design .demo/design
-.venv/bin/python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.2.0a1.zip
+.venv/bin/python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.3.0a1.zip
 ```
 
-On Windows use `.venv\Scripts\python.exe`. The 38 tests include all existing
-Stage-A regressions plus all four harness/scope combinations, idempotent installs,
-updates, rollback, preserved project/configuration data, unmanaged/modified file
-conflicts, backup protection, swap failures, deterministic packages, integrity,
-relocation and paths with spaces. Symlink tests run when OS privileges permit.
-No offline result claims successful model or Figma behavior.
+On Windows use `.venv\Scripts\python.exe`. The suite includes Stage-A regressions,
+installer lifecycle/integrity/conflicts, source-adapter parsing and error cases,
+and project plan/apply/migration/recovery. See the B2 evidence below for actually
+observed results. No offline result claims successful model or Figma behavior.
 
 ## Reproduce live CLI probes
 
@@ -81,5 +127,5 @@ installed path, a real successful resource read, the seven-command menu and
 honest unavailable-command status. Model self-report alone is insufficient.
 
 Hooks remain opt-in future integration; installation does not add or enable
-hooks at either scope. DS scanning and design-tool execution are not part of
-these tests and are still unavailable B2/B3 commands.
+hooks at either scope. B1 probes cover discovery only. B2 init/refresh requires
+the separate live project workflow; B3 design-tool execution remains unavailable.

@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "figma-capture",
+  "fileKey": "synthetic-public-example",
+  "version": "synthetic-revision-1",
+  "lastModified": "2026-01-01T00:00:00Z",
+  "document": {"id": "0:0", "name": "Synthetic library", "type": "DOCUMENT", "children": []},
+  "components": [
+    {"key": "native-component-key-example", "node_id": "1:2", "name": "Synthetic button"}
+  ],
+  "componentSets": [],
+  "styles": [],
+  "variables": {
+    "meta": {
+      "variableCollections": {"collection-1": {"id": "collection-1", "modes": [{"modeId": "mode-1", "name": "Light"}]}},
+      "variables": {"variable-1": {"id": "variable-1", "name": "color/brand", "resolvedType": "COLOR", "valuesByMode": {"mode-1": {"r": 0.1, "g": 0.2, "b": 0.3, "a": 1}}}}
+    }
+  }
+}

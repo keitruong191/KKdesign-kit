@@ -1,6 +1,6 @@
 # Install and maintain KKdesign-kit
 
-B1 preview 0.2.0a1. Requires Python 3.9+ on macOS, Linux or Windows and a separately
+B2 preview 0.3.0a1. Requires Python 3.9+ on macOS, Linux or Windows and a separately
 installed/authenticated Codex CLI or Claude Code. Packaging and installation use
 only the Python standard library. Offline contract validation also needs
 `python -m pip install -r requirements.txt`; use a virtual environment outside the
@@ -12,7 +12,7 @@ See [compatibility](compatibility.md) for measured harness support.
 From the checkout root, build a ZIP outside the source directory:
 
 ```sh
-python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.2.0a1.zip
+python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.3.0a1.zip
 ```
 
 Unzip to a folder of your choice. Run commands below inside its `kkdesign-kit/`
@@ -91,5 +91,6 @@ or credentials are never collected, overwritten or removed.
 - Skill not found: restart, verify the path above, inspect conflicts and check
   workspace trust/managed policy. Cloud harnesses and Desktop skill syncing are
   outside this CLI evidence. Installer success alone does not prove discovery.
-- A missing external design tool is not an installation failure. B1 does not
-  execute Figma or certify live UX, accessibility, performance or human approval.
+- A missing external design tool is not an installation failure. B2 reads source
+  data, but does not certify Figma import/render, UX, accessibility, performance
+  or human approval. See [project-kit lifecycle](project-kits.md) for init/refresh.

@@ -1,0 +1,7 @@
+{
+  "sources": [
+    {"id": "base", "provider": "local", "location": "base"},
+    {"id": "theme", "provider": "local", "location": "theme"},
+    {"id": "figma-sample", "provider": "figma", "location": "https://www.figma.com/design/synthetic-public-example/Library", "capture": "figma-capture.json"}
+  ]
+}
