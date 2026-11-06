@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "kind",
+    "status",
+    "objective",
+    "platform",
+    "productProfileId",
+    "target",
+    "designPlan",
+    "lessonReview",
+    "handoff"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "kind": {
+      "enum": [
+        "task-template",
+        "design-task"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "taskId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "objective": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "platform": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "productProfileId": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "target": {
+      "type": "object"
+    },
+    "designPlan": {
+      "type": "object"
+    },
+    "lessonReview": {
+      "type": "object",
+      "required": [
+        "status",
+        "sourceHash",
+        "entries"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "reviewed",
+            "retrospective",
+            "not-applicable"
+          ]
+        },
+        "sourceHash": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "reviewedAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "lessonId",
+              "decision",
+              "reason",
+              "verification",
+              "evidence"
+            ],
+            "properties": {
+              "lessonId": {
+                "type": "string",
+                "pattern": "^DL-[0-9]{3}$"
+              },
+              "decision": {
+                "enum": [
+                  "apply",
+                  "not-applicable"
+                ]
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "verification": {
+                "enum": [
+                  "pending",
+                  "pass",
+                  "evidence-mapped",
+                  "not-applicable"
+                ]
+              },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "handoff": {
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "design-task"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "taskId"
+        ],
+        "properties": {
+          "objective": {
+            "type": "string",
+            "minLength": 1
+          },
+          "platform": {
+            "type": "string",
+            "minLength": 1
+          },
+          "productProfileId": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}

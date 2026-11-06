@@ -1,0 +1,68 @@
+{
+  "$schema": "../../schemas/task.schema.json",
+  "schemaVersion": "1.0.0",
+  "kind": "design-task",
+  "status": "in_progress",
+  "instruction": "Copy per task. Null means not supplied; fill from the request or existing destination evidence. Do not mutate this shared template for a task.",
+  "objective": "Exercise portable contract checks; no design execution.",
+  "product": "Fictional example",
+  "platform": "web",
+  "delivery": "figma_design",
+  "target": {
+    "fileKey": null,
+    "pageId": null,
+    "existingFrameIds": []
+  },
+  "users": [],
+  "flows": [],
+  "screens": [],
+  "content": {
+    "language": null,
+    "source": null,
+    "representativeLongContent": null
+  },
+  "viewport": {
+    "targetWidths": [],
+    "targetHeights": [],
+    "source": null
+  },
+  "modes": {
+    "colorModeId": null,
+    "typographyModeId": null
+  },
+  "states": {
+    "required": [],
+    "notApplicable": []
+  },
+  "constraints": [],
+  "references": [],
+  "sourceDecisions": [],
+  "selectedAssets": [],
+  "assumptions": [],
+  "openQuestions": [],
+  "exceptions": [],
+  "acceptanceCriteria": [],
+  "handoff": {
+    "frameLinks": [],
+    "createdNodeIds": [],
+    "modifiedNodeIds": [],
+    "checks": [],
+    "remainingGaps": []
+  },
+  "designPlan": {
+    "recipeId": null,
+    "platformProfileId": null,
+    "layoutDecisions": [],
+    "stateDispositions": [],
+    "accessibilityChecks": [],
+    "referenceExamples": [],
+    "policyOverrides": []
+  },
+  "productProfileId": "example-web",
+  "lessonReview": {
+    "status": "pending",
+    "sourceHash": null,
+    "entries": []
+  },
+  "taskId": "demo"
+}

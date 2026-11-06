@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "kind",
+    "source",
+    "sourceHash",
+    "lessons"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schemaVersion": {
+      "const": "1.0.0"
+    },
+    "kind": {
+      "const": "lesson-index"
+    },
+    "source": {
+      "const": "LESSON.md"
+    },
+    "sourceHash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "lessons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "anchor",
+          "sectionHash",
+          "status",
+          "platforms",
+          "tags",
+          "appliesWhen",
+          "evidence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^DL-[0-9]{3}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1
+          },
+          "anchor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sectionHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "superseded",
+              "retired"
+            ]
+          },
+          "platforms": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "any",
+                "web",
+                "macos",
+                "ios",
+                "android",
+                "windows"
+              ]
+            }
+          },
+          "tags": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "appliesWhen": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "originTask": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "supersededBy": {
+            "type": "string",
+            "pattern": "^DL-[0-9]{3}$"
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,35 @@
+{
+  "name": "KKdesign-kit",
+  "identifier": "kkdesign-kit",
+  "version": "0.1.0a1",
+  "stage": "A",
+  "status": "foundation-preview",
+  "targets": [
+    "codex",
+    "claude-code"
+  ],
+  "implemented": [
+    "lesson-index",
+    "product-profile-contract",
+    "task-contract",
+    "task-evidence-contract",
+    "offline-validation"
+  ],
+  "planned": [
+    "skill-installation",
+    "init-scan",
+    "refresh",
+    "design",
+    "review",
+    "prototype",
+    "learn",
+    "package",
+    "optional-hooks"
+  ],
+  "externalRuntimeDependencies": [
+    "Python >=3.9",
+    "jsonschema >=4.18,<5"
+  ],
+  "requiresInstalledImpeccable": false,
+  "requiresInstalledHoangsa": false
+}
