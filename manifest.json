@@ -1,9 +1,9 @@
 {
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
-  "version": "0.1.0a1",
-  "stage": "A",
-  "status": "foundation-preview",
+  "version": "0.2.0a1",
+  "stage": "B1",
+  "status": "installation-preview",
   "targets": [
     "codex",
     "claude-code"
@@ -13,17 +13,22 @@
     "product-profile-contract",
     "task-contract",
     "task-evidence-contract",
-    "offline-validation"
+    "offline-validation",
+    "skill-installation",
+    "command-menu",
+    "package",
+    "installation-inspection",
+    "update",
+    "rollback",
+    "uninstall"
   ],
   "planned": [
-    "skill-installation",
     "init-scan",
     "refresh",
     "design",
     "review",
     "prototype",
     "learn",
-    "package",
     "optional-hooks"
   ],
   "externalRuntimeDependencies": [
@@ -31,5 +36,38 @@
     "jsonschema >=4.18,<5"
   ],
   "requiresInstalledImpeccable": false,
-  "requiresInstalledHoangsa": false
+  "requiresInstalledHoangsa": false,
+  "compatibilityEvidence": "docs/compatibility.md",
+  "harnessAdapters": {
+    "codex": {
+      "user": "~/.agents/skills/kkdesign-kit",
+      "project": ".agents/skills/kkdesign-kit",
+      "invocation": "$kkdesign-kit"
+    },
+    "claude-code": {
+      "user": "~/.claude/skills/kkdesign-kit",
+      "project": ".claude/skills/kkdesign-kit",
+      "invocation": "/kkdesign-kit"
+    }
+  },
+  "hooks": "not-installed; opt-in integration deferred",
+  "compatibility": {
+    "macOS": {
+      "codex": {
+        "version": "0.167.0",
+        "user": "discovery-menu-resource-pass",
+        "project": "discovery-menu-resource-pass"
+      },
+      "claude-code": {
+        "version": "2.1.308",
+        "user": "discovery-menu-resource-pass",
+        "project": "discovery-menu-resource-pass"
+      }
+    },
+    "linux": "installer CI configured; live harness unverified",
+    "windows": "installer CI configured; live harness unverified",
+    "otherHarnessVersions": "unverified",
+    "designTools": "not-tested; outside-B1"
+  },
+  "runtimeEvidence": "docs/evidence/b1-harness-smoke.json"
 }

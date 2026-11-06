@@ -3,6 +3,8 @@
 import argparse
 from pathlib import Path
 import shutil
+import sys
+sys.dont_write_bytecode = True
 from kkdesign_core import build_lesson_index, save
 
 

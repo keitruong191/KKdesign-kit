@@ -1,0 +1,88 @@
+{
+  "release": "0.2.0a1",
+  "scope": "Synthetic, isolated CLI smoke probes; no design-tool/runtime certification",
+  "runs": [
+    {
+      "harness": "codex",
+      "version": "codex-cli 0.167.0",
+      "scope": "project",
+      "exitCode": 0,
+      "installationStatus": "installed",
+      "isolation": "fresh home, synthetic project, extracted package; no user config/skills/hooks",
+      "verdict": "pass: manually reviewed discovery, menu, actual resource read and unavailable-init disclosure",
+      "platform": "macOS 26.5 arm64",
+      "rawTranscriptSha256": "553995dbfe3d49e6286eb8f48b9c32a2d047f06ca815708b851f81ccbf9c6496",
+      "observedTools": [
+        {
+          "tool": "shell read",
+          "resource": "SKILL.md and references/commands.md",
+          "exitCode": 0,
+          "command": "<shell> -lc \"cat '<ISOLATED_ROOT>/synthetic project/.agents/skills/kkdesign-kit/SKILL.md' '<ISOLATED_ROOT>/synthetic project/.agents/skills/kkdesign-kit/references/commands.md'\"",
+          "resourceReadResult": "success; local tool output reviewed"
+        }
+      ],
+      "finalResponse": "Read the installed `SKILL.md` and bundled `references/commands.md`.\n\nResolved installed location:\n```text\n<ISOLATED_ROOT>/synthetic project/.agents/skills/kkdesign-kit\n```\n\n| Command | Availability | Purpose |\n|---|---|---|\n| `init` | Planned B2, unavailable | Scan a DS and initialize project design context. |\n| `refresh` | Planned B2, unavailable | Compare DS revisions and preserve history. |\n| `design` | Planned B3, unavailable | Execute a scoped design task. |\n| `review` | Planned B3, unavailable | Review UX, visual quality and DS usage. |\n| `prototype` | Planned B3, unavailable | Create or edit an explicit prototype. |\n| `learn` | Planned, unavailable in B1 | Author lessons with evidence and regenerate the index. |\n| `package` | Implemented B1 | Build a hash-verified portable ZIP from bundled files. |\n\n**`init` cannot execute in this B1 release.** No files were created or edited; no source checkout search or network access occurred."
+    },
+    {
+      "harness": "codex",
+      "version": "codex-cli 0.167.0",
+      "scope": "user",
+      "exitCode": 0,
+      "installationStatus": "installed",
+      "isolation": "fresh home, synthetic project, extracted package; no user config/skills/hooks",
+      "verdict": "pass: manually reviewed discovery, menu, actual resource read and unavailable-init disclosure",
+      "platform": "macOS 26.5 arm64",
+      "rawTranscriptSha256": "3d6cbc41da8741dee3693657d1975fedf7eb15ff14277eb939d5131c1ea4b5b7",
+      "observedTools": [
+        {
+          "tool": "shell read",
+          "resource": "SKILL.md and references/commands.md",
+          "exitCode": 0,
+          "command": "<shell> -lc \"cat '<ISOLATED_ROOT>/home/.agents/skills/kkdesign-kit/SKILL.md' '<ISOLATED_ROOT>/home/.agents/skills/kkdesign-kit/references/commands.md'\"",
+          "resourceReadResult": "success; local tool output reviewed"
+        }
+      ],
+      "finalResponse": "Invoked the installed B1 skill and read its bundled `references/commands.md`.\n\nResolved installed location:\n`<ISOLATED_ROOT>/home/.agents/skills/kkdesign-kit`\n\n| Command | Availability | Purpose |\n|---|---|---|\n| `init` | Planned B2, unavailable | Scan a DS and initialize project design context. |\n| `refresh` | Planned B2, unavailable | Compare DS revisions and preserve history. |\n| `design` | Planned B3, unavailable | Execute a scoped design task. |\n| `review` | Planned B3, unavailable | Review UX, visual quality and DS usage. |\n| `prototype` | Planned B3, unavailable | Create or edit an explicit prototype. |\n| `learn` | Planned, unavailable in B1 | Author lessons with evidence and regenerate the index. |\n| `package` | Implemented B1 | Build a hash-verified portable ZIP from bundled files. |\n\n**`init` cannot execute in this release.** Only local file reads were performed; no files were created or edited, and no source checkout search or network access occurred."
+    },
+    {
+      "harness": "claude-code",
+      "version": "2.1.308 (Claude Code)",
+      "scope": "project",
+      "exitCode": 0,
+      "installationStatus": "installed",
+      "isolation": "fresh home, synthetic project, extracted package; no user config/skills/hooks",
+      "verdict": "pass: manually reviewed discovery, menu, actual resource read and unavailable-init disclosure",
+      "platform": "macOS 26.5 arm64",
+      "rawTranscriptSha256": "85e3317227555e65674c369aae445c01ed14a249d309c62bed70d93244330f6c",
+      "observedTools": [
+        {
+          "tool": "Read",
+          "resource": "references/commands.md",
+          "path": "<ISOLATED_ROOT>/synthetic project/.claude/skills/kkdesign-kit/references/commands.md",
+          "resourceReadResult": "success; local tool output reviewed"
+        }
+      ],
+      "finalResponse": "The skill is loaded from the project-level install. I read `references/commands.md` with a local file read. I didn't create or change any files, and I didn't use the network or search for a source checkout.\n\n**Installed location:**\n`<ISOLATED_ROOT>/synthetic project/.claude/skills/kkdesign-kit`\n\nThe menu came from `references/commands.md` in that directory (`.../.claude/skills/kkdesign-kit/references/commands.md`).\n\n## KKdesign-kit command menu (B1 preview)\n\n| Command | Availability | Purpose |\n|---|---|---|\n| init | Planned B2, unavailable | Scan a DS and initialize project design context. |\n| refresh | Planned B2, unavailable | Compare DS revisions and preserve history. |\n| design | Planned B3, unavailable | Execute a scoped design task. |\n| review | Planned B3, unavailable | Review UX, visual quality and DS usage. |\n| prototype | Planned B3, unavailable | Create or edit an explicit prototype. |\n| learn | Planned, unavailable in B1 | Author lessons with evidence and regenerate the index. |\n| package | Implemented B1 | Build a hash-verified portable ZIP from the bundled files. |\n\nInstallation, inspection, update, rollback and uninstall are handled by `scripts/kkdesign_install.py`, which is documented in `docs/installation.md`.\n\n## Can `init` run in this release?\n\n**No.** `init` won't be available until B2. In this B1 preview it does not scan design-system sources and does not create `DESIGN.md`. The only command that works in this release is `package`.\n\nNo design operation ran, since a bare invocation only shows the menu."
+    },
+    {
+      "harness": "claude-code",
+      "version": "2.1.308 (Claude Code)",
+      "scope": "user",
+      "exitCode": 0,
+      "installationStatus": "installed",
+      "isolation": "fresh home, synthetic project, extracted package; no user config/skills/hooks",
+      "verdict": "pass: manually reviewed discovery, menu, actual resource read and unavailable-init disclosure",
+      "platform": "macOS 26.5 arm64",
+      "rawTranscriptSha256": "b6ea6617575dd352416323ea033d052ba3eb3ab0e7924969bc1a913f7f4c61c5",
+      "observedTools": [
+        {
+          "tool": "Read",
+          "resource": "references/commands.md",
+          "path": "<ISOLATED_ROOT>/home/.claude/skills/kkdesign-kit/references/commands.md",
+          "resourceReadResult": "success; local tool output reviewed"
+        }
+      ],
+      "finalResponse": "The probe passed. The skill is installed in your Claude home directory, and I read its bundled `references/commands.md` from there. I created and edited no files, made no network calls, and didn't search for the source checkout.\n\n**Installed location**\n- Skill directory: `<ISOLATED_ROOT>/home/.claude/skills/kkdesign-kit`\n- File read: `\u2026/kkdesign-kit/references/commands.md` (17 lines). The path contains spaces, so it needs quoting in shell calls.\n\n**Command menu (B1 preview)**\n\n| Command | Availability | Purpose |\n|---|---|---|\n| init | Planned B2, unavailable | Scan a design system (DS) and initialize project design context. |\n| refresh | Planned B2, unavailable | Compare DS revisions and preserve history. |\n| design | Planned B3, unavailable | Execute a scoped design task. |\n| review | Planned B3, unavailable | Review UX, visual quality and DS usage. |\n| prototype | Planned B3, unavailable | Create or edit an explicit prototype. |\n| learn | Planned, unavailable in B1 | Author lessons with evidence and regenerate the index. |\n| package | **Implemented B1** | Build a hash-verified portable ZIP from the bundled files. |\n\nAccording to the reference, `scripts/kkdesign_install.py` handles installation, inspection, update, rollback and uninstall, and `docs/installation.md` documents them.\n\n**Can init run in this release?** No. `init` is planned for B2 and doesn't work in this B1 release. It won't scan design-system sources or create `DESIGN.md`, and the kit says not to use other utilities in its place or fake its results. `package` is the only command that works in this release."
+    }
+  ]
+}
