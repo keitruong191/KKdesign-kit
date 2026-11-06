@@ -2,7 +2,31 @@
 
 Portable design-system execution foundations for **Codex and Claude Code**.
 
-**Status: Stage A / foundation preview (`0.1.0a1`).** This repository provides working lesson indexing, product-profile and task/evidence contracts, and offline validation. The installable `kkdesign-kit` skill, DS scanning, Figma execution/review/prototype commands, installers, and hook adapters are Stage B work and are not advertised as implemented.
+**Status: B1 / installation preview (`0.2.0a1`).** One canonical `kkdesign-kit`
+skill now ships with a command menu, portable resources, packaging, and a
+conservative installer for Codex and Claude Code. `package` works; DS scanning,
+design/review/prototype execution and lesson authoring remain planned B2/B3 work.
+
+## Install the skill
+
+Python 3.9+; no third-party packages are needed for installation or packaging.
+From this checkout (or the extracted portable `kkdesign-kit/` directory):
+
+```sh
+python scripts/kkdesign_install.py install --harness codex --scope project --project "/path/to/project with spaces"
+python scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/project with spaces"
+```
+
+Use `--harness claude-code` for Claude Code, or `--scope user` for personal scope.
+Restart the harness and invoke `$kkdesign-kit` in Codex or `/kkdesign-kit` in
+Claude Code. Bare invocation shows the seven-command menu and actual availability.
+See [installation and lifecycle](docs/installation.md) for update, rollback,
+uninstall, conflicts, platform prerequisites and artifact building.
+
+Live CLI discovery, menu and bundled-resource reads passed in isolated user and
+project installs on Codex `0.167.0` and Claude Code `2.1.308` (macOS).
+[Compatibility and evidence](docs/compatibility.md) distinguish those runs from
+cross-platform installer tests and unverified design-tool environments.
 
 ## Run the foundation preview
 
@@ -35,7 +59,7 @@ See [contracts](docs/contracts.md), [profile provenance](docs/product-profiles.m
 
 ## Boundaries
 
-The DS provider and design destination are independent. Future source adapters can scan Figma, a Git revision or a local folder; a Git-sourced token does not require a Figma component key. No provider scan runs in Stage A.
+The DS provider and design destination are independent. Future source adapters can scan Figma, a Git revision or a local folder; a Git-sourced token does not require a Figma component key. No provider scan runs in this B1 preview.
 
 The public repository contains generic code and invented examples only. Project-specific DS snapshots, product profiles, screenshots and task evidence stay in their respective projects. No credentials, global hook changes, external publication or Figma access are required to run this preview.
 
