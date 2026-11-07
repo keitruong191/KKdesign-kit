@@ -1,12 +1,13 @@
 ---
 name: kkdesign-kit
-description: Initialize and refresh project design kits from Figma, Git or local sources, inspect KKdesign-kit capabilities, package the portable kit, or consult bundled design contracts. Design execution and prototypes are separate, unavailable B3 workflows.
+description: Initialize or refresh a project design kit, execute and verify a scoped design task, review UX and design-system conformance, explicitly create prototypes, capture lessons, or package the portable kit through Codex or Claude Code.
 ---
 
 # KKdesign-kit
 
-This is the B2 project-kit preview, sharing Stage-A contracts across Codex and
-Claude Code. No installed Hoangsa, Impeccable, MCP server, or hook is required.
+This is the B3 workflow preview, sharing canonical project contracts across Codex
+and Claude Code. No installed Hoangsa, Impeccable, MCP server, or hook is required.
+Actual design-tool operations need a separately authorized authenticated tool.
 
 Resolve every bundled path relative to the directory containing THIS SKILL.md,
 not the user's working directory. In Claude Code `${CLAUDE_SKILL_DIR}` identifies
@@ -27,10 +28,18 @@ For unknown commands, show the menu and explain that the command is unknown.
 - `init`, `refresh`: implemented; read [references/project-kit.md](references/project-kit.md).
   Scan only declared sources, stage and inspect the plan, then apply only with
   the user's authorization. Preserve product context, lessons and task history.
-- `design`, `review`, `prototype`: unavailable until B3. Say so without claiming
-  a design, audit, prototype, or design-tool execution has occurred.
-- `learn`: unavailable until B3; future lesson-authoring workflow. Existing offline
-  lesson indexing is a foundation utility, not this command's implementation.
+- `design`: read [references/design.md](references/design.md). Resolve the brief,
+  scope and lesson decisions before mutation; inspect actual instances/assets,
+  read back persisted structure and inspect rendered output before delivery.
+- `review`: read [references/review.md](references/review.md). Findings by default,
+  not fixes. Bundled guidance is independent of installed Impeccable. Separate
+  canvas evidence, source audits and runtime evidence; never approve untested behavior.
+- `prototype`: read [references/prototype.md](references/prototype.md). Create or
+  change interactions only on an explicit prototype request, never as a side effect
+  of design/review. Label simulated validation, APIs and timing.
+- `learn`: read [references/learn.md](references/learn.md). Preserve direct feedback
+  separately from inferred lessons and regenerate the canonical source's index.
+  Never restamp old task decisions or invent prior reading/new pass results.
 
 Load [docs/contracts.md](docs/contracts.md) only for a contract question;
 [docs/product-profiles.md](docs/product-profiles.md) only for profile provenance;

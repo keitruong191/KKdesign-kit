@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "design-review-record",
+  "fixtureId": "flawed-settings-screen",
+  "scope": {
+    "surface": "Account settings panel",
+    "task": "Change notification preferences",
+    "mode": "Operate",
+    "intendedPlatforms": ["macos"],
+    "evidenceType": "synthetic-record",
+    "revision": "fixture-1"
+  },
+  "records": {
+    "references": [
+      {
+        "location": "Settings/Notifications/Reference",
+        "intendedPlatform": "macos",
+        "referencePlatform": "ios",
+        "referenceId": "mobile-settings-pattern",
+        "evidence": "Synthetic reference metadata; no real design file inspected."
+      }
+    ],
+    "instances": [
+      {
+        "location": "Settings/Notifications/SaveButton",
+        "component": "Button/Primary",
+        "variant": "Primary/Default",
+        "overrides": ["fill.color"],
+        "evidence": "Synthetic instance record marks a local fill override."
+      }
+    ],
+    "textStyles": [
+      {
+        "location": "Settings/Notifications/Heading",
+        "expectedBinding": "Typography/Heading/Small",
+        "actualBinding": null,
+        "evidence": "Synthetic text-style record indicates the expected binding is absent."
+      }
+    ],
+    "contentBounds": [
+      {
+        "location": "Settings/Notifications/PreferenceDescription",
+        "contentHeight": 380,
+        "availableHeight": 180,
+        "contentCase": "long-localized-string",
+        "evidence": "Synthetic layout measurements; no rendered behavior exercised."
+      }
+    ],
+    "contrast": [
+      {
+        "location": "Settings/Notifications/DisabledHint",
+        "foreground": "#9A9A9A",
+        "background": "#FFFFFF",
+        "ratio": 2.85,
+        "requiredRatio": 4.5,
+        "textClass": "normal-text",
+        "mode": "light",
+        "evidence": "Synthetic contrast values included to exercise a recorded-measurement rule; no pixel sampling performed."
+      }
+    ]
+  },
+  "limitations": [
+    "This is synthetic training data, not a Figma file, source tree, native app, or runtime capture.",
+    "No live user behavior, accessibility tree, platform rendering, or performance was tested."
+  ]
+}

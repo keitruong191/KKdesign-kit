@@ -1,6 +1,6 @@
 # Compatibility and observed evidence
 
-B2 (`0.3.0a1`) retains one canonical `SKILL.md`, technical identifier `kkdesign-kit`
+B3 (`0.4.0a1`) retains one canonical `SKILL.md`, technical identifier `kkdesign-kit`
 and Codex display name **KKdesign-kit**. Claude Code uses the same frontmatter
 and native skill/slash-command handling. See [installation](installation.md).
 
@@ -10,6 +10,81 @@ The discovery paths were checked against the official
 Compatibility below is limited to the versions actually run, not all later or
 earlier releases. Desktop sync, cloud sessions and managed enterprise policies
 are unverified.
+
+## B3 workflow evidence
+
+- Python 3.9.6 on macOS 26.5 arm64: **105 regression tests passed**, including
+  foundation, installer, source adapters, project lifecycle, lesson history,
+  evidence integrity and prototype timeout/transition mismatch rollback.
+  The final ship-stage CLI smoke additionally verified earlier/superseded and
+  CRLF lesson replay without mutation and rejection of history-root/hash symlinks
+  without copying private snapshots into synthetic public docs. These later
+  corrections were not rerun through the pinned Codex/Claude or native Figma
+  captures below; their historical local ZIP remains unchanged.
+- Codex CLI **0.167.0**, project-installed extracted package in a fresh isolated
+  home: actual `design` preflight/check, bundled review findings, feedback capture,
+  inferred lesson authoring/deduplication, subsequent task lesson decision,
+  packaging, extracted verification and foundation validation passed.
+  Source extraction was removed; no Impeccable, Hoangsa, MCP, user skills or hooks
+  were installed. The task remained `in_progress` with honest unavailable-canvas
+  gaps. No prototype artifact was created by design/review.
+- Claude Code **2.1.308**: after user reauthentication, the isolated B3 installed
+  workflow probe passed. Actual task begin/check/handoff, all five fixture review
+  findings, feedback/lesson deduplication, subsequent task lesson selection,
+  package/extracted verification and foundation validation were reviewed against
+  tool output and independent postconditions. Existing task hashes and installed
+  skill bytes remained unchanged; no prototype artifact was created. The prior
+  HTTP 401/OAuth-revoked attempt remains recorded as a historical failure.
+  The tested ZIP matched the existing `0.4.0a1` archive exactly; that archive and
+  checksum are not overwritten by this later checkout-evidence update.
+- The controlled flawed fixture produced findings for wrong-platform reference,
+  instance override, lost typography binding, long-content overflow and contrast.
+  Output remains `assessment: evidence-only`, `approval: not-assessed`.
+- A separate authenticated Figma design run created four editable 768×544
+  macOS transfer-state copies in an isolated authorized review board. Each state
+  retained 637 layers, 107 instances and 173 text layers. Separate persisted
+  readback found no instance/property, typography, style/variable binding,
+  editability or reaction mismatch. Two vector Y-coordinate differences per
+  frame were approximately 0.0001221 px; retained as a scoped serialization
+  exception, not concealed as exact geometry equality.
+- All four genuine PNG exports were directly inspected: uploading, offline,
+  complete and long-content states remained distinct; long filenames were
+  intentionally ellipsized without overlapping adjacent content. This proves
+  those rendered artifact states, not API calculations or native accessibility.
+  During design/review capture all source and copied subtrees had zero reactions.
+  Native snapshots, images, direct links and requirement/state mapping stay in
+  the authorized private workspace, outside this public distribution.
+- The separate, explicit prototype request persisted the requested five-edge
+  graph through the installed helper. A first attempt correctly failed on nested
+  `NAVIGATE` destinations; the existing acceptance copies were then promoted to
+  page-level frames with absolute geometry and all 15 resolved modes preserved.
+  No duplicate screens or original-product edits were introduced. Separate
+  readback verified triggers, destinations, back action and the simulated
+  1200 ms timeout / 0.2 s dissolve. Figma automatically added the entry flow.
+  Structural error/retry, completion/back and long-content/cancel traversals
+  passed; **interactive preview remains untested because the browser requires
+  Figma login**. These are not API, text-validation, native or timing passes.
+- Recorded native reaction defaults exposed a duplicate-edge comparison defect:
+  `resetVideoPosition: false` made a serialized edge look different. A
+  failing-before/passing-after smoke and permanent regression now verify
+  semantic duplicate rejection before writes.
+- Clean extracted public resources validated with 57 payload files, 32 required
+  resources and 48 resolvable bundled Markdown links. Identical inputs produced
+  identical ZIP bytes; modified extraction verification failed as intended.
+  Private project paths and known private Figma identities were absent.
+
+The source-only, opt-in runner uses the actual installed helpers and preserves
+raw transcripts outside the checkout:
+
+```sh
+python scripts/smoke_workflow_harness.py --harness codex --credential "/private/auth/auth.json" --output "/private/results/b3-codex"
+python scripts/smoke_workflow_harness.py --harness claude-code --credential "/private/auth/claude.json" --output "/private/results/b3-claude"
+```
+
+Use the dependency-equipped interpreter. Review transcript commands as well as
+postconditions; model success text alone is insufficient. Failed authentication
+or incomplete runs are retained as failures, never converted to passes.
+See [B3 evidence](evidence/b3-verification.json) for current outcomes and gates.
 
 ## B2 project workflow evidence
 
@@ -94,7 +169,7 @@ python -m venv .venv
 .venv/bin/python -m unittest discover -s tests -v
 .venv/bin/python scripts/materialize_example.py --output .demo
 .venv/bin/python scripts/kkdesign_core.py validate --design .demo/design
-.venv/bin/python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.3.0a1.zip
+.venv/bin/python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.4.0a1.zip
 ```
 
 On Windows use `.venv\Scripts\python.exe`. The suite includes Stage-A regressions,
@@ -128,4 +203,5 @@ honest unavailable-command status. Model self-report alone is insufficient.
 
 Hooks remain opt-in future integration; installation does not add or enable
 hooks at either scope. B1 probes cover discovery only. B2 init/refresh requires
-the separate live project workflow; B3 design-tool execution remains unavailable.
+the separate live project workflow. B3 live design/prototype evidence is distinct
+from the offline record/fixture/learn/package checks above.

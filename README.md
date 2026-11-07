@@ -1,11 +1,11 @@
 # KKdesign-kit
 
-Portable design-system execution foundations for **Codex and Claude Code**.
+Portable design-system workflows for **Codex and Claude Code**.
 
-**Status: B2 / project-kit preview (`0.3.0a1`).** The installable `kkdesign-kit`
-skill now initializes and refreshes project kits from declared Figma, Git and
-local sources, with reviewable plans, scoped profile drafts and recovery.
-Design/review/prototype execution and lesson authoring remain planned B3 work.
+**Status: B3 workflow preview (`0.4.0a1`).** All seven command routes are bundled:
+init, refresh, design, review, explicit prototype, learn and package. Design and
+prototype canvas execution require an authenticated, authorized design tool.
+Offline checks never substitute for rendered-output, navigation or native testing.
 
 ## Install the skill
 
@@ -46,6 +46,26 @@ python scripts/kkdesign_project.py refresh --project /chosen/project --sources /
 Existing product context, profiles, lesson IDs and task history are preserved.
 See [project lifecycle, context provenance and recovery](docs/project-kits.md).
 Provider metadata validation is not live Figma import/render or product approval.
+
+## Design, review, prototype and learn
+
+Invoke `$kkdesign-kit <command>` in Codex or `/kkdesign-kit <command>` in Claude Code.
+The same installed resources and Python helpers serve both harnesses:
+
+| Command | Guide | Boundary |
+|---|---|---|
+| design | [Task execution](references/design.md) | Resolve scope and lesson decisions before edits; inspect instances, persisted structure and rendered output. |
+| review | [Bundled review](references/review.md) | Findings first; fixes only when requested. Canvas, source and runtime evidence stay separate. |
+| prototype | [Explicit prototype](references/prototype.md) | Separate request; documented graph, back/cancel and simulated validation/timing. Never created by design/review. |
+| learn | [Canonical lessons](references/learn.md) | Direct feedback separate from inference; stable IDs, deduplication, supersession and historical source snapshots. |
+| package | [Portable distribution](references/packaging.md) | Versioned manifest, checksums and clean-extraction verification; public resources only, no publication. |
+
+Review includes selected, attributed Impeccable 4.8.0 guidance under its upstream
+license; no installed Impeccable, detector, launcher or Hoangsa is needed.
+See [source, license and adaptations](docs/review-attribution.md).
+Controlled examples are invented fixtures, not live Figma or native-runtime proof.
+Actual execution evidence and remaining external gates belong in
+[compatibility](docs/compatibility.md).
 
 ## Run the foundation preview
 
