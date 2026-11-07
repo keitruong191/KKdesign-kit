@@ -176,6 +176,34 @@ def validate_foundation(design, schemas=None):
             if decision.get('status') in ('confirmed', 'observed') and not decision.get('sourceIds'):
                 errors.append(str(path) + ': confirmed/observed decision lacks evidence')
 
+    historical_lessons = {}
+
+    def task_lessons(source_hash):
+        """Resolve a pinned source without rewriting the task's historical claims."""
+        if index and source_hash == index.get('sourceHash'):
+            return lessons
+        if not isinstance(source_hash, str) or not re.fullmatch(r'[0-9a-f]{64}', source_hash):
+            return None
+        if source_hash in historical_lessons:
+            return historical_lessons[source_hash]
+        snapshot = design / 'lesson-history' / source_hash
+        try:
+            source_path = local_path(design, 'lesson-history/' + source_hash + '/LESSON.md', boundary)
+            index_path = local_path(design, 'lesson-history/' + source_hash + '/lessons-index.json', boundary)
+            if digest(source_path.read_bytes()) != source_hash:
+                raise ValueError('historical lesson source hash mismatch')
+            saved = load(index_path)
+            if schema_errors(saved, schemas / 'lesson-index.schema.json'):
+                raise ValueError('invalid historical lesson index')
+            generated = build_lesson_index(snapshot)
+            if {k: v for k, v in saved.items() if k != '$schema'} != generated:
+                raise ValueError('historical lesson index mismatch')
+            result = {item['id']: item for item in generated['lessons']}
+        except (ValueError, OSError, KeyError, TypeError):
+            result = None
+        historical_lessons[source_hash] = result
+        return result
+
     paths = [design / 'task-template.json'] + sorted((design / 'tasks').rglob('*.json'))
     for path in paths:
         family = 'task' if path.name in ('task-template.json', 'task.json') else 'task-evidence'
@@ -219,9 +247,14 @@ def validate_foundation(design, schemas=None):
                 errors.append(str(path) + ': delivered task still has pending lesson review')
             if status == 'retrospective':
                 warnings.append(str(path.relative_to(design)) + ': retrospective mapping is not proof of pre-task reading')
+        reviewed_lessons = lessons
         if status in ('reviewed', 'retrospective', 'not-applicable'):
-            if index and review.get('sourceHash') != index.get('sourceHash'):
-                errors.append(str(path) + ': lessonReview sourceHash is stale')
+            reviewed_lessons = task_lessons(review.get('sourceHash'))
+            if reviewed_lessons is None:
+                errors.append(str(path) + ': lessonReview sourceHash is stale or historical snapshot is invalid')
+                reviewed_lessons = lessons
+            elif index and review.get('sourceHash') != index.get('sourceHash'):
+                warnings.append(str(path.relative_to(design)) + ': historical lesson source verified; not proof of prior reading or a new pass')
         if status == 'reviewed' and not entries:
             errors.append(str(path) + ': reviewed task has no lesson decisions')
         if status in ('retrospective', 'not-applicable') and not review.get('reason'):
@@ -232,12 +265,12 @@ def validate_foundation(design, schemas=None):
             if lid in used:
                 errors.append(str(path) + ': duplicate lesson decision ' + str(lid))
             used.add(lid)
-            if lid not in lessons:
+            if lid not in reviewed_lessons:
                 errors.append(str(path) + ': unknown lesson ID ' + str(lid))
-            elif lessons[lid].get('status') != 'active' and entry.get('decision') == 'apply':
+            elif reviewed_lessons[lid].get('status') != 'active' and entry.get('decision') == 'apply':
                 errors.append(str(path) + ': applying inactive lesson ' + str(lid))
             elif entry.get('decision') == 'apply':
-                platforms = lessons[lid].get('platforms', [])
+                platforms = reviewed_lessons[lid].get('platforms', [])
                 if 'any' not in platforms and str(doc.get('platform')).lower() not in platforms:
                     errors.append(str(path) + ': lesson platform mismatch ' + str(lid))
             if entry.get('verification') in ('pass', 'evidence-mapped') and not entry.get('evidence'):

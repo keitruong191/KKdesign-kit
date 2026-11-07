@@ -74,6 +74,20 @@ class InstallationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'integrity'):
             kit.payload(target)
 
+    def test_extracted_verification_rejects_version_drift_and_missing_resources(self):
+        source = self.source_copy()
+        self.assertEqual(kit.verify(source)['status'], 'verified')
+        bundle = source / 'bundle.json'
+        data = json.loads(bundle.read_text())
+        data['version'] = 'unrelated-version'
+        bundle.write_text(json.dumps(data))
+        with self.assertRaisesRegex(ValueError, 'version mismatch'):
+            kit.verify(source)
+        bundle.unlink()
+        (source / 'references/review.md').unlink()
+        with self.assertRaisesRegex(ValueError, 'Missing required resource'):
+            kit.payload(source)
+
     def test_update_rollback_and_repeat_update(self):
         source = self.source_copy()
         # Modify checkout-style source rather than an integrity-protected artifact.
@@ -190,9 +204,6 @@ class InstallationTests(unittest.TestCase):
         files, _ = kit.payload(source)
         self.assertNotIn('unrelated-private.json', files)
         self.assertNotIn('scripts/unrelated.py', files)
-        for required in ('SKILL.md', 'references/commands.md', 'agents/openai.yaml',
-                         'schemas/task.schema.json', 'docs/installation.md'):
-            self.assertIn(required, files)
 
     def test_symlink_conflicts_and_concurrent_mutation(self):
         self.act('install')

@@ -1,6 +1,6 @@
 # Install and maintain KKdesign-kit
 
-B2 preview 0.3.0a1. Requires Python 3.9+ on macOS, Linux or Windows and a separately
+B3 workflow preview 0.4.0a1. Requires Python 3.9+ on macOS, Linux or Windows and a separately
 installed/authenticated Codex CLI or Claude Code. Packaging and installation use
 only the Python standard library. Offline contract validation also needs
 `python -m pip install -r requirements.txt`; use a virtual environment outside the
@@ -12,13 +12,16 @@ See [compatibility](compatibility.md) for measured harness support.
 From the checkout root, build a ZIP outside the source directory:
 
 ```sh
-python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.3.0a1.zip
+python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.4.0a1.zip
 ```
 
 Unzip to a folder of your choice. Run commands below inside its `kkdesign-kit/`
 directory (or from the checkout root). With an absolute script path, quote it;
 the payload is located relative to that script, not your current directory.
 No runtime download or access to the original checkout is needed.
+After extracting, run `python scripts/kkdesign_install.py verify --source .`
+from the extracted directory. This checks the complete file inventory, checksums,
+version and declared required resources without repairing missing files.
 
 Choose one harness and one scope explicitly. Example, project install:
 
@@ -43,9 +46,10 @@ canonical frontmatter name and description, plus native slash invocation and
 skill-directory/argument substitution. There is no second authored SKILL.md,
 plugin, settings merge, or hook adapter to enable.
 
-Bare invocation displays the bundled menu. `package` works in B1; `init` and
-`refresh` await B2; `design`, `review` and `prototype` await B3; `learn` is planned.
-Unavailable commands must report their status without performing the operation.
+Bare invocation displays all seven routes. `init`, `refresh`, `learn`, `review`
+and `package` have bundled offline operations. `design` and `prototype` also need
+an authorized design-tool connection for live canvas changes. Missing access is
+a scoped blocker, not permission to simulate a successful design or prototype.
 
 ## Inspect, update, rollback, uninstall
 

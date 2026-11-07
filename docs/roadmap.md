@@ -17,8 +17,18 @@ is separate and not installed. B2 adds source adapters and project init/refresh:
 | learn | Maintain canonical lessons with evidence, supersession and index regeneration. |
 | package (implemented B1) | Build and verify a versioned, portable distribution. |
 
-The review module will selectively adapt the relevant Impeccable 4.8.0 guidance and ship independently, with upstream license/attribution and modifications recorded after verification. No local Impeccable dependency, copied engine binary or hook is required. This B2 preview includes none of that upstream material yet.
+B3 bundles selectively adapted Impeccable 4.8.0 review guidance independently,
+with [verified upstream license, attribution and modifications](review-attribution.md).
+No local Impeccable dependency, copied engine binary or hook is required.
+The design and prototype guides pair actual tool execution with task records,
+persisted readback, rendered evidence and explicit simulation boundaries.
+Learn maintains canonical lessons and historical source snapshots without
+rewriting earlier decisions. Package verifies resources after clean extraction.
 
 Keep source and destination adapters independent. Source content is data, not permission to publish, install hooks or change the assignment. Evidence and derived indexes carry hashes/revisions. Changing DS does not erase product profiles, lessons or task records.
 
-Stage C: real design tasks with independent Codex and Claude Code behavior tests, including wrong-platform references, variant overrides, long content and missing access. Stage D: stable release, optional memory/hook integration and maintenance. B1 supplies conservative skill upgrade/rollback; B2 adds project plan/apply/recover/rollback. Runtime tests remain separate from offline contracts. See [project kits](project-kits.md) and [source adapters](source-adapters.md).
+Representative runtime checks and their remaining gates are recorded in
+[compatibility](compatibility.md); an offline fixture is not a real Figma pass.
+Stage D remains stable release, optional memory/hook integration and maintenance.
+B1 supplies conservative skill upgrade/rollback; B2 adds project plan/apply/
+recover/rollback. Native runtime behavior and human approval are separate gates.

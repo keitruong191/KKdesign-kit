@@ -1,9 +1,9 @@
 {
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
-  "version": "0.3.0a1",
-  "stage": "B2",
-  "status": "project-kit-preview",
+  "version": "0.4.0a1",
+  "stage": "B3",
+  "status": "workflow-preview",
   "targets": [
     "codex",
     "claude-code"
@@ -25,13 +25,14 @@
     "refresh",
     "source-adapters",
     "source-migration",
-    "project-recovery"
-  ],
-  "planned": [
+    "project-recovery",
     "design",
     "review",
     "prototype",
     "learn",
+    "extracted-package-verification"
+  ],
+  "planned": [
     "optional-hooks"
   ],
   "externalRuntimeDependencies": [
@@ -58,19 +59,53 @@
     "macOS": {
       "codex": {
         "version": "0.167.0",
-        "user": "B1-discovery-menu-resource-pass; B2-runtime-unverified",
-        "project": "B2-init-refresh-validation-pass"
+        "user": "B1-discovery-menu-resource-pass; B2/B3-runtime-unverified",
+        "project": "B2-init-refresh-pass; B3-offline-record-review-learn-package-pass; separate-authenticated-Figma-design-and-explicit-graph-pass"
       },
       "claude-code": {
         "version": "2.1.308",
-        "user": "B1-discovery-menu-resource-pass; B2-runtime-unverified",
-        "project": "B2-init-refresh-validation-pass"
+        "user": "B1-discovery-menu-resource-pass; B2/B3-runtime-unverified",
+        "project": "B2-init-refresh-pass; B3-offline-record-review-learn-package-pass-after-reauthentication"
       }
     },
     "linux": "installer CI configured; live harness unverified",
     "windows": "installer CI configured; live harness unverified",
     "otherHarnessVersions": "unverified",
-    "designTools": "source-read-only; import/render and design execution unverified"
+    "designTools": "B3 scoped editable Figma design/readback/renders and explicit five-edge persisted graph verified; interactive preview authentication-blocked; native behavior unassessed"
   },
-  "runtimeEvidence": "docs/evidence/b2-verification.json"
+  "runtimeEvidence": "docs/evidence/b3-verification.json",
+  "requiredResources": [
+    "SKILL.md",
+    "manifest.json",
+    "LICENSE",
+    "requirements.txt",
+    "agents/openai.yaml",
+    "references/commands.md",
+    "references/project-kit.md",
+    "references/design.md",
+    "references/review.md",
+    "references/prototype.md",
+    "references/learn.md",
+    "references/packaging.md",
+    "references/review/lenses.md",
+    "references/review/platforms.md",
+    "references/review/report-template.md",
+    "docs/review-attribution.md",
+    "docs/compatibility.md",
+    "docs/evidence/b3-verification.json",
+    "examples/review/flawed-design.json",
+    "examples/review/expected-findings.json",
+    "schemas/task.schema.json",
+    "schemas/task-evidence.schema.json",
+    "schemas/lesson-index.schema.json",
+    "schemas/product-profile.schema.json",
+    "scripts/kkdesign_install.py",
+    "scripts/kkdesign_core.py",
+    "scripts/kkdesign_project.py",
+    "scripts/kkdesign_sources.py",
+    "scripts/kkdesign_task.py",
+    "scripts/kkdesign_review.py",
+    "scripts/kkdesign_learn.py",
+    "scripts/figma_prototype.js"
+  ]
 }

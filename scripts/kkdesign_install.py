@@ -18,7 +18,9 @@ ADAPTERS = {'codex': '.agents', 'claude-code': '.claude'}
 SINGLE_FILES = ('SKILL.md', 'manifest.json', 'requirements.txt', 'LICENSE')
 DIRECTORIES = ('agents', 'references', 'docs', 'schemas', 'templates', 'examples')
 SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
-           'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py')
+           'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py',
+           'kkdesign_task.py', 'kkdesign_review.py', 'kkdesign_learn.py',
+           'figma_prototype.js')
 
 
 def canonical(path):
@@ -81,6 +83,9 @@ def payload(source):
     manifest = json.loads(result['manifest.json'])
     if manifest.get('identifier') != IDENTIFIER:
         raise ValueError('Wrong package identifier')
+    for name in manifest.get('requiredResources', []):
+        if name not in result:
+            raise ValueError('Missing required resource: ' + name)
     bundle = {'identifier': IDENTIFIER, 'version': manifest['version'],
               'files': {name: hashlib.sha256(data).hexdigest() for name, data in result.items()}}
     result['bundle.json'] = (json.dumps(bundle, indent=2, sort_keys=True) + '\n').encode()
@@ -105,6 +110,32 @@ def package(source, output):
                 archive.writestr(info, data)
     return {'status': 'packaged', 'version': version, 'output': str(output),
             'sha256': hashlib.sha256(output.read_bytes()).hexdigest()}
+
+
+def verify(source):
+    """Check an extracted distribution without repairing or regenerating it."""
+    no_links(source)
+    if not (source / 'bundle.json').is_file():
+        raise ValueError('Verification requires an extracted bundle.json')
+    bundle = read_json(source / 'bundle.json')
+    manifest = read_json(source / 'manifest.json')
+    actual = hashes(source)
+    actual.pop('bundle.json', None)
+    if (bundle.get('identifier') != IDENTIFIER
+            or manifest.get('identifier') != IDENTIFIER
+            or bundle.get('version') != manifest.get('version')
+            or actual != bundle.get('files')):
+        raise ValueError('Bundle integrity or version mismatch')
+    required = manifest.get('requiredResources')
+    if not isinstance(required, list) or not required:
+        raise ValueError('Manifest must declare requiredResources')
+    for name in required:
+        if name not in actual:
+            raise ValueError('Missing required resource: ' + str(name))
+    return {'status': 'verified', 'identifier': IDENTIFIER,
+            'version': manifest['version'], 'files': len(actual),
+            'requiredResources': len(required),
+            'scope': 'Extracted resource completeness and SHA-256 integrity; not publisher authenticity or runtime approval.'}
 
 
 def locations(harness, scope, home, project):
@@ -259,7 +290,7 @@ def lifecycle(action, harness, scope, home, project, source):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('package', 'install', 'inspect', 'update', 'rollback', 'uninstall'))
+    parser.add_argument('action', choices=('package', 'verify', 'install', 'inspect', 'update', 'rollback', 'uninstall'))
     parser.add_argument('--harness', choices=ADAPTERS)
     parser.add_argument('--scope', choices=('user', 'project'))
     parser.add_argument('--home', type=Path, default=Path.home(), help='Override user root (isolated testing)')
@@ -272,6 +303,8 @@ def main():
             if not args.output:
                 parser.error('package requires --output')
             result = package(canonical(args.source), canonical(args.output))
+        elif args.action == 'verify':
+            result = verify(canonical(args.source))
         else:
             if not args.harness or not args.scope:
                 parser.error('lifecycle actions require --harness and --scope')
