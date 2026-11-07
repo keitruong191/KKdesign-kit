@@ -1,105 +1,105 @@
 # KKdesign-kit
 
-Portable design-system workflows for **Codex and Claude Code**.
+A design-system skill for Codex and Claude Code. Use it to prepare project design context, execute and review design tasks, create explicitly requested prototypes, and retain evidence-backed lessons.
 
-**Status: B3 workflow preview (`0.4.0a1`).** All seven command routes are bundled:
-init, refresh, design, review, explicit prototype, learn and package. Design and
-prototype canvas execution require an authenticated, authorized design tool.
-Offline checks never substitute for rendered-output, navigation or native testing.
+The skill includes command guides, Python helpers, schemas and synthetic examples. Live canvas edits and prototype playback use your separately configured design tools.
 
-## Install the skill
+## Install
 
-Python 3.9+; no third-party packages are needed for installation or packaging.
-From this checkout (or the extracted portable `kkdesign-kit/` directory):
+You need Python 3.9+ and an installed, authenticated Codex CLI or Claude Code. Installation and packaging use the Python standard library; project workflows and contract validation also need the packages in `requirements.txt`.
+
+From this checkout or an extracted portable `kkdesign-kit/` folder, create an environment **outside the skill directory**:
 
 ```sh
-python scripts/kkdesign_install.py install --harness codex --scope project --project "/path/to/project with spaces"
-python scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/project with spaces"
+# macOS / Linux
+python3 -m venv ../kkdesign-env
+source ../kkdesign-env/bin/activate
+python -m pip install -r requirements.txt
 ```
 
-Use `--harness claude-code` for Claude Code, or `--scope user` for personal scope.
-Restart the harness and invoke `$kkdesign-kit` in Codex or `/kkdesign-kit` in
-Claude Code. Bare invocation shows the seven-command menu and actual availability.
-See [installation and lifecycle](docs/installation.md) for update, rollback,
-uninstall, conflicts, platform prerequisites and artifact building.
+On Windows, use `py -3 -m venv ..\kkdesign-env` and activate it with `..\kkdesign-env\Scripts\Activate.ps1` in PowerShell. You can also invoke the environment's Python directly without activation.
 
-Live CLI discovery passed in isolated user/project installs on Codex `0.167.0`
-and Claude Code `2.1.308` (macOS). B2 init/refresh execution passed in project
-scope on both; real Figma capture ingestion and committed Git lifecycle checks
-are recorded separately in [compatibility and evidence](docs/compatibility.md).
-Linux/Windows live execution and Figma import/render behavior remain unverified.
-
-## Initialize and refresh a project kit
-
-Install the dependencies in `requirements.txt` outside the installed skill.
-Declare sources using the [exact supported formats](docs/source-adapters.md).
-Then stage, inspect and explicitly authorize a plan:
+Install into your product project:
 
 ```sh
-python scripts/kkdesign_project.py init --project /chosen/project --sources /chosen/project/sources.json
-python scripts/kkdesign_project.py plan --project /chosen/project --plan <PLAN_ID>
-python scripts/kkdesign_project.py apply --project /chosen/project --plan <PLAN_ID>
-python scripts/kkdesign_project.py validate --project /chosen/project
-python scripts/kkdesign_project.py refresh --project /chosen/project --sources /chosen/project/sources.json
+python scripts/kkdesign_install.py install --harness codex --scope project --project "/path/to/your-project"
+python scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/your-project"
 ```
 
-Existing product context, profiles, lesson IDs and task history are preserved.
-See [project lifecycle, context provenance and recovery](docs/project-kits.md).
-Provider metadata validation is not live Figma import/render or product approval.
+For Claude Code, replace `codex` with `claude-code`. Use `--scope user` for a personal installation instead. Restart the agent in your product project after installation.
 
-## Design, review, prototype and learn
+| Agent | Project installation | Invocation |
+| --- | --- | --- |
+| Codex | `.agents/skills/kkdesign-kit` | `$kkdesign-kit` |
+| Claude Code | `.claude/skills/kkdesign-kit` | `/kkdesign-kit` |
 
-Invoke `$kkdesign-kit <command>` in Codex or `/kkdesign-kit <command>` in Claude Code.
-The same installed resources and Python helpers serve both harnesses:
+Bare invocation shows the command menu. For example, use `$kkdesign-kit init` in Codex or `/kkdesign-kit init` in Claude Code. Helper commands need the dependency-equipped Python environment; give the agent its absolute interpreter path if it does not inherit that environment.
 
-| Command | Guide | Boundary |
-|---|---|---|
-| design | [Task execution](references/design.md) | Resolve scope and lesson decisions before edits; inspect instances, persisted structure and rendered output. |
-| review | [Bundled review](references/review.md) | Findings first; fixes only when requested. Canvas, source and runtime evidence stay separate. |
-| prototype | [Explicit prototype](references/prototype.md) | Separate request; documented graph, back/cancel and simulated validation/timing. Never created by design/review. |
-| learn | [Canonical lessons](references/learn.md) | Direct feedback separate from inference; stable IDs, deduplication, supersession and historical source snapshots. |
-| package | [Portable distribution](references/packaging.md) | Versioned manifest, checksums and clean-extraction verification; public resources only, no publication. |
+See [installation and lifecycle](docs/installation.md) for personal scope, updates, rollback, uninstall and conflicts, or [requirements and tool access](docs/compatibility.md) for environment limitations.
 
-Review includes selected, attributed Impeccable 4.8.0 guidance under its upstream
-license; no installed Impeccable, detector, launcher or Hoangsa is needed.
-See [source, license and adaptations](docs/review-attribution.md).
-Controlled examples are invented fixtures, not live Figma or native-runtime proof.
-Actual execution evidence and remaining external gates belong in
-[compatibility](docs/compatibility.md).
+## Commands
 
-## Run the foundation preview
+| Command | What it does | Guide |
+| --- | --- | --- |
+| `init` | Scan declared design-system sources and stage a project-kit plan for review. | [Project setup](references/project-kit.md) |
+| `refresh` | Compare source changes and stage an update while preserving project history. | [Project setup](references/project-kit.md) |
+| `design` | Resolve scope and lesson decisions, execute with authorized tools, then inspect saved structure and rendered output. | [Design](references/design.md) |
+| `review` | Report UX, visual and design-system findings. Make edits only when requested. | [Review](references/review.md) |
+| `prototype` | Create or change explicitly requested interactions and verify actual navigation. | [Prototype](references/prototype.md) |
+| `learn` | Capture feedback separately from inferred lessons; preserve stable IDs, supersession and historical sources. | [Learning](references/learn.md) |
+| `package` | Build a portable ZIP with a versioned manifest and checksums. | [Packaging](references/packaging.md) |
 
-Requires Python 3.9 or newer. From the repository root:
+Design and review never create prototype interactions as a side effect. Review guidance is bundled with [upstream attribution and licenses](docs/review-attribution.md); no installed Impeccable or Hoangsa is required. Installation does not enable hooks or configure external tools.
+
+## Set up a project
+
+Create a `sources.json` using the [supported local, Git or Figma input formats](docs/source-adapters.md). Give the agent the product-project path, source-config path and relevant platform or surface. Source locations resolve relative to the configuration file.
+
+For direct CLI use, run these from the checkout or extracted skill folder:
 
 ```sh
-python -m venv .venv
-# macOS/Linux
-.venv/bin/python -m pip install -r requirements.txt
-.venv/bin/python scripts/materialize_example.py --output .demo
-.venv/bin/python scripts/kkdesign_core.py validate --design .demo/design
-.venv/bin/python -m unittest discover -s tests -v
+python scripts/kkdesign_project.py init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
+python scripts/kkdesign_project.py plan --project "/path/to/your-project" --plan PLAN_ID
+python scripts/kkdesign_project.py apply --project "/path/to/your-project" --plan PLAN_ID
+python scripts/kkdesign_project.py validate --project "/path/to/your-project"
 ```
 
-On Windows use `.venv\Scripts\python.exe` instead of `.venv/bin/python`. The same commands may be run from a Codex or Claude Code terminal. Automated checks do not constitute live agent or Figma-runtime testing.
+Replace `PLAN_ID` with the ID returned by `init`. Inspect its file changes, conflicts and source limitations before authorizing `apply`. Use `refresh` when those sources change, then review and apply its new plan in the same way.
 
-For an existing project, copy the four contracts from `schemas/` to its `design/schemas/`, adopt the documented lesson/profile/task format, then run the core validator against its `design/` directory. Existing DS snapshot validation should run alongside these foundation checks. The core does not certify arbitrary provider registries.
+Existing product context, profiles, lessons and task history are preserved. Project files stay in the selected product project:
 
-## What Stage A implements
+- `PRODUCT.md` and `DESIGN.md` provide product context and the design entry point.
+- `design/` holds source registries, scoped profiles, canonical `LESSON.md`, its derived index, task records and evidence.
+- `.kkdesign-kit/project/` holds staged plans and recovery state.
 
-- One authored `design/LESSON.md`; a deterministic, hash-checked `lessons-index.json` for lookup.
-- Stable lesson IDs, platform applicability, triggers, status and evidence.
-- A task `lessonReview` that distinguishes pending decisions, verified decisions and retrospective evidence mapping.
-- Product decisions with field-level sources, observation dates, revisions, applicability and recheck conditions.
-- Separate task and evidence schemas. Evidence wrappers preserve and hash the original payload.
-- Local-reference containment, missing evidence, stale index/source and unknown lesson/profile checks.
-- A synthetic fixture, negative regression tests and CI on Linux, macOS and Windows.
+Design-system sources and design destinations are independent: a Git token source does not require a Figma component key. See [project lifecycle and recovery](docs/project-kits.md) and [profile provenance](docs/product-profiles.md) for details.
 
-See [contracts](docs/contracts.md), [profile provenance](docs/product-profiles.md), [compatibility](docs/compatibility.md), and the [Stage B roadmap](docs/roadmap.md).
+## Package and verify
 
-## Boundaries
+Choose fresh output and extraction paths. Existing archives are not overwritten.
 
-The DS provider and design destination are independent. Source adapters scan explicitly supported Figma, Git or local inputs; a Git-sourced token does not require a Figma component key. Capture limitations are part of the registry, not filled with invented values.
+```sh
+python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.4.0a1.zip
+python -m zipfile -e ../kkdesign-kit-0.4.0a1.zip ../kkdesign-kit-extracted
+python ../kkdesign-kit-extracted/kkdesign-kit/scripts/kkdesign_install.py verify --source ../kkdesign-kit-extracted/kkdesign-kit
+```
 
-The public repository contains generic code and invented examples only. Project-specific DS snapshots, product profiles, screenshots and task evidence stay in their respective projects. No credentials, global hook changes, external publication or Figma access are required to run this preview.
+The extracted script checks the payload inventory, required resources, version and SHA-256 integrity. This does not authenticate the publisher or approve a design.
 
-`validate` checks saved contracts. It does not fetch remote evidence, execute instructions in a DS, prove native accessibility/performance, or grant product approval. A lesson trigger is applicability metadata, not an installed automatic hook.
+Packaging collects reusable skill resources from the skill directory. It does not export the surrounding product project or upload anything. Keep private source captures, credentials, project profiles and task evidence outside the public checkout and its resource folders.
+
+## Verify work at the right boundary
+
+Contract validation checks saved schemas, references, hashes and task records. It cannot establish rendered quality, playable navigation, native accessibility or performance.
+
+For design work, inspect the actual destination, read back saved properties and view rendered output. For prototypes, check effective timing in the design tool and run the requested transitions, including back/cancel with valid history. Label simulated data, APIs, validation and timing. Human design approval remains separate.
+
+For repository development, use the dependency-equipped Python environment:
+
+```sh
+python -m unittest discover -s tests -v
+python scripts/materialize_example.py --output ../kkdesign-example
+python scripts/kkdesign_core.py validate --design ../kkdesign-example/design
+```
+
+Use an unused example-output directory. The example is synthetic; passing it is not evidence of live design-tool or product behavior. See [data contracts](docs/contracts.md) for the saved formats and validation rules.

@@ -1,14 +1,14 @@
-# Command menu — B3 workflow preview
+# Command menu
 
 | Command | Availability | Purpose |
 |---|---|---|
-| init | Implemented B2 | Scan declared sources and stage a project-kit initialization plan. |
-| refresh | Implemented B2 | Compare source revisions, review changes and authorize a recoverable update. |
-| design | Implemented B3; live tool required for canvas mutation | Execute a scoped task; read back structure and inspect renders. |
-| review | Implemented B3 | Bundled UX/visual/DS findings; no edits unless requested. |
-| prototype | Implemented B3; explicit request and live tool required | Create or edit requested interactions; verify graph and navigation. |
-| learn | Implemented B3 | Capture feedback/lessons with evidence and regenerate the index. |
-| package | Implemented B1/B3 | Build a versioned portable ZIP; validate extracted resources and checksums. |
+| init | Available | Scan declared sources and stage a project-kit initialization plan. |
+| refresh | Available | Compare source revisions, review changes and authorize a recoverable update. |
+| design | Available; live tool required for canvas mutation | Execute a scoped task; read back structure and inspect renders. |
+| review | Available | Bundled UX/visual/DS findings; no edits unless requested. |
+| prototype | Available; explicit request and live tool required | Create or edit requested interactions; verify graph and navigation. |
+| learn | Available | Capture feedback/lessons with evidence and regenerate the index. |
+| package | Available | Build a versioned portable ZIP; validate extracted resources and checksums. |
 
 Bare invocation shows this menu. Missing tools/access block only the dependent
 operation. Never simulate design edits, screenshots, navigation or native approval.

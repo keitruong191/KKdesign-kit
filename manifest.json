@@ -2,7 +2,6 @@
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
   "version": "0.4.0a1",
-  "stage": "B3",
   "status": "workflow-preview",
   "targets": [
     "codex",
@@ -41,7 +40,7 @@
   ],
   "requiresInstalledImpeccable": false,
   "requiresInstalledHoangsa": false,
-  "compatibilityEvidence": "docs/compatibility.md",
+  "supportGuide": "docs/compatibility.md",
   "harnessAdapters": {
     "codex": {
       "user": "~/.agents/skills/kkdesign-kit",
@@ -56,24 +55,10 @@
   },
   "hooks": "not-installed; opt-in integration deferred",
   "compatibility": {
-    "macOS": {
-      "codex": {
-        "version": "0.167.0",
-        "user": "B1-discovery-menu-resource-pass; B2/B3-runtime-unverified",
-        "project": "B2-init-refresh-pass; B3-offline-record-review-learn-package-pass; separate-authenticated-Figma-design-and-explicit-graph-pass"
-      },
-      "claude-code": {
-        "version": "2.1.308",
-        "user": "B1-discovery-menu-resource-pass; B2/B3-runtime-unverified",
-        "project": "B2-init-refresh-pass; B3-offline-record-review-learn-package-pass-after-reauthentication"
-      }
-    },
-    "linux": "installer CI configured; live harness unverified",
-    "windows": "installer CI configured; live harness unverified",
-    "otherHarnessVersions": "unverified",
-    "designTools": "B3 scoped editable Figma design/readback/renders and explicit five-edge persisted graph verified; interactive preview authentication-blocked; native behavior unassessed"
+    "toolAccess": "Codex CLI or Claude Code must be installed and authenticated separately; live design operations need a separately authorized design-tool connection",
+    "optionalIntegrations": "Hoangsa, Impeccable, MCP servers and hooks are not installed or required",
+    "verificationBoundary": "Offline validation checks contracts and package integrity; live behavior, rendered results and owner approval require separate verification"
   },
-  "runtimeEvidence": "docs/evidence/b3-verification.json",
   "requiredResources": [
     "SKILL.md",
     "manifest.json",
@@ -92,13 +77,13 @@
     "references/review/report-template.md",
     "docs/review-attribution.md",
     "docs/compatibility.md",
-    "docs/evidence/b3-verification.json",
     "examples/review/flawed-design.json",
     "examples/review/expected-findings.json",
     "schemas/task.schema.json",
     "schemas/task-evidence.schema.json",
     "schemas/lesson-index.schema.json",
     "schemas/product-profile.schema.json",
+    "schemas/source-registry.schema.json",
     "scripts/kkdesign_install.py",
     "scripts/kkdesign_core.py",
     "scripts/kkdesign_project.py",

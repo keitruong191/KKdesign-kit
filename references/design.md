@@ -1,4 +1,4 @@
-# Design workflow (B3)
+# Design workflow
 
 The design command is an agent-orchestrated workflow. The helper records a plan and
 real evidence; it does not connect to Figma, inspect a canvas, draw, mutate nodes,

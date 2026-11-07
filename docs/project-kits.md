@@ -1,8 +1,8 @@
 # Project kits: init, refresh and recovery
 
-B2 keeps source snapshots independent of the design destination. A Figma source
-does not imply a Figma destination; Git/local assets never receive invented
-Figma import keys. See [adapter contracts and inputs](source-adapters.md).
+Source snapshots are independent of the design destination. A Figma source does
+not imply a Figma destination; Git/local assets never receive invented Figma
+import keys. See [adapter contracts and inputs](source-adapters.md).
 
 ## Review before writing
 
@@ -24,10 +24,10 @@ not disposable generated output. A conflicting existing kit is not overwritten
 just because a command is called `init`.
 
 Generated kit contents include the entry DESIGN.md, `design/sources.json`, the
-four Stage-A schemas, canonical lessons/index, a pending task template and scoped
-profile drafts. Plans and recovery state live in `.kkdesign-kit/project/` outside
-skill discovery. Keep this project state private alongside its source snapshots.
-Do not publish it in the portable skill package.
+five contract schemas, canonical lessons/index, a pending task template and
+scoped profile drafts. Plans and recovery state live in `.kkdesign-kit/project/`
+outside skill discovery. Keep this project state private alongside its source
+snapshots. Do not publish it in the portable skill package.
 
 ## Product context
 
@@ -78,8 +78,7 @@ must not rewrite their decisions to match a new DS snapshot.
 macOS remains independent of iOS/Android. Operate/Read/Persuade/Experience are
 surface/task-level decisions, not a product-wide default. Such a mode entry must
 include `surface`, `surfaceId`, `task` or `taskId`, not just a generic scope string.
-Use scoped canonical lessons and review decisions before later design execution;
-B2 creates no screens or prototypes and does not implement B3 design/review/learn.
+Use scoped canonical lessons and review decisions before design execution.
 
 ## Refresh and migration
 
@@ -121,10 +120,10 @@ reported conflict rather than forcing restoration.
 
 ## Validation boundary
 
-`validate` checks source registries and existing Stage-A contracts, including
-profile provenance, task references and canonical lesson-index hashes. Source
-capture metadata is not proof of publication/importability, live rendering,
+`validate` checks source registries and project contracts, including profile
+provenance, task references and canonical lesson-index hashes. Source capture
+metadata is not proof of publication/importability, live rendering,
 accessibility, product approval or shipped runtime behavior. Figma access is a
 separate live-adapter verification, not inferred from synthetic HTTP fixtures.
-The [compatibility record](compatibility.md) states exactly which harnesses and
-source paths were exercised.
+The [compatibility guide](compatibility.md) explains prerequisites and the
+limits of offline and live verification.
