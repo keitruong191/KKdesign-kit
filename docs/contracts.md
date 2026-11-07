@@ -1,6 +1,8 @@
-# Stage-A contracts
+# Project contracts
 
-The project owns `DESIGN.md` and `design/`; the skill will orchestrate their use in Stage B. DS snapshots can retain their provider-specific schemas. Foundation records use the four schemas in this repository.
+The project owns `DESIGN.md` and `design/`; the skill orchestrates their use.
+DS snapshots can retain provider-specific schemas. Foundation records use the
+four schemas in this repository.
 
 ## Canonical lessons
 

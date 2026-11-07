@@ -15,4 +15,9 @@ Every decision records `status` (`confirmed`, `observed`, `inferred`, `open`, `s
 
 Profile source locations are relative to the project root. Lesson evidence is relative to `design/`; task evidence is relative to the task folder. Missing context remains open. Do not convert another platform's behavior, a DS example size or one dialog into a universal default.
 
-B2 init discovers and reuses existing product context, drafts profiles from explicit evidence and leaves unknown facts open. See [project kits](project-kits.md) for the context input, per-platform selection and review/apply lifecycle. Refresh preserves existing profiles. Surface modes belong to the surface/task, not a product-wide mode. macOS has its own profile; it is not treated as iOS or Android.
+Initialization discovers and reuses existing product context, drafts profiles
+from explicit evidence and leaves unknown facts open. See [project kits](project-kits.md)
+for context input, per-platform selection and the review/apply lifecycle.
+Refresh preserves existing profiles. Surface modes belong to the surface/task,
+not a product-wide mode. macOS has its own profile; it is not treated as iOS or
+Android.

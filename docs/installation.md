@@ -1,11 +1,11 @@
 # Install and maintain KKdesign-kit
 
-B3 workflow preview 0.4.0a1. Requires Python 3.9+ on macOS, Linux or Windows and a separately
-installed/authenticated Codex CLI or Claude Code. Packaging and installation use
-only the Python standard library. Offline contract validation also needs
-`python -m pip install -r requirements.txt`; use a virtual environment outside the
-installed skill. Nothing installs Hoangsa, Impeccable, hooks or MCP configuration.
-See [compatibility](compatibility.md) for measured harness support.
+Requires Python 3.9+ on macOS, Linux or Windows and a separately installed
+Codex CLI or Claude Code. Packaging and installation use only the Python
+standard library. Offline contract validation also needs
+`python -m pip install -r requirements.txt`; use a virtual environment outside
+the installed skill. Nothing installs Hoangsa, Impeccable, hooks or MCP
+configuration. See [compatibility](compatibility.md) for verification limits.
 
 ## From source or portable artifact
 
@@ -93,8 +93,8 @@ or credentials are never collected, overwritten or removed.
   no installer process is running. Do not delete staging blindly: it may hold
   the recoverable previous installation.
 - Skill not found: restart, verify the path above, inspect conflicts and check
-  workspace trust/managed policy. Cloud harnesses and Desktop skill syncing are
-  outside this CLI evidence. Installer success alone does not prove discovery.
-- A missing external design tool is not an installation failure. B2 reads source
-  data, but does not certify Figma import/render, UX, accessibility, performance
-  or human approval. See [project-kit lifecycle](project-kits.md) for init/refresh.
+  workspace trust/managed policy. Cloud harnesses and Desktop skill syncing
+  are outside this CLI. Installer success alone does not prove discovery.
+- A missing external design tool is not an installation failure; source reads
+  do not certify Figma import/render, UX, accessibility, performance or human
+  approval. See [project-kit lifecycle](project-kits.md).

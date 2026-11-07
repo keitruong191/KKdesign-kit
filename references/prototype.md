@@ -97,10 +97,15 @@ file. The function validates all edges and node IDs before writing, supports
 `NODE` navigation actions (`NAVIGATE`, `OVERLAY`, `SWAP`, `SCROLL_TO`,
 `CHANGE_TO`), plus explicit `BACK` and `CLOSE` actions. Each edge is appended to
 existing reactions rather than replacing them. It writes via Plugin API
-`setReactionsAsync`, reads reactions back, verifies the requested trigger (including
-`AFTER_TIMEOUT.timeout` in milliseconds) and requested transition/navigation while
-tolerating serialized duration rounding, and checks existing reactions remain
-unchanged. It attempts to restore changed nodes if a write or readback fails.
+`setReactionsAsync`, reads reactions back, verifies the requested trigger and raw
+`AFTER_TIMEOUT.timeout` value against the documented Plugin API contract, and
+verifies requested transition/navigation while tolerating serialized duration
+rounding. It also checks existing reactions remain unchanged and attempts to
+restore changed nodes if a write or readback fails. The stored timeout value is
+not proof of effective UI/playback timing. Run the actual interaction in preview
+and inspect its delay before claiming timing behavior; do not infer a universal
+SDK/bridge conversion.
+
 It refuses unknown destinations, unsupported triggers/actions, duplicate edges in
 the requested graph and semantically matching edges already persisted on a source.
 Native serialization defaults such as `resetVideoPosition: false` do not permit a
