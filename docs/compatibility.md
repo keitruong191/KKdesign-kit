@@ -13,11 +13,11 @@ are unverified.
 
 ## B3 workflow evidence
 
-- Python 3.9.6 on macOS 26.5 arm64: **104 regression tests passed**, including
+- Python 3.9.6 on macOS 26.5 arm64: **105 regression tests passed**, including
   foundation, installer, source adapters, project lifecycle, lesson history,
   evidence integrity and prototype timeout/transition mismatch rollback.
-  The final ship-stage CLI smoke additionally verified earlier/superseded lesson
-  replay without mutation and rejection of history-root/hash-directory symlinks
+  The final ship-stage CLI smoke additionally verified earlier/superseded and
+  CRLF lesson replay without mutation and rejection of history-root/hash symlinks
   without copying private snapshots into synthetic public docs. These later
   corrections were not rerun through the pinned Codex/Claude or native Figma
   captures below; their historical local ZIP remains unchanged.

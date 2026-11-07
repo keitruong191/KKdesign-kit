@@ -76,6 +76,17 @@ class LearningWorkflowTests(unittest.TestCase):
         self.assertEqual(self.lesson.read_bytes(), lesson_before)
         self.assertEqual((self.design / 'lessons-index.json').read_bytes(), index_before)
 
+    def test_crlf_lesson_replay_preserves_canonical_bytes_and_index_hash(self):
+        first = self.author(body='First line.\r\nSecond line.')
+        self.lesson.write_bytes(self.lesson.read_bytes().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n'))
+        index = build_lesson_index(self.design)
+        (self.design / 'lessons-index.json').write_text(
+            json.dumps({'$schema': 'schemas/lesson-index.schema.json', **index}), encoding='utf-8')
+        before = {path: path.read_bytes() for path in self.design.rglob('*') if path.is_file()}
+        replay = self.author(body='First line.\nSecond line.')
+        self.assertEqual(replay, {'status': 'duplicate', 'id': first['id'], 'changed': False})
+        self.assertEqual({path: path.read_bytes() for path in self.design.rglob('*') if path.is_file()}, before)
+
     def test_replaying_earlier_lesson_after_another_author_returns_original_id(self):
         first = self.author()
         self.author(title='Different practice')

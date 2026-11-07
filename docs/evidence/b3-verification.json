@@ -190,7 +190,8 @@
     "Initial Claude Code B3 probe failed with revoked OAuth; retained as historical failure. A separate reauthenticated run subsequently passed.",
     "Prototype browser access reached login; screenshot call timed out and is not image evidence.",
     "First exact prototype graph application was rejected because NAVIGATE requires top-level same-page destination frames; readback confirmed zero persisted edges and unchanged source roots. Recorded placement correction uses existing acceptance copies only, no new prototype-screen duplicates.",
-    "Recorded native reaction defaults bypassed bytewise duplicate detection in an isolated fixture, causing one duplicate write in that fixture only; semantic comparison fixed and regression passed. No live duplicate replay was attempted before the fix."
+    "Recorded native reaction defaults bypassed bytewise duplicate detection in an isolated fixture, causing one duplicate write in that fixture only; semantic comparison fixed and regression passed. No live duplicate replay was attempted before the fix.",
+    "Initial Windows CI exposed CRLF canonical text breaking lesson deduplication and the exhausted-ID replay regression. Actual CLI reproduction authored a duplicate; normalized comparison now returns the original ID without rewriting canonical bytes or the derived index."
   ],
   "package": {
     "release": "0.4.0a1",
@@ -250,21 +251,23 @@
     "retrospectiveWarning": "Historical task mapping is not proof of pre-task reading; warning retained unchanged."
   },
   "shipVerification": {
-    "suite": {"command": "python -m unittest discover -s tests -q", "passed": 104, "failed": 0},
+    "suite": {"command": "python -m unittest discover -s tests -q", "passed": 105, "failed": 0},
     "reviewCorrections": [
       "An earlier authored lesson remains a duplicate after another lesson is added.",
       "Replaying superseded advice preserves the original ID and does not reactivate it.",
       "Exact replays remain available when new lesson IDs are exhausted.",
+      "LF and CRLF advice compare identically without normalizing stored canonical bytes or changing their source hash on replay.",
       "Learning write paths reject pre-existing symlink redirection, including history roots and hash directories, before private snapshots can escape the selected design directory."
     ],
     "actualCliSmoke": {
       "interleavedReplay": "pass; original ID and all design files unchanged",
       "supersededReplay": "pass; no reactivation or file mutation",
-      "historyRootAndHashSymlinks": "pass; exit 2, no canonical mutation and no write into synthetic public docs"
+      "historyRootAndHashSymlinks": "pass; exit 2, no canonical mutation and no write into synthetic public docs",
+      "crlfReplay": "pass; original ID, canonical bytes, index hash and other design files unchanged"
     },
     "relocatedExtractedPackage": {"status": "verified", "files": 57, "requiredResources": 32},
     "review": "Automated correctness and security source review; reported corrections re-reviewed with no surviving supported finding. Runtime evidence is the suite and CLI smoke, not the static reviews.",
-    "scope": "Native Figma and authenticated Claude records above refer to their pinned historical candidate. These later source corrections were exercised by the 104-test suite, actual authoring CLI smoke and clean relocated extraction; no claim that the earlier local ZIP was overwritten or that Claude or Figma preview was rerun.",
+    "scope": "Native Figma and Codex/authenticated Claude records above refer to their pinned historical candidate. These later source corrections were exercised by the 105-test suite, actual authoring CLI smoke and clean relocated extraction; no claim that the earlier local ZIP was overwritten or that those harnesses or Figma preview were rerun.",
     "limits": "Static symlink checks are not a guarantee against concurrent filesystem replacement. Interactive Figma preview remains unverified."
   }
 }

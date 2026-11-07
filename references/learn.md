@@ -58,6 +58,8 @@ An exact authoring replay returns the original ID without rewriting files,
 including after other lessons were added or IDs were exhausted. Replaying a
 superseded or retired lesson does not reactivate it; lifecycle changes remain
 explicit.
+LF and CRLF line endings compare as the same advice; a duplicate replay still
+preserves the exact stored canonical bytes and their existing source hash.
 
 Before the canonical source changes, the CLI writes the old source and a freshly
 generated matching index to

@@ -187,6 +187,8 @@ def _next_id(text):
 
 
 def _existing_authored_lesson(text, metadata, title, body, verification):
+    text = text.replace('\r\n', '\n')
+    expected_advice = ('\n\n' + body + '\n\n**Verification:** ' + verification + '\n').replace('\r\n', '\n')
     headings = list(LESSON.finditer(text))
     lifecycle_fields = {'id', 'status', 'supersededBy'}
     comparable = {key: value for key, value in metadata.items() if key not in lifecycle_fields}
@@ -201,7 +203,6 @@ def _existing_authored_lesson(text, metadata, title, body, verification):
             continue
         existing = json.loads(blocks[0].group(1))
         existing_comparable = {key: value for key, value in existing.items() if key not in lifecycle_fields}
-        expected_advice = '\n\n' + body + '\n\n**Verification:** ' + verification + '\n'
         advice = section[blocks[0].end():]
         if existing_comparable == comparable and match.group(2) == title and advice == expected_advice:
             return match.group(1)
