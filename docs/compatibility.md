@@ -13,9 +13,14 @@ are unverified.
 
 ## B3 workflow evidence
 
-- Python 3.9.6 on macOS 26.5 arm64: **100 regression tests passed**, including
+- Python 3.9.6 on macOS 26.5 arm64: **104 regression tests passed**, including
   foundation, installer, source adapters, project lifecycle, lesson history,
   evidence integrity and prototype timeout/transition mismatch rollback.
+  The final ship-stage CLI smoke additionally verified earlier/superseded lesson
+  replay without mutation and rejection of history-root/hash-directory symlinks
+  without copying private snapshots into synthetic public docs. These later
+  corrections were not rerun through the pinned Codex/Claude or native Figma
+  captures below; their historical local ZIP remains unchanged.
 - Codex CLI **0.167.0**, project-installed extracted package in a fresh isolated
   home: actual `design` preflight/check, bundled review findings, feedback capture,
   inferred lesson authoring/deduplication, subsequent task lesson decision,
