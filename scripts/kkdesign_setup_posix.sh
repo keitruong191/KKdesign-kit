@@ -15,15 +15,24 @@ fail() {
 package=
 consent=
 helper=
+project=
+# Keep migration arguments as positional parameters without eval or word splitting.
+migrations=
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --package-root) [ "$#" -ge 2 ] || fail 'Missing package root'; package=$2; shift 2 ;;
         --consent) consent=--consent; shift ;;
+        --project-root) [ "$#" -ge 2 ] || fail 'Missing project root'; project=$2; shift 2 ;;
+        --migrate) [ "$#" -ge 2 ] || fail 'Missing migration location'
+            case "$2" in *'
+'*) fail 'Migration locations cannot contain newlines' ;; esac
+            migrations="$migrations
+$2"; shift 2 ;;
         --helper) [ "$#" -ge 2 ] || fail 'Missing helper name'; helper=$2; [ -n "$helper" ] || fail 'Missing helper name'; shift 2; break ;;
         *) fail 'Unknown Setup argument' ;;
     esac
 done
-[ -z "$helper" ] || [ -z "$consent" ] || fail 'Helper invocation cannot provision; choose Setup separately'
+[ -z "$helper" ] || { [ -z "$consent" ] && [ -z "$project" ] && [ -z "$migrations" ]; } || fail 'Helper invocation cannot provision; choose Setup separately'
 case "$package" in /*) ;; *) fail 'An explicit absolute package root is required' ;; esac
 [ -f "$package/SKILL.md" ] && [ -f "$package/scripts/kkdesign_setup.py" ] || fail 'Invalid package root'
 system=$(/usr/bin/uname -s)
@@ -190,7 +199,19 @@ fi
 # -I ignores ambient Python configuration, -B prevents plugin/cache bytecode.
 # The same canonical Python Setup handles requirements, locks, helper validation
 # and its readiness receipt. There is no second installer or dispatcher.
-if "$cache/python/bin/python3" -I -B "$package/scripts/kkdesign_setup.py" --package-root "$package" ${consent:+--consent}; then
+set -- --package-root "$package"
+[ -z "$consent" ] || set -- "$@" --consent
+[ -z "$project" ] || set -- "$@" --project-root "$project"
+# Newline-only splitting with globbing disabled preserves spaces/metacharacters.
+set -f
+old_ifs=$IFS
+IFS='
+'
+for location in $migrations; do
+    set -- "$@" --migrate "$location"
+done
+IFS=$old_ifs
+if "$cache/python/bin/python3" -I -B "$package/scripts/kkdesign_setup.py" "$@"; then
     :
 else
     fail 'Runtime execution or helper verification failed; inspect diagnostics and authorized execution/network access before retrying'

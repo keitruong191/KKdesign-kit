@@ -13,6 +13,7 @@ sys.dont_write_bytecode = True
 # Isolated invocation must work from an arbitrary installed package directory.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kkdesign_install as kit
+import kkdesign_migration as migration
 
 
 # Bump when interpreter/provisioning/receipt requirements become incompatible.
@@ -131,13 +132,39 @@ def verify_helpers(package, runtime):
         kit.smoke_runtime(package, runtime, Path(temp))
 
 
-def setup(package, home, consent=False, emit=lambda event: None):
+def setup(package, home, consent=False, emit=lambda event: None, project=None, migrate=()):
     state = {'plugin': 'loaded', 'runtime': 'setup-required', 'externalTools': 'unverified'}
     def phase(name, **values):
         emit(dict(state, phase=name, **values))
     try:
         phase('checking')
         package = package_root(package)
+        copies = migration.discover(home, project, package)
+        if os.name == 'nt':
+            for item in copies:
+                if item['ownership'] == 'managed':
+                    try:
+                        base = Path(item['state']).parents[2]
+                        windows_private(Path(item['state']), base, tree=True)
+                        windows_private(Path(item['location']), base, tree=True)
+                    except SetupError as exc:
+                        item.update(ownership='unknown', reason=str(exc))
+        migration_state = {'status': 'clear' if project is not None else 'project-scope-unchecked',
+                           'copies': copies, 'projectRoot': str(project) if project is not None else None}
+        state['migration'] = migration_state
+        if copies or migrate:
+            identity = migration.plugin_identity(package)
+            migration_state['plugin'] = identity
+            selected = {str(path) for path in migrate}
+            managed = all(item['ownership'] == 'managed' for item in copies)
+            if project is None or not managed or selected != {item['location'] for item in copies}:
+                migration_state['status'] = 'conflict' if not managed else 'consent-required'
+                result = dict(state, status='migration-' + migration_state['status'],
+                              nextAction='Show every location/version/ownership and the target plugin. Preserve conflicts; obtain explicit consent for every intact managed copy before retrying with --project-root and one --migrate ABSOLUTE_LOCATION per copy. Provisioning consent is separate.')
+                phase('migration-' + migration_state['status'], result=result)
+                return result
+        if copies:
+            migration_state['status'] = 'consented-verification-pending'
         requirements = (package / 'requirements.txt').read_bytes()
         runtime = trusted_runtime(home, requirements)
         if runtime is None and not consent:
@@ -167,13 +194,28 @@ def setup(package, home, consent=False, emit=lambda event: None):
             verify_helpers(package, runtime)
             reused = True
         state['runtime'] = 'ready'
+        if copies:
+            # Helpers have actually passed before any historical owner moves.
+            # Recheck package identity after execution and before mutation.
+            try:
+                migration.plugin_identity(package)
+                retained = migration.deactivate(copies, home, project, package,
+                                                secure=lambda path, base: windows_private(path, base, tree=True))
+            except (OSError, ValueError, KeyError) as exc:
+                state['migration']['status'] = 'error'
+                raise SetupError('migration-failed', str(exc),
+                                 'Preserve and inspect the reported standalone locations, ownership, locks and retained archives before retrying; do not force-remove copies or provider files.') from exc
+            state['migration'].update(status='migrated', retained=retained,
+                                      nextAction='Open a fresh provider session so discovery drops the old standalone registrations; manage the plugin with native controls.')
+
         result = dict(state, status='ready', reused=reused, runtimePath=str(runtime),
                       python=str(kit.runtime_python(runtime)),
                       scope='Synthetic helper materialization and dependency-backed contract validation; not live tools or human approval.')
         phase('complete', result=result)
         return result
     except (OSError, ValueError, KeyError, subprocess.SubprocessError) as exc:
-        state['runtime'] = 'error'
+        if state['runtime'] != 'ready':
+            state['runtime'] = 'error'
         if isinstance(exc, SetupError):
             code, action = exc.code, exc.action
         elif isinstance(exc, PermissionError):
@@ -190,10 +232,13 @@ def setup(package, home, consent=False, emit=lambda event: None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--package-root', type=Path, required=True)
+    parser.add_argument('--project-root', type=Path, help='Explicit product root for project and ancestor conflict discovery; never inferred from CWD')
+    parser.add_argument('--migrate', type=Path, action='append', default=[], help='Agent obtained migration consent for this exact disclosed managed standalone location; repeat for each copy')
     parser.add_argument('--consent', action='store_true', help='Agent obtained explicit permission for the disclosed provisioning action')
     args = parser.parse_args()
     result = setup(args.package_root, Path.home(), args.consent,
-                   emit=lambda event: print(json.dumps(event), flush=True))
+                   emit=lambda event: print(json.dumps(event), flush=True),
+                   project=args.project_root, migrate=args.migrate)
     return 1 if result['status'] == 'error' else 0
 
 

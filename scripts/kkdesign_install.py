@@ -23,7 +23,7 @@ SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
            'kkdesign_task.py', 'kkdesign_review.py', 'kkdesign_learn.py',
            'figma_prototype.js', 'kkdesign_run.py', 'kkdesign_setup.py',
            'kkdesign_setup_posix.sh', 'kkdesign_setup_windows.ps1',
-           'kkdesign_windows_security.ps1')
+           'kkdesign_windows_security.ps1', 'kkdesign_migration.py')
 
 
 def canonical(path):

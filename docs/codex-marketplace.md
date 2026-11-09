@@ -58,7 +58,11 @@ choose Setup to verify compatibility. Unchanged requirements and runtime
 contracts reuse a verified cache; changes require explicit consent to provision
 a separate cache. Remove/reinstall preserves and reevaluates shared runtimes.
 See [lifecycle evidence and acceptance limits](verification/native-lifecycle.md).
-Standalone conflict detection/migration remains WWA-09.
+Setup now discovers standalone conflicts using the explicitly selected project
+root. It preserves modified/unmanaged copies and requests separate consent
+before archiving verified managed copies after helper validation; see
+[standalone migration](../references/setup.md#standalone-conflicts-and-migration)
+and [migration evidence](verification/standalone-migration.md).
 
 ## Canonical build
 

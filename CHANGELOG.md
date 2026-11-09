@@ -11,6 +11,18 @@
   and helpers on macOS ARM64. Intel native/provider/human acceptance remains
   separate.
 
+### Standalone migration
+
+- Discover both harnesses' user, explicit project and ancestor standalone
+  locations during Setup, with version, ownership and conflict diagnostics.
+- Require separate consent for every intact managed copy and verify the native
+  plugin, private runtime and actual helpers before deactivation. Retain old
+  copies and ledgers outside active discovery, plus historical backups, project
+  data and shared runtimes; preserve modified, unmanaged or ambiguous copies.
+- Recheck under locks and restore caught partial moves. Pass project and
+  migration choices through both OS entrypoints; restart the provider session
+  after deactivation. Native human/usability acceptance remains separate.
+
 ### Native lifecycle compatibility
 
 - Reuse native runtimes by exact dependency digest and explicit runtime contract,
