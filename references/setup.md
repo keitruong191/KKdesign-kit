@@ -32,27 +32,31 @@ When the user explicitly chooses Setup:
    Linux acquisition is implemented; native Linux acceptance is pending; see
    [Linux verification](../docs/verification/linux-runtime.md).
 
-   On Windows, WWA-06 acquisition remains pending. With an existing Python
-   3.9+ and working venv/ensurepip, the existing shared Setup remains usable:
+   On native Windows use Windows PowerShell 5.1 (the system host, including
+   when the executor defaults to PowerShell 7):
 
-   ```sh
-   python3 -I -B "$SKILL_DIR/scripts/kkdesign_setup.py" --package-root "$SKILL_DIR"
+   ```powershell
+   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -File "$SKILL_DIR\scripts\kkdesign_setup_windows.ps1" -PackageRoot "$SKILL_DIR"
    ```
 
-   Use the actual discovered interpreter (Windows can use `py -3`). These are
-   agent execution instructions, not terminal homework. `--package-root` is the
-   absolute directory containing the activated SKILL.md, including Codex's
-   nested skill layout; never infer it from product CWD.
+   No Python/Node, WSL or Git Bash is required. The implemented targets are
+   Windows x64/ARM64 with native tar (Windows 10 1803+); native acceptance on
+   both CPUs/providers is pending. See [Windows verification](../docs/verification/windows-runtime.md).
+   If the host blocks scripts or executables, report that policy and stop;
+   never add ExecutionPolicy bypass flags, change policy or unblock files.
+   These are agent execution instructions, not terminal homework. The package
+   root is the absolute directory containing the activated SKILL.md, including
+   Codex's nested layout; never infer it from product CWD.
 3. **Explain and ask when needed.** The entrypoint emits checking and either
    verifies an existing trusted runtime or returns `consent-required` without
    writes, dependency downloads, venv creation or new-runtime execution. Explain
    the returned exact cache location, downloads, purpose and permissions in
    plain language.
 
-   On macOS/Linux also disclose the pinned CPython 3.12.12 archive from Astral's
+   On all three OS entrypoints also disclose the pinned CPython 3.12.12 archive from Astral's
    python-build-standalone GitHub release 20251014, stored under
    `~/.kkdesign-kit/bootstrap/`; its HTTPS source and SHA-256 are pinned in the
-   bundled entrypoint. It uses host curl, tar and SHA-256 tools, without a
+   bundled entrypoint. POSIX uses host curl/tar/SHA-256; Windows uses .NET HTTPS, native tar and SHA-256, without a
    second downloaded bootstrap executable. For example:
 
    “KKdesign needs to create a private Python environment and download its
@@ -64,17 +68,17 @@ When the user explicitly chooses Setup:
    Wait for an explicit yes. A Setup request, install, schema pass or tool
    approval alone is not this consent. Refusal/cancellation means stop here;
    do not rerun with consent, download or execute a new runtime. After yes,
-   rerun the same OS entrypoint with `--consent`. This flag conveys the agent's
+   rerun the same OS entrypoint with `--consent` (Windows: `-Consent`). This flag conveys the agent's
    observed permission; no file or test can establish human approval.
 4. **Show progress.** Translate streamed JSON phase events into short updates:
-   checking → consent required (if needed) → downloading pinned Python (macOS/Linux,
+   checking → consent required (if needed) → downloading pinned Python (all OS entrypoints,
    if needed) → preparing runtime → verifying helpers → complete or failed. Preparation uses venv and requirements.txt in
    the private user cache, with bounded subprocess execution. No standalone
    install lifecycle, hooks or alternate installer is invoked.
-5. **Use the result.** On macOS/Linux use the absolute `python` path returned by a
+5. **Use the result.** On every OS use the absolute `python` path returned by a
    successful Setup to invoke the existing `scripts/kkdesign_run.py` dispatcher,
    with `-I -B`, for the remainder of this agent session. Never substitute a
-   project-provided executable or PATH Python. In a new session run the POSIX
+   project-provided executable or PATH Python. In a new session run the same OS
    Setup check again to verify/reuse the cache and obtain that path. General
    Python-free helper startup and full caller migration remain WWA-07.
 6. **Report the result.** Only `ready` following actual synthetic workspace
@@ -96,20 +100,16 @@ is insufficient verification; preserve it for explicit inspection/repair.
 
 ## Remaining integration contracts
 
-macOS/Linux Setup acquires pinned CPython internally and reuses it only after checking
-its archive and full file/link/directory inventory. The user-owned private cache
+Setup acquires pinned CPython internally and reuses it only after checking
+its archive and full file/link/directory inventory. Windows additionally checks NTFS ownership,
+ACL write access and rejects reparse points throughout executable caches; it
+creates new private storage with a protected inheritable DACL. The user-owned private cache
 is the trust boundary; hashes detect corruption/modification, not publisher
 identity or protection against an attacker controlling the same user account.
 The package must come from a trusted provider/reviewed source. The CPython
 archive remains in the private cache to verify reuse. Cache conflicts and
 checksum failures preserve existing data and stop; never delete a suspicious
 cache automatically or use arbitrary fallback interpreters.
-
-Windows acquisition remains WWA-06. Without suitable Python on
-Windows, explain that its bootstrap integration is pending, without asking
-for manual Python installation or offering a standalone fallback. Its adapter
-must preserve the same package-root, consent, private-cache, integrity and real
-helper-validation contracts.
 
 The current Python launcher accepts only the private cache matching package
 requirements and its verification receipt. Python-free helper entrypoints and

@@ -9,7 +9,8 @@ user's consent, acquiring pinned CPython internally on macOS/Linux without exist
 Python/Node, then verify helpers and reuse a trusted private cache without a redundant download
 prompt. macOS ARM64 runtime smoke is recorded in
 [verification](verification/macos-runtime.md). Linux acquisition is implemented with [native acceptance pending](verification/linux-runtime.md).
-Intel native acceptance, Windows acquisition and general Python-free helper startup remain pending.
+Windows PowerShell acquisition is implemented; [native acceptance is pending](verification/windows-runtime.md).
+Intel/Windows native acceptance and general Python-free helper startup remain pending.
 Native provider/OS acceptance is separate. Do not use
 standalone commands below to set up or manage a plugin. The remainder documents
 the legacy standalone lifecycle.
