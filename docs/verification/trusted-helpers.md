@@ -1,5 +1,10 @@
 # Trusted helper runtime verification
 
+This is an item-specific historical verification record. For current integrated
+behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
+and [onboarding handoff](onboarding.md); earlier implementation gaps below are
+not current capability limits when superseded by later items.
+
 WWA-07 implements Python-free helper startup for both provider packages using
 `kkdesign_setup_posix.sh --package-root ABSOLUTE_SKILL_DIR --helper NAME ...`
 or the native PowerShell equivalent in [helper invocation](../../references/helpers.md).

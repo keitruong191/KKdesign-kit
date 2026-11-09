@@ -1,7 +1,8 @@
 # Package the kit
 
-For the new Claude Code marketplace artifact, use the maintainer builder and
-native review flow in [docs/claude-marketplace.md](../docs/claude-marketplace.md).
+For provider marketplace artifacts, use the maintainer builders and native
+review flows for [Claude Code](../docs/claude-marketplace.md) and
+[Codex](../docs/codex-marketplace.md).
 It reuses this package's canonical allowlisted resources. The portable package
 and release workflow below are legacy and are not a plugin installation or
 Setup fallback. Building an artifact does not authorize release/publication.
@@ -81,8 +82,10 @@ fresh-shell helpers, update, rollback and uninstall. The final job uses the
 settings before dispatch. It creates a new **draft** release for `v0.5.0a1` and
 refuses an existing release; it never overwrites assets. Draft creation is not
 publication. This PR does not authorize dispatch, tag creation or publication.
-Do not document a public `curl` URL as ready until an authorized owner publishes
-the release and the exact pinned public command has been smoke-tested against it.
+This historical workflow is not the marketplace release path. Do not dispatch it
+or publish a curl/standalone installation channel for marketplace onboarding.
+Owner-approved marketplace publication and exact native install verification
+remain separate pending work in the [handoff](../docs/verification/onboarding.md).
 
 For the same real-download check locally, run
 `python3 -B scripts/smoke_bootstrap.py` from the source checkout. It uses only

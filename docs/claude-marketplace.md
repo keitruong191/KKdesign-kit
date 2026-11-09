@@ -1,4 +1,4 @@
-# Claude Code marketplace packaging preview
+# Claude Code marketplace packaging and native review
 
 This adapter loads the canonical root `SKILL.md` as
 `/kkdesign-kit:kkdesign-kit`. It does not copy or fork the workflow into a
@@ -15,12 +15,17 @@ Windows PowerShell acquisition is implemented with [native acceptance pending](v
 Python-free helper startup uses the [verified OS entrypoints](../references/helpers.md); native end-to-end acceptance remains pending. No public release or official listing is claimed.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
-## Native review flow
+## Native maintainer review
+
+**User-ready publication is pending.** Version `0.5.0a1` is the local review
+payload. `<reviewed-marketplace-source>` below is a maintainer-supplied isolated
+catalog, not a published URL. See [onboarding](installation.md) and the measured
+[support matrix](compatibility.md); do not install from a guessed default-branch
+source or treat local review as public availability.
 
 Use a clean isolated Claude Code profile and a trusted marketplace source at the
 reviewed revision. These are maintainer review instructions; no hosted release
-or official listing is claimed. Once a marketplace source has actually been
-published and verified, native registration and installation use:
+or official listing is claimed. For a disposable reviewed catalog, native registration and installation use:
 
 ```text
 claude plugin marketplace add <reviewed-marketplace-source>
@@ -33,7 +38,13 @@ Start a new Claude session in the selected product project and invoke:
 ```text
 /kkdesign-kit:kkdesign-kit
 /kkdesign-kit:kkdesign-kit Setup
+/kkdesign-kit:kkdesign-kit init
 ```
+
+For `init`, supply the selected product project and declared sources, inspect
+the staged plan and authorize apply only after review. External design-tool
+authorization is separate. These are invocation instructions, not a claim that
+authenticated menu/Setup/workflow observation has passed.
 
 The bare menu shows Setup, plugin loaded, runtime not checked/Setup required
 and external tools unverified. Explicit Setup follows the shared consent flow;
@@ -96,8 +107,10 @@ never change a user's primary provider settings or copy their credentials.
 Manifest validation, bundle verification and native CLI inventory each prove
 different things. Only an actual Claude session showing the namespaced menu
 can complete native discovery/menu acceptance; authentication or policy blocks
-must remain explicit. Public publication and end-to-end Setup/workflow
-acceptance are later gates.
+must remain explicit. Runtime acquisition, helper invocation, lifecycle compatibility and consented
+migration are implemented. Public publication and authenticated end-to-end
+Setup/workflow acceptance remain external gates; see the
+[consolidated handoff](verification/onboarding.md).
 
 Observed acceptance and the authentication blocker are recorded in
 [native verification](verification/claude-marketplace.md).

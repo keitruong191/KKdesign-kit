@@ -6,7 +6,7 @@
       "name": "kkdesign-kit",
       "source": "./",
       "version": "0.5.0a1",
-      "description": "Design workflows. Packaging preview; runtime Setup required."
+      "description": "Design workflows. Explicit agent Setup required; publication and native acceptance tracked separately."
     }
   ]
 }

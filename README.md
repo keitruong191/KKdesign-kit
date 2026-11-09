@@ -4,84 +4,46 @@ A design-system skill for Codex and Claude Code. Use it to prepare project desig
 
 The skill includes command guides, Python helpers, schemas and synthetic examples. Live canvas edits and prototype playback use your separately configured design tools.
 
-## Install
+## Get started
 
-The new distribution direction is marketplace-only. The Codex
-[marketplace packaging preview](docs/codex-marketplace.md) uses `$kkdesign-kit:kkdesign-kit`. The Claude Code
-[marketplace packaging preview](docs/claude-marketplace.md) loads the canonical
-skill as `/kkdesign-kit:kkdesign-kit`, including a readable **Setup** route.
-Choose **Setup** to check/reuse a trusted runtime or, after explicit consent,
-prepare one and verify real helpers. macOS/Linux Setup can acquire pinned Python
-internally without Python/Node on PATH; ARM64 acquisition/helper smoke is
-recorded in [macOS verification](docs/verification/macos-runtime.md). Linux
-acquisition is implemented with [native acceptance pending](docs/verification/linux-runtime.md).
-Windows PowerShell acquisition is implemented; [native acceptance is pending](docs/verification/windows-runtime.md).
-Helpers start through the [verified OS entrypoints](references/helpers.md) without
-system Python. Intel/Windows native acceptance remains pending. No public marketplace release or official listing is claimed.
-Do not use the old standalone installer as a plugin Setup fallback.
+**Marketplace publication is pending.** Version `0.5.0a1` is the canonical
+review package version, not a publicly installable release. There is currently
+no verified published KKdesign marketplace source/version to give users. The
+owner must approve and publish a source, then verify that exact version through
+the native provider flow before user installation instructions can name it.
+No release, marketplace endpoint or directory listing is claimed here.
 
-### Legacy standalone instructions
+For maintainer review, use the [Codex](docs/codex-marketplace.md) or
+[Claude Code](docs/claude-marketplace.md) native packaging instructions and the
+[acceptance handoff](docs/verification/onboarding.md). These instructions use
+review packages and isolated profiles; they are not a second installation channel.
 
-The commands below describe the existing standalone implementation, not the
-new marketplace onboarding flow. Marketplace packaging does not authorize
-publication of the old bootstrap or a standalone fallback.
+Once a reviewed plugin is installed in your authorized local provider session:
 
-The approved one-command bootstrap and public release are **pending PR approval and release**. There is no public download URL ready to use yet; do not run a guessed `curl` command. After the exact release artifact and checksum are published, the release instructions will provide a pinned command and that exact command will be smoke-tested before it is called ready.
-
-Run the future bootstrap from the **destination product directory**; project scope defaults to that directory. It will require an explicit `--harness codex` or `--harness claude-code`, with `--project "/absolute/other project"` and `--scope user` available. The checked-in `install.sh` still downloads the pinned release; running it from a checkout is not a source fallback before publication.
-
-### Source route while release is gated
-
-Acquire the public source into a new path, then enter it (reviewers must use the PR revision containing this change):
-
-```sh
-git clone https://github.com/keitruong191/KKdesign-kit.git "$HOME/KKdesign-kit-source"
-cd "$HOME/KKdesign-kit-source"
-```
-
-Do not overwrite an existing checkout; use that checkout's reviewed revision instead. From the source root, install into an existing destination you own:
-
-```sh
-python3 -I -B scripts/kkdesign_install.py install --harness codex --scope project --project "/absolute/path/to/product project" --runtime
-```
-
-To install for the product project that is your current working directory, call the checkout installer by its absolute path:
-
-```sh
-python3 -I -B "/path/to/kkdesign-kit/scripts/kkdesign_install.py" install --harness codex --scope project --project "$PWD" --runtime
-```
-
-To target another project, provide its quoted absolute path:
-
-```sh
-python3 -I -B scripts/kkdesign_install.py install --harness claude-code --scope project --project "/path/to/another-project" --runtime
-```
-
-For personal scope, choose the harness and pass `--scope user` (plus `--project` as context for conflict checks):
-
-```sh
-python3 -I -B scripts/kkdesign_install.py install --harness codex --scope user --project "/path/to/project-for-conflict-check" --runtime
-python3 -I -B scripts/kkdesign_install.py install --harness claude-code --scope user --project "/path/to/project-for-conflict-check" --runtime
-```
-
-Requirements: Python 3.9+ (`python3` on macOS/Linux; Windows `py -3`), `curl` and network access for bootstrap downloads, and working `venv`/`ensurepip` plus network/package-index access for runtime provisioning. Bootstrap always provisions a workflow runtime in the user's private cache; manual stdlib install/update may omit `--runtime` and use the launcher's current dependency-equipped interpreter instead. Neither route needs activation or system pip.
-
-These are usable local-source commands from the checkout; for the manual secondary route after release, acquire `kkdesign-kit-0.5.0a1.zip` and its `.sha256` from a trusted release, verify the checksum, extract it, `cd` into `kkdesign-kit/`, then run the installer command there. This upcoming version is not evidence that the public archive exists. On Windows use `py -3 -I -B scripts\kkdesign_install.py install --harness codex --scope project --project "C:\Work\Your Project" --runtime`.
-
-Use `--harness claude-code` for Claude Code and `--scope user` for personal scope. Project installation should receive an explicit absolute `--project` path, which may contain spaces.
-
-| Agent | Project installation | Invocation |
+| Step | Codex | Claude Code |
 | --- | --- | --- |
-| Codex | `.agents/skills/kkdesign-kit` | `$kkdesign-kit` |
-| Claude Code | `.claude/skills/kkdesign-kit` | `/kkdesign-kit` |
+| Open the command menu | `$kkdesign-kit:kkdesign-kit` | `/kkdesign-kit:kkdesign-kit` |
+| Prepare or check the runtime | `$kkdesign-kit:kkdesign-kit Setup` | `/kkdesign-kit:kkdesign-kit Setup` |
+| Start a project | `$kkdesign-kit:kkdesign-kit init` | `/kkdesign-kit:kkdesign-kit init` |
 
-After installation, restart the agent in the intended product project. A bare `$kkdesign-kit` or `/kkdesign-kit` shows the command menu; it is not an installer, discovery guarantee, or proof of live-tool readiness. Invoke a route explicitly, such as `$kkdesign-kit init` or `/kkdesign-kit init`. Live design work still requires separately authenticated design tools.
+Choose your product project and give the agent your design-system sources.
+Setup explains any needed downloads, private cache location and permissions,
+and waits for your consent. You do not need to install Python, activate an
+environment or run runtime commands in a terminal. Opening the menu and installing
+the plugin do not authorize a runtime download. A verified runtime can be reused.
 
-The installed launcher resolves helper scripts from the absolute installed `SKILL_DIR`, not the product's current working directory. You can work from another CWD; do not construct `../scripts/...` paths from there. If `python` is missing or resolves to Python 2, use Python 3 explicitly (`python3`, or `py -3` on Windows).
+After Setup reports helpers ready, `init` stages a project plan. Review its
+changes before allowing the agent to apply it, then choose `design`, `review`
+or another command below. Live design tools need their own connection and
+permissions; helper readiness does not establish that connection or design approval.
+Use provider controls to update, enable, disable or remove the plugin.
 
-Installation writes `<BASE>/.agents/skills/kkdesign-kit` (Codex) or `<BASE>/.claude/skills/kkdesign-kit` (Claude Code), plus ownership/rollback state in `<BASE>/.kkdesign-kit/installations/<harness>/`. `BASE` is the destination project or your home for personal scope. Managed runtimes always live in `~/.kkdesign-kit/runtimes/<requirements-sha256>/`, shared across installations and outside destination repositories; both scopes require a writable user home. A marker or runtime path supplied by a project is never trusted as executable provenance. No hooks, MCP settings, shell profiles, login or product design files are changed.
-
-See [installation and lifecycle](docs/installation.md) for manual acquisition/extraction, inspect, update, rollback, uninstall, and troubleshooting. SHA-256 verifies integrity, not publisher authenticity. See [requirements and tool access](docs/compatibility.md) for environment limitations.
+See [installation and troubleshooting](docs/installation.md), the measured
+[support matrix](docs/compatibility.md), and [Setup](references/setup.md).
+Authenticated agent and non-dev observation are still pending; partial native
+checks do not establish a fully accepted user journey. Existing standalone users
+should choose Setup's consented migration flow; standalone installation is not
+an onboarding fallback.
 
 ## Commands
 
@@ -100,24 +62,17 @@ Design and review never create prototype interactions as a side effect. Review g
 
 ## Set up a project
 
-The helper commands in this section describe legacy standalone installations.
-The marketplace Setup route prepares a verified runtime and can acquire pinned
-Python internally on macOS;
-helper execution then uses that trusted cache. See [Setup](references/setup.md)
-for current prerequisites and remaining integration boundaries.
+In the installed provider session, choose `init` after Setup. Give the agent
+the product-project path, source-config path and relevant platform or surface.
+Create a `sources.json` using the [supported local, Git or Figma formats](docs/source-adapters.md);
+source locations resolve relative to that configuration file. The agent uses
+the trusted [helper entrypoints](references/helpers.md) from the activated plugin,
+independently of the product CWD.
 
-Create a `sources.json` using the [supported local, Git or Figma input formats](docs/source-adapters.md). Give the agent the product-project path, source-config path and relevant platform or surface. Source locations resolve relative to the configuration file.
-
-For direct CLI use from an installed skill, invoke the stable launcher with the helper name (without `.py`). Set `SKILL_DIR` to the absolute installed directory containing `SKILL.md`; the launcher resolves scripts there, independently of the product CWD:
-
-```sh
-/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
-/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project plan --project "/path/to/your-project" --plan PLAN_ID
-/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project apply --project "/path/to/your-project" --plan PLAN_ID
-/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project validate --project "/path/to/your-project"
-```
-
-Replace `PLAN_ID` with the ID returned by `init`. Inspect its file changes, conflicts and source limitations before authorizing `apply`. Use `refresh` when those sources change, then review and apply its new plan in the same way.
+Inspect the staged plan's file changes, conflicts and source limitations before
+authorizing apply. Use `refresh` when sources change and review its new plan in
+the same way. Maintainer executable examples are in the
+[acceptance handoff](docs/verification/onboarding.md), separate from onboarding.
 
 Existing product context, profiles, lessons and task history are preserved. Project files stay in the selected product project:
 
@@ -127,7 +82,11 @@ Existing product context, profiles, lessons and task history are preserved. Proj
 
 Design-system sources and design destinations are independent: a Git token source does not require a Figma component key. See [project lifecycle and recovery](docs/project-kits.md) and [profile provenance](docs/product-profiles.md) for details.
 
-## Package and verify
+## Maintainer package verification
+
+These commands build and inspect a source artifact; they do not install a
+plugin or authorize publication. For both native marketplace builders and
+installed-package smoke, use the [handoff](docs/verification/onboarding.md).
 
 Choose fresh output and extraction paths. Existing archives are not overwritten.
 

@@ -2,6 +2,20 @@
 
 ## Unreleased — agent Setup and marketplace integration
 
+### Marketplace onboarding and acceptance handoff
+
+- Replace README/installation standalone acquisition with marketplace → agent
+  Setup → project workflow guidance for both namespaced provider invocations.
+  Keep historical standalone maintenance separate from new-user installation.
+- Consolidate actual install/discovery/runtime/helper/lifecycle evidence and
+  pending OS/CPU/provider surfaces in one support matrix, without claiming
+  full acceptance or treating helper checks as authenticated agent behavior.
+- Document actionable consent/network/policy/cache/conflict recovery and a
+  practical native/publication/non-dev acceptance checklist with safe feedback.
+  No verified public source/version exists yet; owner publication/review and
+  observed usability remain pending rather than fabricated install commands.
+
+
 - Add internal macOS Setup without existing Python/Node, using pinned CPython
   3.12.12 artifacts, HTTPS/SHA-256 verification before execution, private
   staging/locking and full bootstrap-cache verification before reuse.
@@ -84,8 +98,8 @@
 - Reuse verified runtimes without redundant download consent; reject unowned,
   missing or changed runtimes and preserve existing data on errors. Expose
   actionable network, write, local-execution and policy guidance.
-- Enable the existing Python helper dispatcher after trusted Setup. Native lifecycle integration
-  and provider/usability acceptance remain separate pending work.
+- Enable the existing Python helper dispatcher after trusted Setup. Native lifecycle compatibility is implemented; authenticated provider/usability
+  acceptance remains separate pending work.
 
 ### Earlier packaging changes
 

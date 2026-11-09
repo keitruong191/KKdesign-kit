@@ -203,3 +203,7 @@ dispatcher for both providers. Native lifecycle compatibility is implemented as 
 conflict discovery and consented migration are implemented above. End-to-end provider/OS/authentication/usability
 acceptance remains separate from coding checks. Provider owns plugin lifecycle;
 cache retention never grants tool authentication or approval.
+
+For measured provider/OS coverage and owner-arranged publication, authenticated
+agent and non-dev observation, use the [support matrix](../docs/compatibility.md)
+and [acceptance handoff](../docs/verification/onboarding.md).

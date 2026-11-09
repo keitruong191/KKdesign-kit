@@ -1,5 +1,10 @@
 # Linux runtime implementation and acceptance
 
+This is an item-specific historical verification record. For current integrated
+behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
+and [onboarding handoff](onboarding.md); earlier implementation gaps below are
+not current capability limits when superseded by later items.
+
 WWA-05 extends the internal marketplace Setup to Linux through the canonical
 `scripts/kkdesign_setup_posix.sh`. Both provider packages ship this same source;
 there is no standalone distribution, second dispatcher or installer lifecycle.
