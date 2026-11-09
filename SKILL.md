@@ -13,7 +13,9 @@ Resolve every bundled path relative to the absolute directory containing THIS
 SKILL.md (`SKILL_DIR`), never the user's current working directory. In Claude
 Code `${CLAUDE_SKILL_DIR}` identifies that directory; in Codex use the skill
 location supplied at activation. Quote absolute paths, including paths containing
-spaces. Invoke Python helpers through the stable launcher:
+spaces. On macOS, run the shared Setup check and use its returned absolute
+managed interpreter in place of `python3` below (see [setup.md](references/setup.md));
+this also works when PATH has no Python. Invoke helpers through the stable launcher:
 `python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER args...`, where `HELPER`
 is the helper name without `.py`. Project data always belongs to the user's
 selected project, outside this installed directory.
@@ -55,7 +57,8 @@ Read the menu using file-reading tools only; no execution or provisioning just
 to display it. Always show **Setup**. Report plugin loaded separately from
 runtime not checked/Setup required and external tools unverified. Native install
 never grants provisioning consent. Explicit Setup follows [setup.md](references/setup.md),
-which can provision with available Python after consent, or verify/reuse a
+which acquires pinned Python internally on macOS, provisions after consent,
+or verifies/reuses a
 trusted private runtime without another download prompt. Only successful real
 helper verification establishes runtime ready; do not infer readiness from
 Python on PATH, a directory, a schema check or a standalone marker.

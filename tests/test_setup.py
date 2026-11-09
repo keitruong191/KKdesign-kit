@@ -45,6 +45,7 @@ class SetupTests(unittest.TestCase):
         kit.write_json(self.runtime / 'runtime.json', {'identifier': kit.IDENTIFIER,
                                                      'requirementsSha256': self.runtime.name})
         kit.write_json(self.runtime / 'setup.json', setup.fingerprint(self.runtime, self.requirements))
+        return Path(purelib)
 
     def test_no_consent_does_not_create_execute_or_download_runtime(self):
         events = []
@@ -143,6 +144,29 @@ class SetupTests(unittest.TestCase):
             result = setup.setup(ROOT, self.home, consent=True)
         self.assertEqual((result['status'], result['code']), ('error', 'ownership'))
         self.assertEqual((self.runtime / 'setup.json').read_bytes(), receipt)
+
+    def test_added_startup_file_and_unsafe_metadata_fail_before_execution(self):
+        purelib = self.verified_cache()
+        receipt = (self.runtime / 'setup.json').read_bytes()
+        # A startup injection can leave the interpreter bytes unchanged.
+        injected = purelib / 'sitecustomize.py'
+        injected.write_text("raise RuntimeError('synthetic injection')\n")
+        with patch.object(kit, 'run_runtime', side_effect=AssertionError('untrusted execution')):
+            result = setup.setup(ROOT, self.home, consent=True)
+        self.assertEqual((result['status'], result['code']), ('error', 'runtime-unverified'))
+        self.assertEqual((self.runtime / 'setup.json').read_bytes(), receipt)
+        self.assertTrue(injected.exists())
+        injected.unlink()
+        if os.name == 'nt':
+            return  # POSIX mode rejection; Windows ACL acceptance is separate.
+        for name in ('runtime.json', 'setup.json'):
+            metadata = self.runtime / name
+            metadata.chmod(0o666)
+            with patch.object(kit, 'run_runtime', side_effect=AssertionError('unsafe execution')):
+                result = setup.setup(ROOT, self.home, consent=True)
+            self.assertEqual((result['status'], result['code']), ('error', 'ownership'))
+            self.assertEqual((self.runtime / 'setup.json').read_bytes(), receipt)
+            metadata.chmod(0o600)
 
     def test_failed_new_provision_leaves_no_ready_cache(self):
         for failure in (ValueError('package index network unavailable'), PermissionError('cache denied'),

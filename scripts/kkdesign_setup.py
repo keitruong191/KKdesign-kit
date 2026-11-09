@@ -54,8 +54,30 @@ def fingerprint(runtime, requirements):
     if not python.is_file():
         raise SetupError('runtime-missing', 'Managed interpreter is missing.',
                          'Inspect the retained cache, then run Setup again; no PATH fallback is used.')
+    files = {}
+    for path in sorted(runtime.rglob('*')):
+        info = path.lstat()
+        if ((hasattr(os, 'getuid') and info.st_uid != os.getuid())
+                or (not path.is_symlink() and os.name != 'nt' and info.st_mode & 0o022)):
+            raise SetupError('ownership', 'Managed runtime contains unsafe ownership or permissions.',
+                             'Preserve and inspect the cache; do not execute or overwrite it.')
+        if path.name == 'setup.json' and path.parent == runtime:
+            continue
+        name = path.relative_to(runtime).as_posix()
+        if path.is_symlink():
+            files[name] = {'link': os.readlink(path)}
+            if path.is_file():
+                files[name]['sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+        elif path.is_file():
+            files[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        elif path.is_dir():
+            files[name] = 'directory'
+        else:
+            raise SetupError('runtime-unverified', 'Unexpected managed runtime file type.',
+                             'Preserve and inspect the cache before repair.')
     return {'identifier': kit.IDENTIFIER, 'requirementsSha256': hashlib.sha256(requirements).hexdigest(),
-            'pythonSha256': hashlib.sha256(python.read_bytes()).hexdigest()}
+            'pythonSha256': hashlib.sha256(python.read_bytes()).hexdigest(),
+            'filesSha256': hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()}
 
 
 def trusted_runtime(home, requirements):
