@@ -6,16 +6,31 @@ separately. This report does not establish platform support or human consent.
 
 ## Coding and changed-path evidence
 
-Final checks on macOS ARM64 with Python 3.9.6 in a temporary development venv
+Checks on macOS ARM64 with Python 3.9.6 in a temporary development venv
 populated from `requirements.txt`:
 
 | Check | Result | Actual scope |
 |---|---|---|
-| `python -m unittest discover -s tests -v` | PASS, 138 tests, 17.921 seconds | Existing core regressions plus consent refusal without writes/execution, real cached-helper reuse, integrity/requirements/missing-interpreter rejection, symlink and unsafe permission rejection, failed provisioning cleanup, failed actual helper validation and both relocated plugin layouts. |
-| `python -B scripts/smoke_agent_setup.py` | PASS | Real venv/pip dependency provisioning after explicit test consent, then repeated Setup and actual materialize/validate helpers for Claude and Codex marketplace artifacts in arbitrary temporary paths with spaces and unrelated product CWD. |
+| `python -m unittest discover -s tests -v` | PASS, 138 tests, 17.915 seconds (capability-claim correction) | Existing core regressions plus consent refusal without writes/execution, real cached-helper reuse, integrity/requirements/missing-interpreter rejection, symlink and unsafe permission rejection, failed provisioning cleanup, failed actual helper validation and both relocated plugin layouts. |
+| `python -B scripts/smoke_agent_setup.py` | Earlier PASS; implementation revision `008ccfb6da0a4cee07f744cf93f3e6d202f16f12` | Real venv/pip dependency provisioning after explicit test consent, then repeated Setup and actual materialize/validate helpers for Claude and Codex marketplace artifacts in arbitrary temporary paths with spaces and unrelated product CWD. |
 | `git diff --check` | PASS | Whitespace/error check only. |
 
-The smoke creates a temporary HOME, extracts actual deterministic marketplace
+## Capability-claim correction
+
+Corrected the Claude and Codex descriptor descriptions and installation guide
+to describe consent-gated Setup with available Python, verified cache reuse,
+and pending WWA-04–07 acquisition/launch integration. Legacy lifecycle ownership
+and pending native acceptance remain explicit. No code, tests or native
+provider/authentication flow changed in this correction, and no wording tests
+were added. The final delivery SHA is recorded in PR #11's description so this
+committed report does not attempt to embed its own Git object ID.
+
+The unit suite passed once after these capability edits for the revised package
+bytes; the real Setup smoke above remains evidence for its earlier tested
+implementation revision, not a smoke of this correction's final package bytes.
+No native authentication acceptance rerun is claimed.
+
+The earlier smoke creates a temporary HOME, extracts actual deterministic marketplace
 artifacts, first requests Setup without consent and observes no cache creation,
 then provisions and runs real dependency-backed validation. The second adapter
 reuses the same requirements-matched cache without new consent/download. Both

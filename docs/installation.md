@@ -4,9 +4,13 @@ For the Codex adapter, see [Codex marketplace packaging](codex-marketplace.md)
 and use its native namespaced invocation `$kkdesign-kit:kkdesign-kit`.
 For the new Claude Code adapter, see [marketplace packaging preview](claude-marketplace.md).
 It uses native plugin lifecycle and `/kkdesign-kit:kkdesign-kit`; its menu and
-Setup instructions do not require Python. Runtime Setup is still required and
-not implemented by this preview. Do not use standalone commands below to set
-up or manage a plugin. The remainder documents the legacy standalone lifecycle.
+Setup instructions do not require Python. Explicit Setup can provision with the
+user's consent using available Python 3.9+ and working venv/ensurepip, then
+verify helpers and reuse a trusted private cache without a redundant download
+prompt. Automatic Python acquisition and Python-free launch remain pending
+WWA-04–07; native provider/OS acceptance is separate and pending. Do not use
+standalone commands below to set up or manage a plugin. The remainder documents
+the legacy standalone lifecycle.
 
 Requires Python 3.9+ on macOS, Linux or Windows and a separately installed,
 authenticated Codex CLI or Claude Code. Bootstrap and installer use only the
