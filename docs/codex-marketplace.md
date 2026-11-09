@@ -1,4 +1,4 @@
-# Codex marketplace packaging preview
+# Codex marketplace packaging and native review
 
 The Codex adapter packages the canonical skill/resources under
 `skills/kkdesign-kit/`, without a second workflow source. The generated
@@ -20,6 +20,12 @@ Linux acquisition is implemented; [native Linux acceptance](verification/linux-r
 
 ## Native maintainer review
 
+**User-ready publication is pending.** Version `0.5.0a1` is the local review
+payload. `<reviewed-marketplace-source>` below is a maintainer-supplied isolated
+catalog, not a published URL. See [onboarding](installation.md) and the measured
+[support matrix](compatibility.md); do not install from a guessed default-branch
+source or treat local review as public availability.
+
 Use a clean isolated HOME and CODEX_HOME with a reviewed marketplace source.
 No published marketplace endpoint or public-directory approval is claimed.
 Register the source using native controls (the marketplace argument to plugin
@@ -36,7 +42,13 @@ Start a new session in the selected product project, then invoke:
 ```text
 $kkdesign-kit:kkdesign-kit
 $kkdesign-kit:kkdesign-kit Setup
+$kkdesign-kit:kkdesign-kit init
 ```
+
+For `init`, supply the selected product project and declared sources, inspect
+the staged plan and authorize apply only after review. External design-tool
+authorization is separate. These are invocation instructions, not a claim that
+authenticated menu/Setup/workflow observation has passed.
 
 Resolve bundled resources from the activation-provided skill directory, never
 from product CWD or the author's checkout. Do not create a standalone skill
@@ -87,16 +99,14 @@ reviewed ref can instead distribute it through the host's clone/cache flow.
 
 ## Surface boundaries
 
-Native review targets Codex CLI on macOS ARM64 only. This does not advertise
-working Setup/runtime support on that combination. Linux, Windows, other CPUs,
-and the ChatGPT desktop app have no native evidence for this adapter yet.
-The Codex IDE extension does not support plugins. Cloud/web/mobile sessions
-without a local executor cannot run helper workflows; no fallback installer is
-provided. Public-directory local-execution plugins have Desktop only limits;
-local CLI marketplace evidence does not establish public-directory coverage.
-Unsupported surfaces should use a supported local host when a verified release
-is available. Provider installation never establishes design-tool access or
-human approval.
+Native evidence currently covers Codex CLI 0.167.0 on macOS ARM64 for
+install/discovery/lifecycle and direct installed-cache Setup/helpers; see the
+[measured matrix](compatibility.md). Authenticated agent interaction, Intel,
+Linux/Windows and other surfaces remain pending. No IDE, desktop-app or cloud
+coverage is inferred from CLI checks. Sessions without an authorized local
+executor cannot run Setup/helpers. Public-directory local-execution eligibility
+has separate publication constraints; repo CLI evidence does not establish it.
+Provider installation never establishes design-tool access or human approval.
 
 See [native verification](verification/codex-marketplace.md) for observed
 results and pending acceptance. Official sources:

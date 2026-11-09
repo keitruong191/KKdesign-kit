@@ -1,5 +1,10 @@
 # Windows runtime implementation and acceptance
 
+This is an item-specific historical verification record. For current integrated
+behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
+and [onboarding handoff](onboarding.md); earlier implementation gaps below are
+not current capability limits when superseded by later items.
+
 WWA-06 adds the canonical internal `scripts/kkdesign_setup_windows.ps1` to both
 provider packages. It performs Setup only; provider installation, update and
 uninstall remain native. The shared Python Setup still provisions requirements,

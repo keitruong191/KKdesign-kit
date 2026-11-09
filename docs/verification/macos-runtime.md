@@ -1,5 +1,10 @@
 # macOS runtime implementation and acceptance
 
+This is an item-specific historical verification record. For current integrated
+behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
+and [onboarding handoff](onboarding.md); earlier implementation gaps below are
+not current capability limits when superseded by later items.
+
 WWA-04 adds an internal `/bin/sh` Setup entrypoint to the canonical marketplace
 payload. It is an agent-invoked Setup action, never a public installer, install
 hook, alternate skill distribution or provider lifecycle command.

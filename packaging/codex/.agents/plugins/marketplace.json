@@ -1,6 +1,6 @@
 {
   "name": "kkdesign-kit-codex",
-  "interface": {"displayName": "KKdesign-kit Codex preview"},
+  "interface": {"displayName": "KKdesign-kit Codex"},
   "plugins": [{
     "name": "kkdesign-kit",
     "source": {"source": "local", "path": "./"},

@@ -1,5 +1,10 @@
 # WWA-01 native verification
 
+This is an item-specific historical verification record. For current integrated
+behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
+and [onboarding handoff](onboarding.md); earlier implementation gaps below are
+not current capability limits when superseded by later items.
+
 Implementation/code verification: **ready for coordinator review and integration**.
 Authenticated native menu/Setup acceptance: **pending**. The prior attempts
 failed because the isolated profile lacked Claude authentication; they are not
