@@ -14,8 +14,9 @@ A trusted runtime is reused only after full cache checks and actual helper
 verification. Linux acquisition targets GNU libc 2.28+ x86_64/ARM64 with host
 curl, GNU tar and coreutils; musl and other CPUs are rejected before download.
 [Linux native acceptance](verification/linux-runtime.md) is pending; implementation
-is not a tested-distribution support claim. Windows acquisition and general
-Python-free launcher integration remain pending (WWA-06/07). Setup smoke does not establish native
+is not a tested-distribution support claim. Windows acquisition is implemented with native PowerShell 5.1 and private ACL
+checks; [native Windows acceptance](verification/windows-runtime.md) is pending.
+General Python-free launcher integration remains WWA-07. Setup smoke does not establish native
 provider support or live design-tool authentication. Native and usability acceptance remain separate.
 
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and

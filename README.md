@@ -15,7 +15,8 @@ prepare one and verify real helpers. macOS/Linux Setup can acquire pinned Python
 internally without Python/Node on PATH; ARM64 acquisition/helper smoke is
 recorded in [macOS verification](docs/verification/macos-runtime.md). Linux
 acquisition is implemented with [native acceptance pending](docs/verification/linux-runtime.md).
-Intel native acceptance, Windows acquisition and general Python-free helper
+Windows PowerShell acquisition is implemented; [native acceptance is pending](docs/verification/windows-runtime.md).
+Intel/Windows native acceptance and general Python-free helper
 startup remain pending. No public marketplace release or official listing is claimed.
 Do not use the old standalone installer as a plugin Setup fallback.
 

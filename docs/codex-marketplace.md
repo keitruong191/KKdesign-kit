@@ -13,8 +13,8 @@ for consent before provisioning and verifying real helpers. macOS/Linux Setup ca
 acquire pinned Python internally without Python/Node on PATH; see
 [runtime evidence](verification/macos-runtime.md).
 Plugin loaded, runtime readiness and external tools unverified remain separate.
-Windows acquisition, general Python-free helper startup and native
-end-to-end acceptance are pending;
+Windows PowerShell acquisition is implemented with [native acceptance pending](verification/windows-runtime.md).
+General Python-free helper startup and native end-to-end acceptance are pending;
 this is not a public release or official listing.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 

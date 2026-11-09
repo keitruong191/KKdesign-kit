@@ -58,11 +58,13 @@ Read the menu using file-reading tools only; no execution or provisioning just
 to display it. Always show **Setup**. Report plugin loaded separately from
 runtime not checked/Setup required and external tools unverified. Native install
 never grants provisioning consent. Explicit Setup follows [setup.md](references/setup.md),
-which acquires pinned Python internally on macOS and Linux, provisions after
+which acquires pinned Python internally on macOS/Linux and native Windows
+PowerShell 5.1, provisions after
 consent, or verifies/reuses a trusted private runtime without another download
 prompt. Native Linux/provider and incomplete-system-Python acceptance remain
-pending; Windows acquisition and general Python-free helper startup remain
-unimplemented. Only successful real
+pending. Windows x64/ARM64 acquisition is implemented with
+[native acceptance pending](docs/verification/windows-runtime.md); general
+Python-free helper startup remains WWA-07. Only successful real
 helper verification establishes runtime ready; do not infer readiness from
 Python on PATH, a directory, a schema check or a standalone marker.
 

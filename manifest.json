@@ -33,7 +33,8 @@
     "managed-helper-runtime",
     "agent-setup-consent",
     "macos-python-bootstrap",
-    "linux-python-bootstrap"
+    "linux-python-bootstrap",
+    "windows-python-bootstrap"
   ],
   "planned": [
     "optional-hooks"
@@ -101,6 +102,8 @@
     "scripts/figma_prototype.js",
     "docs/codex-marketplace.md",
     "scripts/kkdesign_setup.py",
-    "scripts/kkdesign_setup_posix.sh"
+    "scripts/kkdesign_setup_posix.sh",
+    "scripts/kkdesign_setup_windows.ps1",
+    "scripts/kkdesign_windows_security.ps1"
   ]
 }

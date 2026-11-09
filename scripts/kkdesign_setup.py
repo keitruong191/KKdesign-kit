@@ -34,8 +34,25 @@ def package_root(path):
     return path
 
 
+def windows_private(path, home, tree=False):
+    """Use the same native ACL/reparse policy as the Python-free bootstrap."""
+    if os.name != 'nt':
+        return
+    powershell = Path(os.environ['SystemRoot']) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+    command = [str(powershell), '-NoProfile', '-NonInteractive', '-File',
+               str(Path(__file__).with_name('kkdesign_windows_security.ps1')),
+               '-Path', str(path), '-UserHome', str(home)]
+    if tree:
+        command.append('-Recurse')
+    result = subprocess.run(command, capture_output=True, text=True, timeout=180)
+    if result.returncode:
+        raise SetupError('ownership-or-policy', result.stderr.strip() or 'Windows cache verification was denied.',
+                         'Preserve the cache and inspect ownership/ACLs or ask the administrator for authorized execution; never bypass policy.')
+
+
 def cache_paths(home, requirements):
     runtime = kit.runtime_path(home, requirements)
+    windows_private(runtime, home)
     kit.no_links(runtime)
     # Private cache provenance is rooted in the actual user's home, never a
     # project setting or a runtime path read from package/project JSON.
@@ -50,6 +67,7 @@ def cache_paths(home, requirements):
 
 
 def fingerprint(runtime, requirements):
+    windows_private(runtime, runtime.parents[2], tree=True)
     python = kit.runtime_python(runtime)
     if not python.is_file():
         raise SetupError('runtime-missing', 'Managed interpreter is missing.',
@@ -59,7 +77,7 @@ def fingerprint(runtime, requirements):
         info = path.lstat()
         if ((hasattr(os, 'getuid') and info.st_uid != os.getuid())
                 or (not path.is_symlink() and os.name != 'nt' and info.st_mode & 0o022)):
-            raise SetupError('ownership', 'Managed runtime contains unsafe ownership or permissions.',
+            raise SetupError('ownership', 'Managed runtime contains unsafe ownership or permissions: ' + str(path),
                              'Preserve and inspect the cache; do not execute or overwrite it.')
         if path.name == 'setup.json' and path.parent == runtime:
             continue

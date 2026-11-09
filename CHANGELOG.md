@@ -9,7 +9,7 @@
   changed runtime files as well as changed interpreters before helper execution.
 - Verify actual relocated missing-Python Setup, dependency provisioning, reuse
   and helpers on macOS ARM64. Intel native/provider/human acceptance remains
-  separate; Windows acquisition and general helper startup are later items.
+  separate; general helper startup remains a later item.
 
 ### Linux runtime
 
@@ -22,6 +22,18 @@
 - Native Linux missing-Python and missing-venv/ensurepip acceptance remains
   pending available Linux resources; macOS smoke does not establish Linux support.
 
+### Windows runtime
+
+- Add native Windows PowerShell 5.1 Setup for x64/ARM64, with pinned HTTPS
+  CPython acquisition, SHA-256 before extraction/execution, private staging,
+  exclusive locking and full inventory checks before reuse.
+- Verify Windows ownership, ACLs and reparse-point ancestry in both bootstrap
+  and shared runtime readiness; preserve unowned/corrupt caches and respect
+  execution policy. No Python/Node, WSL, Git Bash, admin or PATH changes.
+- Ship the canonical bootstrap/security helper in both marketplace adapters.
+  Add native boundary tests and relocated acquisition/helper smoke; actual
+  Windows/provider acceptance awaits resources and is not inferred from macOS.
+
 ### Shared Setup changes
 
 - Implement shared explicit Setup with streamed phases, consent before new
@@ -31,7 +43,7 @@
   missing or changed runtimes and preserve existing data on errors. Expose
   actionable network, write, local-execution and policy guidance.
 - Enable the existing Python helper dispatcher after trusted Setup. General
-  Python-free launch, Windows acquisition, native lifecycle integration
+  Python-free launch, native lifecycle integration
   and provider/usability acceptance remain separate pending work.
 
 ### Earlier packaging changes

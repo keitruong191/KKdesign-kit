@@ -11,8 +11,8 @@ verify helpers, authenticate design tools or grant approval. The menu needs
 only file-reading tools. Explicit [Setup](../references/setup.md) checks/reuses
 a trusted private runtime or, after consent, provisions and verifies real helpers. macOS/Linux Setup acquires pinned Python
 internally without existing Python/Node; see [runtime evidence](verification/macos-runtime.md).
-Windows acquisition, general Python-free helper startup and native end-to-end
-acceptance remain pending. No public release or official listing is claimed.
+Windows PowerShell acquisition is implemented with [native acceptance pending](verification/windows-runtime.md).
+General Python-free helper startup and native end-to-end acceptance remain pending. No public release or official listing is claimed.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
 ## Native review flow
