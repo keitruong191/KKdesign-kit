@@ -96,13 +96,80 @@ class SetupTests(unittest.TestCase):
             launcher = package / 'scripts/kkdesign_run.py'
             for args in (['materialize_example', '--output', str(output)],
                          ['kkdesign_core', 'validate', '--design', str(output / 'design')]):
-                proc = subprocess.run([sys.executable, '-I', '-B', str(launcher), *args],
+                proc = subprocess.run([sys.executable, '-I', '-B', str(launcher), '--package-root', str(package), *args],
                                       cwd=self.base, env=env, capture_output=True, text=True)
                 self.assertEqual(proc.returncode, 0, proc.stderr)
             self.assertEqual(json.loads(proc.stdout)['status'], 'pass')
             self.assertEqual(kit.hashes(cache), before)
             self.assertFalse((self.base / '.kkdesign-kit').exists())
         self.assertEqual((self.runtime / 'setup.json').read_bytes(), original_runtime)
+
+    def invoke_helper(self, package=ROOT, *arguments):
+        return subprocess.run([sys.executable, '-I', '-B',
+                               str(package / 'scripts/kkdesign_run.py'),
+                               '--package-root', str(package), *arguments],
+                              cwd=self.base,
+                              env=dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home),
+                                       PATH=str(self.base / 'no PATH executables')),
+                              capture_output=True, text=True, timeout=60)
+
+    def test_explicit_package_never_needs_provider_marker_or_project_ledger(self):
+        self.verified_cache()
+        package = self.base / 'arbitrary cache with spaces'
+        shutil.copytree(ROOT, package, ignore=shutil.ignore_patterns('.git', '.hoangsa', '__pycache__'))
+        for marker in ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', 'plugin.json'):
+            (package / marker).unlink(missing_ok=True)
+        # No provider descriptor at this location; explicit roots still require
+        # a trusted runtime, and executable paths in product data are irrelevant.
+        (self.base / 'runtime.json').write_text(json.dumps({'python': str(sys.executable)}))
+        output = self.base / 'selected output with spaces'
+        before = kit.hashes(package)
+        proc = self.invoke_helper(package, 'materialize_example', '--output', str(output))
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        proc = self.invoke_helper(package, 'kkdesign_core', 'validate', '--design', str(output / 'design'))
+        self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)['status'], 'pass')
+        self.assertEqual(kit.hashes(package), before)
+
+    def test_dispatch_rejects_missing_forged_changed_runtime_and_executable_helpers(self):
+        output = self.base / 'must not exist'
+        def refused(*arguments):
+            proc = self.invoke_helper(ROOT, *arguments)
+            self.assertNotEqual(proc.returncode, 0)
+            self.assertFalse(output.exists())
+        arguments = ('materialize_example', '--output', str(output))
+        refused(*arguments)
+        self.assertFalse((self.home / '.kkdesign-kit').exists())
+        self.runtime.mkdir(parents=True)
+        kit.write_json(self.runtime / 'runtime.json', {'identifier': kit.IDENTIFIER,
+                                                     'requirementsSha256': self.runtime.name})
+        before = kit.hashes(self.runtime)
+        refused(*arguments)
+        self.assertEqual(kit.hashes(self.runtime), before)
+        shutil.rmtree(self.runtime)
+        self.runtime.parent.rmdir()
+        purelib = self.verified_cache()
+        # An injected startup file must be rejected before the target runtime
+        # starts, even though its interpreter and ownership marker still match.
+        executed = self.base / 'startup executed'
+        injection = purelib / 'sitecustomize.py'
+        injection.write_text('from pathlib import Path\nPath(' + repr(str(executed)) + ').touch()\n')
+        refused(*arguments)
+        self.assertFalse(executed.exists())
+        self.assertTrue(injection.exists())
+        injection.unlink()
+        requirements = self.runtime / 'requirements.txt'
+        requirements.write_text('synthetic incompatible requirements')
+        refused(*arguments)
+        requirements.write_bytes(self.requirements)
+        refused(str(sys.executable), '--output', str(output))
+        if os.name != 'nt':
+            self.runtime.chmod(0o777)
+            refused(*arguments)
+            self.assertEqual(self.runtime.stat().st_mode & 0o777, 0o777)
+            self.runtime.chmod(0o700)
+        kit.runtime_python(self.runtime).unlink()
+        refused(*arguments)
 
     def test_plugin_in_legacy_shaped_directory_keeps_native_ownership(self):
         self.verified_cache()
@@ -114,7 +181,7 @@ class SetupTests(unittest.TestCase):
         shutil.copytree(self.base / 'extracted/kkdesign-marketplace/plugins/kkdesign-kit', package)
         before = kit.hashes(package)
         destination = self.base / 'legacy shaped example'
-        proc = subprocess.run([sys.executable, '-I', '-B', str(package / 'scripts/kkdesign_run.py'),
+        proc = subprocess.run([sys.executable, '-I', '-B', str(package / 'scripts/kkdesign_run.py'), '--package-root', str(package),
                                'materialize_example', '--output', str(destination)],
                               cwd=self.base, env=dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home)),
                               capture_output=True, text=True)

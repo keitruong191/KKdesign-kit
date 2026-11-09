@@ -8,10 +8,9 @@ contract; do not begin canvas changes until it is complete and stored.
 
 Resolve `SKILL_DIR` to the absolute installed directory containing `SKILL.md`,
 never from the current directory. Invoke the helper as
-`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task ...` (helper name
-without `.py`). The installed launcher uses the external runtime recorded at
-installation; source/manual use needs Python 3.9+ and `jsonschema` from
-`requirements.txt` in the current environment. `PROJECT` is the user's selected
+`/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_task ...` (helper name
+without `.py`). The launcher verifies the private runtime prepared by Setup. For native Windows
+use the equivalent PowerShell form in [helper invocation](helpers.md). `PROJECT` is the user's selected
 project kit. The generic synthetic example is `"$SKILL_DIR/examples/minimal"`;
 never copy private data into this public package.
 
@@ -46,7 +45,7 @@ never copy private data into this public package.
    using the provided request and observations, and pass that file to:
 
    ```sh
-   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task begin \
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_task begin \
      --project "$PROJECT" --record /path/to/complete-task.json
    ```
 
@@ -76,7 +75,7 @@ never copy private data into this public package.
    pass-result payload from this helper. Example:
 
    ```sh
-   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task evidence \
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_task evidence \
      --project "$PROJECT" --task-id "$TASK_ID" --type snapshot \
      --description "Actual saved settings frame readback and viewport capture" \
      --payload /path/to/real-readback.json --historical-status current \
@@ -96,7 +95,7 @@ never copy private data into this public package.
    Run the offline integrity check before handoff:
 
    ```sh
-   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task check \
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_task check \
      --project "$PROJECT" --task-id "$TASK_ID"
    ```
 
@@ -109,7 +108,7 @@ never copy private data into this public package.
    evidence filename in its `evidence` array. Example:
 
    ```sh
-   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task handoff \
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_task handoff \
      --project "$PROJECT" --task-id "$TASK_ID" \
      --record /path/to/evidence-linked-handoff.json --status design_delivered
    ```

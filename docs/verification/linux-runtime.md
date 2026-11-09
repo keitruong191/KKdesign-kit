@@ -105,9 +105,7 @@ not authenticated agent consent, native marketplace or usability evidence.
 | Integrity/write/policy/network failures never ready or trust foreign executables | Implemented with pre-execution verification, private transaction, clear refusal and preservation | Real organization policy/firewall acceptance pending |
 | Repeat Setup, arbitrary CWD and spaces preserve valid runtime/project | Implemented and covered by relocated harness | Linux native repeat smoke pending |
 
-WWA-07 owns general Python-free helper startup and full caller migration. Until
-then agents use the successful Setup result's absolute Python with `-I -B` and
-the existing `kkdesign_run.py`, and rerun Setup checking in a new session. WWA-06
-owns Windows acquisition; WWA-08/09 own lifecycle compatibility/repair and
+WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
+through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own lifecycle compatibility/repair and
 standalone migration. Provider native install/update/remove, authentication,
 human consent and non-dev usability remain separate integrated acceptance.

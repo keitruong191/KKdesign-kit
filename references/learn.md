@@ -7,15 +7,14 @@ are not accepted for these authoring operations; preserve native evidence first
 as a project-local record where policy permits.
 Resolve `SKILL_DIR` to the absolute installed directory containing `SKILL.md`,
 never the project working directory. Invoke helpers as
-`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn ...` (helper
-name without `.py`). Installed helpers use the external runtime recorded by
-installation; source/manual use needs Python 3.9+ and packages from
-`requirements.txt` in the current environment. Quote absolute project paths.
+`/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_learn ...` (helper
+name without `.py`). Helpers verify the private runtime prepared by Setup. For native Windows
+use the equivalent PowerShell form in [helper invocation](helpers.md). Quote absolute project paths.
 
 ## Capture direct feedback
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn feedback \
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_learn feedback \
   --design "/path/to/project/design" \
   --content "The selected control is hard to distinguish." \
   --evidence ../evidence/review-notes.json \
@@ -36,7 +35,7 @@ retain its evidence and origin. Canonical authored advice lives only in
 `design/LESSON.md`; `lessons-index.json` is derived and regenerated from it.
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn author \
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_learn author \
   --design "/path/to/project/design" \
   --title "Keep control states distinguishable" \
   --body "When documenting a control, explain how its relevant states differ. This is an inferred practice, not a claim that a live implementation was tested." \
@@ -80,7 +79,7 @@ guarantee against a concurrent process changing directory entries.
 Author the replacement first, then explicitly mark the prior lesson:
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn supersede \
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_learn supersede \
   --design "/path/to/project/design" --id DL-001 --by DL-002
 ```
 

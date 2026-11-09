@@ -16,8 +16,8 @@ internally without Python/Node on PATH; ARM64 acquisition/helper smoke is
 recorded in [macOS verification](docs/verification/macos-runtime.md). Linux
 acquisition is implemented with [native acceptance pending](docs/verification/linux-runtime.md).
 Windows PowerShell acquisition is implemented; [native acceptance is pending](docs/verification/windows-runtime.md).
-Intel/Windows native acceptance and general Python-free helper
-startup remain pending. No public marketplace release or official listing is claimed.
+Helpers start through the [verified OS entrypoints](references/helpers.md) without
+system Python. Intel/Windows native acceptance remains pending. No public marketplace release or official listing is claimed.
 Do not use the old standalone installer as a plugin Setup fallback.
 
 ### Legacy standalone instructions
@@ -111,10 +111,10 @@ Create a `sources.json` using the [supported local, Git or Figma input formats](
 For direct CLI use from an installed skill, invoke the stable launcher with the helper name (without `.py`). Set `SKILL_DIR` to the absolute installed directory containing `SKILL.md`; the launcher resolves scripts there, independently of the product CWD:
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project plan --project "/path/to/your-project" --plan PLAN_ID
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project "/path/to/your-project" --plan PLAN_ID
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project validate --project "/path/to/your-project"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project plan --project "/path/to/your-project" --plan PLAN_ID
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project apply --project "/path/to/your-project" --plan PLAN_ID
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project validate --project "/path/to/your-project"
 ```
 
 Replace `PLAN_ID` with the ID returned by `init`. Inspect its file changes, conflicts and source limitations before authorizing `apply`. Use `refresh` when those sources change, then review and apply its new plan in the same way.

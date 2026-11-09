@@ -75,12 +75,12 @@ When the user explicitly chooses Setup:
    if needed) → preparing runtime → verifying helpers → complete or failed. Preparation uses venv and requirements.txt in
    the private user cache, with bounded subprocess execution. No standalone
    install lifecycle, hooks or alternate installer is invoked.
-5. **Use the result.** On every OS use the absolute `python` path returned by a
-   successful Setup to invoke the existing `scripts/kkdesign_run.py` dispatcher,
-   with `-I -B`, for the remainder of this agent session. Never substitute a
-   project-provided executable or PATH Python. In a new session run the same OS
-   Setup check again to verify/reuse the cache and obtain that path. General
-   Python-free helper startup and full caller migration remain WWA-07.
+5. **Use the result.** Invoke helpers with the OS entrypoint's helper mode,
+   following [helper invocation](helpers.md). It verifies the acquired interpreter
+   before startup, then the dispatcher checks runtime ownership, requirements and
+   its receipt on every invocation. No remembered executable path, PATH Python,
+   activation or repeated Setup is needed in a new session. Helper mode never
+   downloads or provisions; missing/changed caches require explicit Setup/repair.
 6. **Report the result.** Only `ready` following actual synthetic workspace
    materialization and dependency-backed helper validation establishes runtime
    readiness. Reuse verifies a trusted cache and runs helpers again, without
@@ -112,8 +112,8 @@ checksum failures preserve existing data and stop; never delete a suspicious
 cache automatically or use arbitrary fallback interpreters.
 
 The current Python launcher accepts only the private cache matching package
-requirements and its verification receipt. Python-free helper entrypoints and
-full caller migration belong to WWA-07; native lifecycle compatibility and
-migration belong to WWA-08/09. End-to-end provider/OS/authentication/usability
+requirements and its verification receipt. The same OS entrypoints expose helper mode and share the canonical Python
+dispatcher for both providers. Native lifecycle compatibility and migration
+belong to WWA-08/09. End-to-end provider/OS/authentication/usability
 acceptance remains separate from coding checks. Provider owns plugin lifecycle;
 cache retention never grants tool authentication or approval.

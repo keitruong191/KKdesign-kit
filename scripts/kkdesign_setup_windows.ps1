@@ -1,6 +1,8 @@
 # Internal marketplace Setup, Windows PowerShell 5.1. Never change execution policy.
 [CmdletBinding()]
-param([Parameter(Mandatory=$true)][string]$PackageRoot, [switch]$Consent)
+param([Parameter(Mandatory=$true)][string]$PackageRoot, [switch]$Consent,
+      [string]$Helper,
+      [Parameter(ValueFromRemainingArguments=$true)][string[]]$HelperArguments)
 # A PowerShell 7 executor may pass its incompatible module search path to 5.1.
 # Select only this native host's built-in modules in this child process.
 $env:PSModulePath = [IO.Path]::Combine($PSHOME, 'Modules')
@@ -48,6 +50,9 @@ function Download([string]$Url, [string]$Destination) {
 }
 
 try {
+    if ($PSBoundParameters.ContainsKey('Helper') -and -not $Helper) { throw 'Missing helper name' }
+    if ($HelperArguments -and -not $Helper) { throw 'Helper arguments require a helper name' }
+    if ($Helper -and $Consent) { throw 'Helper invocation cannot provision; choose Setup separately' }
     if ($env:OS -ne 'Windows_NT' -or $PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion -lt [version]'5.1') {
         throw 'Use the native Windows PowerShell 5.1 host; no WSL, Git Bash or alternate installer is required'
     }
@@ -72,6 +77,7 @@ try {
     $root = Join-Path $base 'bootstrap'
     $cache = Join-Path $root ('cpython-3.12.12-20251014-' + $target + '-pc-windows-msvc')
     Assert-PrivatePath $cache $userHome
+    if ($Helper -and -not (Test-Path -LiteralPath $cache -PathType Container)) { throw 'Setup required: managed bootstrap is missing; choose Setup in the installed skill' }
     if (-not (Test-Path -LiteralPath $cache) -and -not $Consent) {
         [Console]::Error.WriteLine("Setup needs pinned CPython 3.12.12 from Astral python-build-standalone release 20251014 over HTTPS and requirements.txt dependencies from the package index. Storage: $cache and $base\runtimes. Network, private user-cache writes and local execution are required; no admin, system Python, PATH or policy changes. Obtain explicit consent before -Consent.")
         Emit @{plugin='loaded'; runtime='setup-required'; externalTools='unverified'; status='consent-required'; phase='consent-required'}
@@ -109,8 +115,11 @@ try {
         [Environment]::SetEnvironmentVariable($name, $null, 'Process')
     }
     $arguments = @('-I','-B', (Join-Path $PackageRoot 'scripts\kkdesign_setup.py'), '--package-root', $PackageRoot)
-    if ($Consent) { $arguments += '--consent' }
+    if ($Helper) {
+        $arguments = @('-I','-B', (Join-Path $PackageRoot 'scripts\kkdesign_run.py'), '--package-root', $PackageRoot, $Helper) + $HelperArguments
+    } elseif ($Consent) { $arguments += '--consent' }
     & $python @arguments
+    if ($Helper) { exit $LASTEXITCODE }
     if ($LASTEXITCODE -ne 0) { throw 'Runtime execution or helper verification failed' }
 } catch {
     [Console]::Error.WriteLine($_.Exception.Message + '. Restore approved network access, user-cache writes or local execution with the administrator; do not bypass policy or use another installer. Existing caches are preserved.')

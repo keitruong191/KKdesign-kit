@@ -5,6 +5,7 @@ from pathlib import Path
 import shutil
 import sys
 sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from kkdesign_core import build_lesson_index, save
 
 

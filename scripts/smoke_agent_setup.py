@@ -68,7 +68,7 @@ def main():
             assert again[-1]['result']['reused'] is True, again
             assert all(event['phase'] != 'consent-required' for event in again)
             example = base / (builder.__name__ + ' example')
-            launcher = [sys.executable, '-I', '-B', package / 'scripts/kkdesign_run.py']
+            launcher = [sys.executable, '-I', '-B', package / 'scripts/kkdesign_run.py', '--package-root', package]
             run([*launcher, 'materialize_example', '--output', example], product, env)
             validation = json.loads(run([*launcher, 'kkdesign_core', 'validate', '--design', example / 'design'], product, env))
             assert (validation['status'], validation['errors'], validation['warnings']) == ('pass', [], []), validation

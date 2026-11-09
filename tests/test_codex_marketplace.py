@@ -39,7 +39,7 @@ class CodexMarketplaceTests(unittest.TestCase):
             before = kit.hashes(plugin)
             destination = base / 'must not exist'
             result = subprocess.run([sys.executable, '-I', '-B',
-                                     str(skill / 'scripts/kkdesign_run.py'),
+                                     str(skill / 'scripts/kkdesign_run.py'), '--package-root', str(skill),
                                      'materialize_example', '--output', str(destination)],
                                     cwd=base, env=dict(os.environ, HOME=str(base), USERPROFILE=str(base)),
                                     capture_output=True, text=True)

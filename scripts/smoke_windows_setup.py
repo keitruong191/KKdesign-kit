@@ -27,7 +27,22 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def run(command, cwd, env, success=True, events=True):
-    proc = subprocess.run([str(arg) for arg in command], cwd=cwd, env=env,
+    command = [str(arg) for arg in command]
+    if '-Helper' in command:
+        # -File in Windows PowerShell 5.1 cannot bind a native argv array.
+        # Exercise the documented same-host script/array form instead.
+        def quoted(value):
+            return "'" + value.replace("'", "''") + "'"
+        file_index = command.index('-File')
+        helper_index = command.index('-Helper')
+        script = command[file_index + 1]
+        package = command[command.index('-PackageRoot') + 1]
+        helper = command[helper_index + 1]
+        arguments = ','.join(quoted(arg) for arg in command[helper_index + 2:])
+        code = ('& ' + quoted(script) + ' -PackageRoot ' + quoted(package)
+                + ' -Helper ' + quoted(helper) + ' -HelperArguments @(' + arguments + ')')
+        command = command[:file_index] + ['-Command', code]
+    proc = subprocess.run(command, cwd=cwd, env=env,
                           capture_output=True, text=True, timeout=600)
     if (proc.returncode == 0) != success:
         raise RuntimeError(proc.stdout + proc.stderr)
@@ -121,13 +136,28 @@ def main():
             assert again[-1]['result']['reused'] is True, again
             assert all(item['phase'] != 'downloading-python' for item in again)
             output = base / (builder.__name__ + ' example')
-            # This is the existing dispatcher with the returned absolute managed
-            # interpreter. General Python-free helper startup is WWA-07.
-            launcher = [result['python'], '-I', '-B', package / 'scripts/kkdesign_run.py']
+            launcher = [*command, '-Helper']
             run([*launcher, 'materialize_example', '--output', output], product, env, events=False)
             validation = json.loads(run([*launcher, 'kkdesign_core', 'validate', '--design', output / 'design'],
                                         product, env, events=False))
             assert (validation['status'], validation['errors'], validation['warnings']) == ('pass', [], [])
+            checked = json.loads(run([*launcher, 'kkdesign_task', 'check', '--project', output,
+                                      '--task-id', 'demo'], product, env, events=False))
+            assert checked['status'] == 'checked', checked
+            run([*launcher, 'kkdesign_learn', 'feedback', '--design', output / 'design',
+                 '--content', 'Synthetic launcher workflow feedback', '--scope', 'web',
+                 '--origin', 'synthetic smoke', '--evidence', 'tasks/demo/audit.json'],
+                product, env, events=False)
+            assert (output / 'design/feedback.json').is_file()
+            retained = Path(result['runtimePath'])
+            receipt = retained / 'setup.json'
+            receipt_bytes = receipt.read_bytes()
+            receipt.write_text('{}')
+            run([*launcher, 'materialize_example', '--output', product / 'forbidden'],
+                product, env, success=False, events=False)
+            assert receipt.read_text() == '{}'
+            assert not (product / 'forbidden').exists()
+            receipt.write_bytes(receipt_bytes)
             assert kit.hashes(extracted) == before
             assert [p.name for p in product.iterdir()] == ['keep.txt']
             outcomes.append({'adapter': builder.__name__, 'acquiredPython': '3.12.12',
@@ -138,6 +168,9 @@ def main():
         acquired = next((home / '.kkdesign-kit/bootstrap').glob('cpython-*'))
         library = acquired / 'python/Lib/site.py'
         library.write_bytes(library.read_bytes() + b'\n# synthetic tamper\n')
+        run([*launcher, 'materialize_example', '--output', product / 'forbidden'],
+            product, env, success=False, events=False)
+        assert not (product / 'forbidden').exists()
         rejected = run(command, product, env, success=False)
         assert rejected[-1]['runtime'] == 'error', rejected
         assert library.read_bytes().endswith(b'# synthetic tamper\n')

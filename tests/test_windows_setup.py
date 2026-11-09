@@ -57,6 +57,13 @@ class WindowsSetupTests(unittest.TestCase):
         self.assertFalse((self.home / '.kkdesign-kit').exists())
         self.assertEqual(list(self.product.iterdir()), [self.sentinel])
 
+    def test_helper_missing_bootstrap_never_provisions(self):
+        output = self.product / 'forbidden'
+        result = self.invoke('-Helper', 'materialize_example')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse((self.home / '.kkdesign-kit').exists())
+        self.assertEqual(list(self.product.iterdir()), [self.sentinel])
+
     def test_corrupt_cache_never_executes_and_is_preserved(self):
         self.cache.mkdir(parents=True)
         artifact = self.cache / 'archive.tar.gz'

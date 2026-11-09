@@ -44,6 +44,31 @@ class PosixSetupTests(unittest.TestCase):
         self.assertEqual(list(self.product.iterdir()), [self.sentinel])
         self.assertEqual(self.sentinel.read_text(), 'synthetic')
 
+    def test_helper_missing_bootstrap_and_invalid_helper_never_provision(self):
+        for arguments in (('--helper', 'materialize_example', '--output', str(self.product / 'forbidden')),
+                          ('--helper', ''), ('--consent', '--helper', 'kkdesign_core')):
+            with self.subTest(arguments=arguments):
+                proc = self.invoke(*arguments)
+                self.assertNotEqual(proc.returncode, 0)
+                self.assertFalse((self.home / '.kkdesign-kit').exists())
+                self.assertEqual(list(self.product.iterdir()), [self.sentinel])
+
+    def test_helper_rejects_corrupt_bootstrap_before_startup(self):
+        self.cache.mkdir(parents=True, mode=0o700)
+        artifact = self.cache / 'archive.tar.gz'
+        artifact.write_bytes(b'synthetic corrupt bootstrap')
+        executed = self.product / 'must not execute'
+        python = self.cache / 'python/bin/python3'
+        python.parent.mkdir(parents=True)
+        python.write_text('#!/bin/sh\ntouch ' + shlex.quote(str(executed)) + '\n')
+        python.chmod(0o700)
+        proc = self.invoke('--helper', 'materialize_example', '--output', str(executed))
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertFalse(executed.exists())
+        self.assertEqual(artifact.read_bytes(), b'synthetic corrupt bootstrap')
+        self.assertFalse((self.home / '.kkdesign-kit/runtimes').exists())
+        self.assertFalse((self.cache.parent / 'lock').exists())
+
     def test_corrupt_retained_artifact_is_rejected_and_preserved_without_download(self):
         self.cache.mkdir(parents=True, mode=0o700)
         artifact = self.cache / 'archive.tar.gz'

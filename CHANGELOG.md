@@ -9,7 +9,23 @@
   changed runtime files as well as changed interpreters before helper execution.
 - Verify actual relocated missing-Python Setup, dependency provisioning, reuse
   and helpers on macOS ARM64. Intel native/provider/human acceptance remains
-  separate; general helper startup remains a later item.
+  separate.
+
+### Trusted helper runtime
+
+- Both providers invoke the canonical dispatcher through verified POSIX or native
+  PowerShell helper mode, with explicit arbitrary package roots, quoted arguments
+  and no system Python, activation or provisioning during helper invocation.
+- Verify bootstrap integrity before startup and runtime ownership, requirements
+  and receipts before dispatch; reject missing/tampered caches and project
+  executable paths. Keep plugin/project bytes unchanged on trust failures.
+- Migrate active skill/workflow instructions, including package and extracted
+  verification, and OS smoke callers. Exercise the package/verify route through
+  unified helper mode without PATH Python; descriptor-free regression fixtures
+  remove root provider markers before dispatch. Legacy
+  standalone maintainer tooling retains its separate historical prerequisites.
+- Native provider sessions and Linux/Windows/Intel acceptance remain pending;
+  relocated package execution is separate from native provider discovery.
 
 ### Linux runtime
 
@@ -42,8 +58,7 @@
 - Reuse verified runtimes without redundant download consent; reject unowned,
   missing or changed runtimes and preserve existing data on errors. Expose
   actionable network, write, local-execution and policy guidance.
-- Enable the existing Python helper dispatcher after trusted Setup. General
-  Python-free launch, native lifecycle integration
+- Enable the existing Python helper dispatcher after trusted Setup. Native lifecycle integration
   and provider/usability acceptance remain separate pending work.
 
 ### Earlier packaging changes

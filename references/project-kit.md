@@ -1,10 +1,10 @@
 # Initialize and refresh a project kit
 
-Use `python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project ...`
+Use `/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project ...`
 from the installed skill; `SKILL_DIR` is the absolute directory containing
-`SKILL.md`, independent of the shell CWD. The installed launcher uses its
-recorded external runtime. Source/manual use requires Python 3.9+ and the
-`requirements.txt` dependencies in the current environment.
+`SKILL.md`, independent of the shell CWD. The launcher verifies the
+private runtime prepared by Setup. For native Windows use the equivalent
+PowerShell form in [helper invocation](helpers.md).
 
 ## Inputs and authority
 
@@ -23,8 +23,8 @@ recorded external runtime. Source/manual use requires Python 3.9+ and the
 ## Plan, inspect, authorize
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project init --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project refresh --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project init --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project refresh --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
 ```
 
 Both commands stage a reviewable plan, not an implicit write authorization.
@@ -37,8 +37,8 @@ Apply only when the user authorized the specific plan. A request to initialize
 or refresh authorizes scanning/planning, not overwriting conflicting files.
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project "<PROJECT>" --plan "<PLAN_ID>"
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project validate --project "<PROJECT>"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project apply --project "<PROJECT>" --plan "<PLAN_ID>"
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project validate --project "<PROJECT>"
 ```
 
 If source access or formats fail, report the exact missing prerequisite and do

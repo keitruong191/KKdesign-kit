@@ -2,7 +2,7 @@
 
 | Command | Availability | Purpose |
 |---|---|---|
-| Setup | Available with local execution and existing Python; Python-free OS bootstrap integration pending | Check, request consent when needed, prepare and verify runtime; see [setup.md](setup.md). |
+| Setup | Implemented with authorized local execution; no existing Python required; native matrix acceptance tracked separately | Check, request consent when needed, prepare and verify runtime; see [setup.md](setup.md). |
 | init | Available | Scan declared sources and stage a project-kit initialization plan. |
 | refresh | Available | Compare source revisions, review changes and authorize a recoverable update. |
 | design | Available; live tool required for canvas mutation | Execute a scoped task; read back structure and inspect renders. |

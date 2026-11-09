@@ -24,8 +24,8 @@ Keep IDs stable. `platforms` is `any`, `web`, `macos`, `ios`, `android` or `wind
 After editing:
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_core lessons-index --design path/to/project/design
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_core validate --design path/to/project/design
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_core lessons-index --design path/to/project/design
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_core validate --design path/to/project/design
 ```
 
 ## Task lifecycle
