@@ -1,5 +1,11 @@
 # Install and maintain KKdesign-kit
 
+For the new Claude Code adapter, see [marketplace packaging preview](claude-marketplace.md).
+It uses native plugin lifecycle and `/kkdesign-kit:kkdesign-kit`; its menu and
+Setup instructions do not require Python. Runtime Setup is still required and
+not implemented by this preview. Do not use standalone commands below to set
+up or manage a plugin. The remainder documents the legacy standalone lifecycle.
+
 Requires Python 3.9+ on macOS, Linux or Windows and a separately installed,
 authenticated Codex CLI or Claude Code. Bootstrap and installer use only the
 Python standard library; the workflow runtime installs `requirements.txt`

@@ -6,6 +6,19 @@ The skill includes command guides, Python helpers, schemas and synthetic example
 
 ## Install
 
+The new distribution direction is marketplace-only. The Claude Code
+[marketplace packaging preview](docs/claude-marketplace.md) loads the canonical
+skill as `/kkdesign-kit:kkdesign-kit`, including a readable **Setup** route.
+It reports **Setup required**: plugin runtime provisioning/execution is not yet
+available. No public marketplace release or official listing is claimed.
+Do not use the old standalone installer as a plugin Setup fallback.
+
+### Legacy standalone instructions
+
+The commands below describe the existing standalone implementation, not the
+new marketplace onboarding flow. Marketplace packaging does not authorize
+publication of the old bootstrap or a standalone fallback.
+
 The approved one-command bootstrap and public release are **pending PR approval and release**. There is no public download URL ready to use yet; do not run a guessed `curl` command. After the exact release artifact and checksum are published, the release instructions will provide a pinned command and that exact command will be smoke-tested before it is called ready.
 
 Run the future bootstrap from the **destination product directory**; project scope defaults to that directory. It will require an explicit `--harness codex` or `--harness claude-code`, with `--project "/absolute/other project"` and `--scope user` available. The checked-in `install.sh` still downloads the pinned release; running it from a checkout is not a source fallback before publication.
@@ -67,6 +80,7 @@ See [installation and lifecycle](docs/installation.md) for manual acquisition/ex
 
 | Command | What it does | Guide |
 | --- | --- | --- |
+| `Setup` | Explain current plugin/runtime/tool states; runtime provisioning is unavailable in the packaging preview. | [Setup](references/setup.md) |
 | `init` | Scan declared design-system sources and stage a project-kit plan for review. | [Project setup](references/project-kit.md) |
 | `refresh` | Compare source changes and stage an update while preserving project history. | [Project setup](references/project-kit.md) |
 | `design` | Resolve scope and lesson decisions, execute with authorized tools, then inspect saved structure and rendered output. | [Design](references/design.md) |
@@ -78,6 +92,10 @@ See [installation and lifecycle](docs/installation.md) for manual acquisition/ex
 Design and review never create prototype interactions as a side effect. Review guidance is bundled with [upstream attribution and licenses](docs/review-attribution.md); no installed Impeccable or Hoangsa is required. Installation does not enable hooks or configure external tools.
 
 ## Set up a project
+
+The helper commands in this section describe legacy standalone installations.
+The marketplace preview exposes the guides but blocks helper execution until
+supported plugin runtime Setup is available.
 
 Create a `sources.json` using the [supported local, Git or Figma input formats](docs/source-adapters.md). Give the agent the product-project path, source-config path and relevant platform or surface. Source locations resolve relative to the configuration file.
 
@@ -120,17 +138,16 @@ Contract validation checks saved schemas, references, hashes and task records. I
 
 For design work, inspect the actual destination, read back saved properties and view rendered output. For prototypes, check effective timing in the design tool and run the requested transitions, including back/cancel with valid history. Label simulated data, APIs, validation and timing. Human design approval remains separate.
 
-For repository development, use the dependency-equipped Python environment. In
-the source checkout, set `SKILL_DIR` to that checkout's absolute path; launcher
-calls then use the current Python environment:
+For repository development, use a dependency-equipped Python environment.
+The source checkout now also carries the plugin descriptor, so its launcher
+reports Setup required, just like the plugin preview. Maintainer verification
+can run the helper scripts directly; this is not a plugin Setup fallback:
 ```sh
-SKILL_DIR="$(pwd -P)"
-
 python3 -m venv "$HOME/.venvs/kkdesign-dev"
 "$HOME/.venvs/kkdesign-dev/bin/python" -m pip install -r requirements.txt
 "$HOME/.venvs/kkdesign-dev/bin/python" -B -m unittest discover -s tests -v
-"$HOME/.venvs/kkdesign-dev/bin/python" -B "$SKILL_DIR/scripts/kkdesign_run.py" materialize_example --output ../kkdesign-example
-"$HOME/.venvs/kkdesign-dev/bin/python" -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_core validate --design ../kkdesign-example/design
+"$HOME/.venvs/kkdesign-dev/bin/python" -B scripts/materialize_example.py --output ../kkdesign-example
+"$HOME/.venvs/kkdesign-dev/bin/python" -B scripts/kkdesign_core.py validate --design ../kkdesign-example/design
 ```
 
 Use an unused example-output directory. The example is synthetic; passing it is not evidence of live design-tool or product behavior. See [data contracts](docs/contracts.md) for the saved formats and validation rules. 
