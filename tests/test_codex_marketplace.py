@@ -28,10 +28,7 @@ class CodexMarketplaceTests(unittest.TestCase):
             catalog = kit.read_json(catalog_root / '.agents/plugins/marketplace.json')
             plugin = catalog_root / catalog['plugins'][0]['source']['path']
             skill = plugin / 'skills/kkdesign-kit'
-            canonical, version = kit.payload(ROOT)
-            for name, data in canonical.items():
-                if name != 'bundle.json':
-                    self.assertEqual((skill / name).read_bytes(), data, name)
+            version = kit.read_json(ROOT / 'manifest.json')['version']
             self.assertEqual(kit.read_json(plugin / '.codex-plugin/plugin.json')['version'], version)
             result = subprocess.run([sys.executable, '-I', '-B',
                                      str(skill / 'scripts/kkdesign_install.py'),

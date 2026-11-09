@@ -34,7 +34,7 @@ python -B scripts/build_codex_marketplace.py --output <outside-source>/marketpla
 ```
 
 Full suite: **130 tests passed**. Regression coverage checks deterministic
-canonical payload bytes, relocated verification, tamper rejection, refusal to
+artifacts, relocated package integrity verification, tamper rejection, refusal to
 execute a plugin helper or mutate cache/output before runtime integration,
 version-drift rejection and preservation of existing artifacts.
 
