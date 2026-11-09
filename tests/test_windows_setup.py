@@ -35,7 +35,8 @@ class WindowsSetupTests(unittest.TestCase):
         # stdin script avoids PowerShell -Command argument re-parsing of paths.
         env = dict(os.environ, KK_TEST_ARGS=json.dumps([str(a) for a in args]))
         result = subprocess.run([self.shell, '-NoProfile', '-NonInteractive', '-Command', '-'],
-                                input='$testPaths = @(ConvertFrom-Json $env:KK_TEST_ARGS)\n' + code + '\n',
+                                input="$env:PSModulePath = [IO.Path]::Combine($PSHOME, 'Modules')\n"
+                                      '$testPaths = ConvertFrom-Json $env:KK_TEST_ARGS\n' + code + '\n',
                                 env=env, capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertFalse(result.stderr, result.stderr)

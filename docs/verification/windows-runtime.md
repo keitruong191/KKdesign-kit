@@ -42,9 +42,13 @@ Executable storage is under the user's profile, outside plugin and project:
 `.kkdesign-kit/bootstrap/cpython-3.12.12-20251014-<target>-pc-windows-msvc/`
 and requirements-matched `.kkdesign-kit/runtimes/`. New private directories are
 created atomically with protected inheritable DACLs. Existing data is never
-re-ACLed or silently repaired. The shared security helper checks current-user
-ownership and rejects write grants to principals other than that user, SYSTEM
+re-ACLed or silently repaired. The shared security helper checks ownership by the current user, SYSTEM or Administrators and rejects write grants to principals other than that user, SYSTEM
 and Administrators, null DACLs and reparse points, including cache ancestry.
+Windows can assign Administrators ownership to newly created files for an
+elevated account; this is the same privileged authority allowed write access,
+not trust in another ordinary user. The child PowerShell process selects only
+its native built-in modules so a PowerShell 7 executor cannot redirect 5.1
+autoloading to incompatible modules. No system module/PATH setting changes.
 Tree walking rejects junctions before traversal. Python Setup/readiness uses the
 same checks for managed runtimes, including files and metadata, before execution.
 A compromised same-user account or trusted administrator remains outside this

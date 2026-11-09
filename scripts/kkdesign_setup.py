@@ -77,7 +77,7 @@ def fingerprint(runtime, requirements):
         info = path.lstat()
         if ((hasattr(os, 'getuid') and info.st_uid != os.getuid())
                 or (not path.is_symlink() and os.name != 'nt' and info.st_mode & 0o022)):
-            raise SetupError('ownership', 'Managed runtime contains unsafe ownership or permissions.',
+            raise SetupError('ownership', 'Managed runtime contains unsafe ownership or permissions: ' + str(path),
                              'Preserve and inspect the cache; do not execute or overwrite it.')
         if path.name == 'setup.json' and path.parent == runtime:
             continue

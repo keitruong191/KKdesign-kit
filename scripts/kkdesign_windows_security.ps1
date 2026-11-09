@@ -1,6 +1,9 @@
 # Shared Windows cache trust checks. No policy or ACL changes to existing data.
 [CmdletBinding()]
 param([string]$Path, [switch]$Recurse, [string]$UserHome = $env:USERPROFILE)
+# A PowerShell 7 executor may pass its incompatible module search path to 5.1.
+# Select only this native host's built-in modules in this child process.
+$env:PSModulePath = [IO.Path]::Combine($PSHOME, 'Modules')
 $ErrorActionPreference = 'Stop'
 
 function Assert-PrivatePath([string]$Target, [string]$HomePath, [switch]$Tree) {
@@ -42,14 +45,17 @@ function Assert-PrivatePath([string]$Target, [string]$HomePath, [switch]$Tree) {
 function Assert-PrivateEntry($Entry, [string]$Sid) {
     if ($Entry.Attributes -band [IO.FileAttributes]::ReparsePoint) { throw 'Reparse point in cache; preserve and inspect it' }
     $acl = Get-Acl -LiteralPath $Entry.FullName
-    if ($acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -ne $Sid) { throw 'Cache has another owner; preserve and inspect it' }
+    # Windows may assign Administrators as owner to an elevated user's new
+    # files. These authorities already have permitted write access below.
+    $trusted = @($Sid, 'S-1-5-18', 'S-1-5-32-544')
+    if ($acl.GetOwner([Security.Principal.SecurityIdentifier]).Value -notin $trusted) { throw 'Cache has another owner; preserve and inspect it' }
     # A missing DACL grants everyone access. Deny entries need not grant trust.
     $raw = New-Object Security.AccessControl.RawSecurityDescriptor($acl.Sddl)
     if ($null -eq $raw.DiscretionaryAcl) { throw 'Cache has no protective DACL' }
     foreach ($rule in $acl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier])) {
         if ($rule.AccessControlType -eq [Security.AccessControl.AccessControlType]::Allow -and
             ([long]$rule.FileSystemRights -band 0x500D0156) -and
-            $rule.IdentityReference.Value -notin @($Sid, 'S-1-5-18', 'S-1-5-32-544')) {
+            $rule.IdentityReference.Value -notin $trusted) {
             throw 'Cache is writable by another account; preserve and inspect its ACL'
         }
     }

@@ -25,7 +25,7 @@ class SetupTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='setup consumer spaces ')
         self.base = Path(self.temp.name).resolve()
         self.home = self.base / 'home'
-        self.home.mkdir()
+        self.home.mkdir(mode=0o700)
         self.requirements = (ROOT / 'requirements.txt').read_bytes()
         self.runtime = kit.runtime_path(self.home, self.requirements)
 
@@ -44,6 +44,13 @@ class SetupTests(unittest.TestCase):
         (self.runtime / 'requirements.txt').write_bytes(self.requirements)
         kit.write_json(self.runtime / 'runtime.json', {'identifier': kit.IDENTIFIER,
                                                      'requirementsSha256': self.runtime.name})
+        if os.name != 'nt':
+            # This fixture provisions its own cache. venv can copy an upstream
+            # interpreter's group-write mode on CI; make newly created bytes
+            # private before certifying them, without repairing retained caches.
+            for entry in self.runtime.rglob('*'):
+                if not entry.is_symlink():
+                    entry.chmod(entry.stat().st_mode & ~0o022)
         kit.write_json(self.runtime / 'setup.json', setup.fingerprint(self.runtime, self.requirements))
         return Path(purelib)
 

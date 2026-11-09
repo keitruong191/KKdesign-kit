@@ -1,6 +1,9 @@
 # Internal marketplace Setup, Windows PowerShell 5.1. Never change execution policy.
 [CmdletBinding()]
 param([Parameter(Mandatory=$true)][string]$PackageRoot, [switch]$Consent)
+# A PowerShell 7 executor may pass its incompatible module search path to 5.1.
+# Select only this native host's built-in modules in this child process.
+$env:PSModulePath = [IO.Path]::Combine($PSHOME, 'Modules')
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version 2
 $stage = $null
