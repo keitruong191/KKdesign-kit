@@ -25,7 +25,18 @@ class SetupTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix='setup consumer spaces ')
         self.base = Path(self.temp.name).resolve()
         self.home = self.base / 'home'
-        self.home.mkdir(mode=0o700)
+        if os.name == 'nt':
+            # The fixture creates private storage just as native Setup does;
+            # runner temp directories may deliberately inherit shared ACLs.
+            shell = Path(os.environ['SystemRoot']) / 'System32/WindowsPowerShell/v1.0/powershell.exe'
+            security = str(ROOT / 'scripts/kkdesign_windows_security.ps1').replace("'", "''")
+            home = str(self.home).replace("'", "''")
+            proc = subprocess.run([str(shell), '-NoProfile', '-NonInteractive', '-Command',
+                                   ". '" + security + "'; New-PrivateDirectory '" + home + "'"],
+                                  capture_output=True, text=True, timeout=30)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+        else:
+            self.home.mkdir(mode=0o700)
         self.requirements = (ROOT / 'requirements.txt').read_bytes()
         self.runtime = kit.runtime_path(self.home, self.requirements)
 

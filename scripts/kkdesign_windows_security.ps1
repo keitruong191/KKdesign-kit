@@ -56,7 +56,7 @@ function Assert-PrivateEntry($Entry, [string]$Sid) {
         if ($rule.AccessControlType -eq [Security.AccessControl.AccessControlType]::Allow -and
             ([long]$rule.FileSystemRights -band 0x500D0156) -and
             $rule.IdentityReference.Value -notin $trusted) {
-            throw 'Cache is writable by another account; preserve and inspect its ACL'
+            throw ('Cache is writable by another account; preserve and inspect its ACL: ' + $Entry.FullName + ' (' + $rule.IdentityReference.Value + ')')
         }
     }
 }

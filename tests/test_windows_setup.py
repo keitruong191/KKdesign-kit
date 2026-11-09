@@ -48,11 +48,13 @@ class WindowsSetupTests(unittest.TestCase):
                                '-PackageRoot', str(ROOT), *args], env=self.env, cwd=self.product,
                               capture_output=True, text=True, timeout=30)
 
-    def test_no_python_node_or_consent_leaves_home_and_product_untouched(self):
+    def test_no_python_node_or_consent_leaves_runtime_and_product_untouched(self):
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)['status'], 'consent-required')
-        self.assertEqual(list(self.home.iterdir()), [])
+        # Native PowerShell can maintain its own AppData module-analysis cache;
+        # no KKdesign runtime/state may be created before consent.
+        self.assertFalse((self.home / '.kkdesign-kit').exists())
         self.assertEqual(list(self.product.iterdir()), [self.sentinel])
 
     def test_corrupt_cache_never_executes_and_is_preserved(self):
