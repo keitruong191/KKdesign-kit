@@ -1,8 +1,12 @@
 # WWA-02 native verification
 
-Code implementation is available for integration review. **Full WWA-02
-acceptance is pending authenticated menu/Setup evidence.** This report does not
-claim Gate A completion, public publication, runtime readiness or approval.
+**Code implementation and tests: ready for coordinator review and integration.**
+**Authenticated native menu/Setup acceptance: pending.** The owner explicitly
+separated acceptance requiring unavailable resources from code readiness and
+will arrange authenticated installation and feedback later. This clarification
+supersedes the original evidence gate for code integration: missing native
+authentication does not block review, the open PR or integration. It does not
+establish an unobserved pass, publication, runtime readiness or approval.
 
 Environment: macOS ARM64, Codex CLI `0.167.0`, Python 3.9 development venv with
 `requirements.txt`. Native commands used a fresh temporary HOME, USERPROFILE
@@ -79,9 +83,10 @@ Removal preserves synthetic files under the selected project's design,
 lessons and task-history directories, and a private user runtime directory.
 No hooks, MCP, provider permission changes or security-policy bypass are used.
 
-Integration assessment: suitable for coordinator code review into
-`feature/marketplace-installation-setup`, subject to review; **not full native
-acceptance or release-ready**. An authenticated clean Codex profile must still
+Integration assessment: **code-ready**, subject to coordinator review into
+`feature/marketplace-installation-setup`; **native acceptance pending** and
+not release-ready. Missing authenticated acceptance does not block code
+integration under the owner clarification. An authenticated clean Codex profile must still
 open the full bare menu and Setup route, verify no Python/download is used just
 to display them, and confirm the displayed readiness states. No credentials
 should be copied into this repository to supply that evidence. Runtime Setup,
