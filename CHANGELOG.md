@@ -9,7 +9,18 @@
   changed runtime files as well as changed interpreters before helper execution.
 - Verify actual relocated missing-Python Setup, dependency provisioning, reuse
   and helpers on macOS ARM64. Intel native/provider/human acceptance remains
-  separate; Linux/Windows acquisition and general helper startup are later items.
+  separate; Windows acquisition and general helper startup are later items.
+
+### Linux runtime
+
+- Extend the canonical internal shell Setup to GNU/Linux, with pinned CPython
+  artifacts for GNU libc 2.28+ x86_64/ARM64 and no dependency on system Python,
+  Node, venv or ensurepip. Reject unsupported libc/CPU before download.
+- Use native SHA-256, ownership/permission checks and deterministic full-tree
+  verification in private user storage. Preserve macOS pins/cache receipts;
+  migrate packaging, agent instructions and smoke to the shared POSIX entrypoint.
+- Native Linux missing-Python and missing-venv/ensurepip acceptance remains
+  pending available Linux resources; macOS smoke does not establish Linux support.
 
 ### Shared Setup changes
 
@@ -20,7 +31,7 @@
   missing or changed runtimes and preserve existing data on errors. Expose
   actionable network, write, local-execution and policy guidance.
 - Enable the existing Python helper dispatcher after trusted Setup. General
-  Python-free launch, Linux/Windows acquisition, native lifecycle integration
+  Python-free launch, Windows acquisition, native lifecycle integration
   and provider/usability acceptance remain separate pending work.
 
 ### Earlier packaging changes

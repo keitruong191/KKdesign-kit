@@ -5,11 +5,11 @@ and use its native namespaced invocation `$kkdesign-kit:kkdesign-kit`.
 For the new Claude Code adapter, see [marketplace packaging preview](claude-marketplace.md).
 It uses native plugin lifecycle and `/kkdesign-kit:kkdesign-kit`; its menu and
 Setup instructions do not require Python. Explicit Setup can provision with the
-user's consent, acquiring pinned CPython internally on macOS without existing
+user's consent, acquiring pinned CPython internally on macOS/Linux without existing
 Python/Node, then verify helpers and reuse a trusted private cache without a redundant download
 prompt. macOS ARM64 runtime smoke is recorded in
-[verification](verification/macos-runtime.md). Intel native acceptance,
-Linux/Windows acquisition and general Python-free helper startup remain pending.
+[verification](verification/macos-runtime.md). Linux acquisition is implemented with [native acceptance pending](verification/linux-runtime.md).
+Intel native acceptance, Windows acquisition and general Python-free helper startup remain pending.
 Native provider/OS acceptance is separate. Do not use
 standalone commands below to set up or manage a plugin. The remainder documents
 the legacy standalone lifecycle.

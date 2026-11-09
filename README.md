@@ -11,11 +11,12 @@ The new distribution direction is marketplace-only. The Codex
 [marketplace packaging preview](docs/claude-marketplace.md) loads the canonical
 skill as `/kkdesign-kit:kkdesign-kit`, including a readable **Setup** route.
 Choose **Setup** to check/reuse a trusted runtime or, after explicit consent,
-prepare one and verify real helpers. macOS Setup can acquire pinned Python
+prepare one and verify real helpers. macOS/Linux Setup can acquire pinned Python
 internally without Python/Node on PATH; ARM64 acquisition/helper smoke is
-recorded in [macOS verification](docs/verification/macos-runtime.md). Intel native
-acceptance, Linux/Windows acquisition and general Python-free helper startup
-remain pending. No public marketplace release or official listing is claimed.
+recorded in [macOS verification](docs/verification/macos-runtime.md). Linux
+acquisition is implemented with [native acceptance pending](docs/verification/linux-runtime.md).
+Intel native acceptance, Windows acquisition and general Python-free helper
+startup remain pending. No public marketplace release or official listing is claimed.
 Do not use the old standalone installer as a plugin Setup fallback.
 
 ### Legacy standalone instructions

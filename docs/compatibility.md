@@ -7,12 +7,15 @@ No IDE/cloud/desktop-app or other OS/CPU support is inferred.
 
 Both [Claude](claude-marketplace.md) and [Codex](codex-marketplace.md) use the
 shared [Setup](../references/setup.md): the menu requires no Python; explicit
-Setup provisions after consent. macOS uses an internal shell bootstrap with
+Setup provisions after consent. macOS/Linux use an internal shell bootstrap with
 pinned CPython, without system Python/Node or venv prerequisites. See
 [macOS runtime evidence and Intel acceptance limits](verification/macos-runtime.md).
 A trusted runtime is reused only after full cache checks and actual helper
-verification. Linux/Windows acquisition and general Python-free launcher
-integration remain pending (WWA-05–07). Setup smoke does not establish native
+verification. Linux acquisition targets GNU libc 2.28+ x86_64/ARM64 with host
+curl, GNU tar and coreutils; musl and other CPUs are rejected before download.
+[Linux native acceptance](verification/linux-runtime.md) is pending; implementation
+is not a tested-distribution support claim. Windows acquisition and general
+Python-free launcher integration remain pending (WWA-06/07). Setup smoke does not establish native
 provider support or live design-tool authentication. Native and usability acceptance remain separate.
 
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and
