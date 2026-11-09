@@ -5,6 +5,13 @@ authenticate the chosen harness separately; use the native skill paths and
 invocations in [installation](installation.md). Packaging and installation use
 Python 3.9+ and the Python standard library. Offline contract validation also
 requires `jsonschema >=4.18,<5` from `requirements.txt`.
+The POSIX bootstrap also requires `curl`, network access to the pinned release
+and package index, and Python's working `venv`/`ensurepip`. It always provisions
+the workflow dependencies outside the skill; manual installation enables this
+with `--runtime`. Helpers use the recorded interpreter through
+`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER`, without activation or
+an inherited environment. A fresh or restarted harness still needs Python 3
+available and its separately authenticated design tools.
 
 The kit does not install Hoangsa, Impeccable, MCP servers, or hooks. Source
 adapters need access to the sources declared by the project. Design and
@@ -16,15 +23,20 @@ product behavior works.
 ## Verify outcomes
 
 Run checks in the environment and against the target project you intend to use.
-From the source checkout, offline contract checks can be run with:
+From the source checkout, use an external development environment (macOS/Linux):
 
 ```sh
-python -m pip install -r requirements.txt
-python -m unittest discover -s tests -v
+python3 -m venv "$HOME/.venvs/kkdesign-dev"
+"$HOME/.venvs/kkdesign-dev/bin/python" -m pip install -r requirements.txt
+"$HOME/.venvs/kkdesign-dev/bin/python" -B -m unittest discover -s tests -v
 ```
 
-For an extracted package, run `python scripts/kkdesign_install.py verify
---source .` from the extracted kit directory to check its declared resources,
+On Windows use `py -3 -m venv "$HOME\\.venvs\\kkdesign-dev"` and invoke that
+environment's `Scripts\\python.exe` directly. No activation or profile edit is
+needed; never install dependencies into the hash-managed skill directory.
+
+For an extracted package, run `python3 -I -B scripts/kkdesign_install.py verify
+--source .` from the extracted kit directory to check declared resources,
 inventory, version and checksums. These checks do not verify harness discovery,
 external-tool access, live source behavior, design quality, rendering,
 accessibility, or product correctness. Verify live results in the relevant

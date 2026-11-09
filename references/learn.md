@@ -5,14 +5,17 @@ never calls Figma, a test harness, or an agent, and it does not verify a design.
 Feedback and lessons must cite existing project-local evidence. Remote-only URLs
 are not accepted for these authoring operations; preserve native evidence first
 as a project-local record where policy permits.
-Resolve `SKILL_DIR` to the installed directory containing `SKILL.md`, not the
-project working directory. Use Python 3.9+ with the bundled requirements installed
-outside the skill. Quote absolute script/project paths, including spaces.
+Resolve `SKILL_DIR` to the absolute installed directory containing `SKILL.md`,
+never the project working directory. Invoke helpers as
+`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn ...` (helper
+name without `.py`). Installed helpers use the external runtime recorded by
+installation; source/manual use needs Python 3.9+ and packages from
+`requirements.txt` in the current environment. Quote absolute project paths.
 
 ## Capture direct feedback
 
 ```sh
-python "$SKILL_DIR/scripts/kkdesign_learn.py" feedback \
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn feedback \
   --design "/path/to/project/design" \
   --content "The selected control is hard to distinguish." \
   --evidence ../evidence/review-notes.json \
@@ -33,8 +36,7 @@ retain its evidence and origin. Canonical authored advice lives only in
 `design/LESSON.md`; `lessons-index.json` is derived and regenerated from it.
 
 ```sh
-python "$SKILL_DIR/scripts/kkdesign_learn.py" author \
-  --design "/path/to/project/design" \
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn author \
   --title "Keep control states distinguishable" \
   --body "When documenting a control, explain how its relevant states differ. This is an inferred practice, not a claim that a live implementation was tested." \
   --verification "On a later task, inspect the specified states and record task-specific evidence before claiming verification." \
@@ -77,7 +79,7 @@ guarantee against a concurrent process changing directory entries.
 Author the replacement first, then explicitly mark the prior lesson:
 
 ```sh
-python "$SKILL_DIR/scripts/kkdesign_learn.py" supersede \
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn supersede \
   --design "/path/to/project/design" --id DL-001 --by DL-002
 ```
 

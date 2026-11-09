@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Self-contained, conservative KKdesign-kit packaging and installation (Python 3.9+)."""
 import argparse
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 import hashlib
 import json
 import os
 from pathlib import Path
 import shutil
 import sys
+import subprocess
 import tempfile
 import zipfile
 
@@ -20,7 +21,7 @@ DIRECTORIES = ('agents', 'references', 'docs', 'schemas', 'templates', 'examples
 SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
            'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py',
            'kkdesign_task.py', 'kkdesign_review.py', 'kkdesign_learn.py',
-           'figma_prototype.js')
+           'figma_prototype.js', 'kkdesign_run.py')
 
 
 def canonical(path):
@@ -172,11 +173,80 @@ def inspect(harness, scope, home, project):
         actual = hashes(target) if target.is_dir() else None
         result.update(status='managed' if actual == data['files'] else 'modified',
                       version=data['version'], rollbackAvailable=(state / 'previous').is_dir())
+        if data.get('runtime'):
+            expected = state / 'runtimes' / data['files']['requirements.txt']
+            if data['runtime'] != str(expected):
+                raise ValueError('Runtime ownership mismatch')
+            no_links(expected)
+            result.update(runtime=str(expected), runtimeReady=(
+                runtime_python(expected).is_file() and (expected / 'runtime.json').is_file()))
     else:
         if (state / 'previous').exists() or (state / 'previous-state.json').exists():
             raise ValueError('Orphan rollback state; inspect interrupted installation before recovery')
         result['status'] = 'conflict' if target.exists() else 'absent'
     return result
+
+
+def runtime_path(state, requirements):
+    return state / 'runtimes' / hashlib.sha256(requirements).hexdigest()
+
+
+def runtime_python(runtime):
+    return runtime / ('Scripts/python.exe' if os.name == 'nt' else 'bin/python')
+
+
+def run_runtime(command):
+    env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
+    env.pop('PYTHONHOME', None)
+    env.pop('PYTHONPATH', None)
+    result = subprocess.run([str(arg) for arg in command], env=env,
+                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if result.returncode:
+        raise ValueError('Runtime command failed: ' + str(command[0]) + '\n' +
+                         result.stdout + result.stderr)
+    return result.stdout
+
+
+@contextmanager
+def prepared_runtime(state, requirements):
+    """Build at its final path: venv entry points are not relocatable."""
+    runtime = runtime_path(state, requirements)
+    no_links(runtime)
+    marker = {'identifier': IDENTIFIER, 'requirementsSha256': runtime.name}
+    created = False
+    if runtime.exists():
+        no_links(runtime / 'runtime.json')
+        if not (runtime / 'runtime.json').is_file() or read_json(runtime / 'runtime.json') != marker:
+            raise ValueError('Unowned or incomplete runtime; preserve and inspect: ' + str(runtime))
+    else:
+        runtime.mkdir(parents=True)
+        created = True
+    try:
+        if created:
+            run_runtime([sys.executable, '-I', '-B', '-m', 'venv', runtime])
+            requirement_file = runtime / 'requirements.txt'
+            requirement_file.write_bytes(requirements)
+            run_runtime([runtime_python(runtime), '-I', '-B', '-m', 'pip',
+                         '--disable-pip-version-check', 'install', '-r', requirement_file])
+            write_json(runtime / 'runtime.json', marker)
+        yield runtime
+    except BaseException:
+        if created:
+            shutil.rmtree(runtime)
+        raise
+
+
+def smoke_runtime(target, runtime, state):
+    """Exercise installed resources and dependency-backed validation, not an import echo."""
+    with tempfile.TemporaryDirectory(prefix='runtime-smoke-', dir=state) as temp:
+        example = Path(temp) / 'example'
+        python = runtime_python(runtime)
+        run_runtime([python, '-B', target / 'scripts/materialize_example.py',
+                     '--output', example])
+        result = json.loads(run_runtime([python, '-B', target / 'scripts/kkdesign_core.py',
+                                        'validate', '--design', example / 'design']))
+        if result.get('status') != 'pass' or result.get('errors') or result.get('warnings'):
+            raise ValueError('Installed helper smoke failed: ' + json.dumps(result))
 
 
 @contextmanager
@@ -193,11 +263,11 @@ def locked(state):
         lock.rmdir()
 
 
-def lifecycle(action, harness, scope, home, project, source):
+def lifecycle(action, harness, scope, home, project, source, runtime=False):
     target, state = locations(harness, scope, home, project)
     if action == 'inspect':
         return inspect(harness, scope, home, project)
-    with locked(state):
+    with locked(state), ExitStack() as resources:
         current = inspect(harness, scope, home, project)
         if current['conflicts'] and action in ('install', 'update', 'rollback'):
             raise ValueError('Other discoverable installation(s); inspect/remove explicitly: ' +
@@ -219,7 +289,10 @@ def lifecycle(action, harness, scope, home, project, source):
                 shutil.rmtree(state / 'previous')
                 (state / 'previous-state.json').unlink()
             (state / 'state.json').unlink()
-            return dict(current, status='uninstalled', rollbackAvailable=False)
+            result = dict(current, status='uninstalled', rollbackAvailable=False, runtimeReady=False)
+            if (state / 'runtimes').exists():
+                result['retainedRuntimeRoot'] = str(state / 'runtimes')
+            return result
         if action in ('update', 'rollback') and current['status'] == 'absent':
             raise ValueError('No managed installation; run install first')
         if action == 'rollback':
@@ -233,11 +306,25 @@ def lifecycle(action, harness, scope, home, project, source):
         else:
             files, version = payload(source)
         new_hashes = {name: hashlib.sha256(data).hexdigest() for name, data in files.items()}
-        if current['status'] == 'managed' and new_hashes == read_json(state / 'state.json')['files']:
-            return dict(current, status='unchanged')
-        if action == 'install' and current['status'] == 'managed':
+        old_record = read_json(state / 'state.json') if current['status'] == 'managed' else None
+        identical = old_record is not None and new_hashes == old_record['files']
+        if action == 'install' and old_record and not identical:
             raise ValueError('Different version already installed; use update explicitly')
+        environment = None
+        if runtime or (old_record and old_record.get('runtime')):
+            environment = resources.enter_context(prepared_runtime(state, files['requirements.txt']))
         new_record = {'identifier': IDENTIFIER, 'version': version, 'target': str(target), 'files': new_hashes}
+        if environment:
+            new_record['runtime'] = str(environment)
+        if identical:
+            if environment:
+                smoke_runtime(target, environment, state)
+            if new_record != old_record:
+                with tempfile.TemporaryDirectory(prefix='ledger-', dir=state) as temp:
+                    ledger = Path(temp) / 'state.json'
+                    write_json(ledger, new_record)
+                    os.replace(ledger, state / 'state.json')
+            return dict(inspect(harness, scope, home, project), status='unchanged')
         target.parent.mkdir(parents=True, exist_ok=True)
         with tempfile.TemporaryDirectory(prefix='staging-', dir=state) as temp:
             staging = Path(temp) / 'skill'
@@ -247,7 +334,6 @@ def lifecycle(action, harness, scope, home, project, source):
                 dest.parent.mkdir(parents=True, exist_ok=True)
                 dest.write_bytes(data)
             # Snapshot before mutation. Stage the ledger, then restore on any caught failure.
-            old_record = read_json(state / 'state.json') if current['status'] == 'managed' else None
             new_ledger = Path(temp) / 'new-state.json'
             write_json(new_ledger, new_record)
             moved = Path(temp) / 'old'
@@ -262,6 +348,8 @@ def lifecycle(action, harness, scope, home, project, source):
                 target.rename(moved)
             try:
                 staging.rename(target)
+                if environment:
+                    smoke_runtime(target, environment, state)
                 if previous.exists():
                     previous.rename(old_backup)
                 if old_record:
@@ -269,7 +357,7 @@ def lifecycle(action, harness, scope, home, project, source):
                     write_json(Path(temp) / 'previous-state.json', old_record)
                     os.replace(Path(temp) / 'previous-state.json', backup_record)
                 os.replace(new_ledger, ledger)
-            except OSError:
+            except (OSError, ValueError):
                 if target.exists():
                     shutil.rmtree(target)
                 if old_record:
@@ -297,6 +385,8 @@ def main():
     parser.add_argument('--project', type=Path, default=Path.cwd())
     parser.add_argument('--source', type=Path, default=ROOT, help='Checkout or extracted skill directory')
     parser.add_argument('--output', type=Path)
+    parser.add_argument('--runtime', action='store_true',
+                        help='Provision an external venv and smoke installed helpers (network required)')
     args = parser.parse_args()
     try:
         if args.action == 'package':
@@ -309,7 +399,7 @@ def main():
             if not args.harness or not args.scope:
                 parser.error('lifecycle actions require --harness and --scope')
             result = lifecycle(args.action, args.harness, args.scope, canonical(args.home),
-                               canonical(args.project), canonical(args.source))
+                               canonical(args.project), canonical(args.source), runtime=args.runtime)
         print(json.dumps(result, indent=2))
     except (OSError, ValueError, KeyError) as exc:
         parser.exit(1, str(exc) + '\n')
