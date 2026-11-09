@@ -1,6 +1,7 @@
 # Internal marketplace Setup, Windows PowerShell 5.1. Never change execution policy.
 [CmdletBinding()]
 param([Parameter(Mandatory=$true)][string]$PackageRoot, [switch]$Consent,
+      [string]$ProjectRoot, [string[]]$Migrate = @(),
       [string]$Helper,
       [Parameter(ValueFromRemainingArguments=$true)][string[]]$HelperArguments)
 # A PowerShell 7 executor may pass its incompatible module search path to 5.1.
@@ -52,7 +53,7 @@ function Download([string]$Url, [string]$Destination) {
 try {
     if ($PSBoundParameters.ContainsKey('Helper') -and -not $Helper) { throw 'Missing helper name' }
     if ($HelperArguments -and -not $Helper) { throw 'Helper arguments require a helper name' }
-    if ($Helper -and $Consent) { throw 'Helper invocation cannot provision; choose Setup separately' }
+    if ($Helper -and ($Consent -or $ProjectRoot -or $Migrate.Count)) { throw 'Helper invocation cannot provision; choose Setup separately' }
     if ($env:OS -ne 'Windows_NT' -or $PSVersionTable.PSEdition -ne 'Desktop' -or $PSVersionTable.PSVersion -lt [version]'5.1') {
         throw 'Use the native Windows PowerShell 5.1 host; no WSL, Git Bash or alternate installer is required'
     }
@@ -117,7 +118,11 @@ try {
     $arguments = @('-I','-B', (Join-Path $PackageRoot 'scripts\kkdesign_setup.py'), '--package-root', $PackageRoot)
     if ($Helper) {
         $arguments = @('-I','-B', (Join-Path $PackageRoot 'scripts\kkdesign_run.py'), '--package-root', $PackageRoot, $Helper) + $HelperArguments
-    } elseif ($Consent) { $arguments += '--consent' }
+    } else {
+        if ($Consent) { $arguments += '--consent' }
+        if ($ProjectRoot) { $arguments += @('--project-root', $ProjectRoot) }
+        foreach ($location in $Migrate) { $arguments += @('--migrate', $location) }
+    }
     & $python @arguments
     if ($Helper) { exit $LASTEXITCODE }
     if ($LASTEXITCODE -ne 0) { throw 'Runtime execution or helper verification failed' }

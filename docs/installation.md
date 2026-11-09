@@ -14,7 +14,11 @@ Helper startup now uses the verified OS entrypoints without system Python; see
 [helper invocation](../references/helpers.md). Intel/Windows native acceptance remains pending.
 Native provider/OS acceptance is separate. Do not use
 standalone commands below to set up or manage a plugin. The remainder documents
-the legacy standalone lifecycle.
+the legacy standalone lifecycle. To migrate an existing copy, choose native
+Setup with the selected project root and follow the consent/conflict flow in
+[Setup](../references/setup.md#standalone-conflicts-and-migration). Migration
+retains verified copies outside discovery and preserves modified/unmanaged
+copies, project data and shared runtimes.
 
 Requires Python 3.9+ on macOS, Linux or Windows and a separately installed,
 authenticated Codex CLI or Claude Code. Bootstrap and installer use only the

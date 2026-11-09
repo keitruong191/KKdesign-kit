@@ -67,6 +67,10 @@ pending. Windows x64/ARM64 acquisition is implemented with
 helper startup is implemented through the same verified OS entrypoints. Only successful real
 helper verification establishes runtime ready; do not infer readiness from
 Python on PATH, a directory, a schema check or a standalone marker.
+Setup uses the explicitly selected project root to discover standalone copies
+in user/project/ancestor scopes. Explain every conflict and obtain separate
+migration consent before deactivating intact managed copies; preserve modified
+or unmanaged copies. Follow [Setup](references/setup.md) for the exact flow.
 
 For helper-dependent commands in plugin mode, use the same stable launcher
 above. It resolves the requirements-matched private user cache and fails with

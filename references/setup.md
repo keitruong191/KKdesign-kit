@@ -5,6 +5,13 @@ Opening the menu or installing the plugin never authorizes provisioning. Show
 **Plugin: loaded**, **Runtime: not checked / Setup required**, and **External
 tools: unverified** separately. No shell or Python is needed to read the menu.
 
+When the user explicitly chooses Setup, identify the product's absolute root
+from the user's selected project, not the executor CWD. Pass it as
+`--project-root "$PROJECT_ROOT"` (Windows: `-ProjectRoot $PROJECT_ROOT`) on
+Setup calls below. Without it, only user-scope discovery is possible and the
+result explicitly reports `project-scope-unchecked`; that is runtime readiness,
+not confirmation that this project has no duplicate installation.
+
 When the user explicitly chooses Setup:
 
 1. **Check the session.** If local execution is unavailable, stop and explain:
@@ -17,7 +24,7 @@ When the user explicitly chooses Setup:
    is present:
 
    ```sh
-   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR"
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --project-root "$PROJECT_ROOT"
    ```
 
    It needs no Python, Node or developer tooling on PATH. It uses a pinned
@@ -36,7 +43,7 @@ When the user explicitly chooses Setup:
    when the executor defaults to PowerShell 7):
 
    ```powershell
-   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -File "$SKILL_DIR\scripts\kkdesign_setup_windows.ps1" -PackageRoot "$SKILL_DIR"
+   & "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -File "$SKILL_DIR\scripts\kkdesign_setup_windows.ps1" -PackageRoot "$SKILL_DIR" -ProjectRoot "$PROJECT_ROOT"
    ```
 
    No Python/Node, WSL or Git Bash is required. The implemented targets are
@@ -98,6 +105,57 @@ cache silently. A failed new-runtime transaction removes only its own incomplete
 runtime and never records ready. A directory or old standalone marker alone
 is insufficient verification; preserve it for explicit inspection/repair.
 
+## Standalone conflicts and migration
+
+Setup discovers both harnesses' user, selected project and ancestor skill
+locations, plus legacy Codex skills and Claude command files. It reports exact
+location, scope, version when verifiable, ownership and reason. It distinguishes
+the supplied active plugin from standalone ownership; it never chooses a version
+silently. A missing/invalid ledger, symlink, unsafe ownership, modified bytes or
+unmanaged copy is a conflict and is preserved. Ask the owner to inspect and
+resolve it; do not force-delete, overwrite or create an alias/fallback copy.
+
+For intact managed copies, explain the target plugin location/version and every
+standalone location/version before asking permission to migrate. Explain that
+migration removes each copy from active skill discovery by moving it with its
+ledger into that owner's `.kkdesign-kit/installations/<harness>/migrated/`
+archive. All bytes, previous rollback backups, project data and shared runtime
+caches are retained. Migration does not invoke the old uninstall lifecycle.
+Refusal stops here with no mutation of old copies. Runtime acquisition permission
+is separate and never authorizes migration.
+
+After explicit consent for **all** disclosed managed locations, repeat Setup
+with the same explicit project root and one `--migrate "ABSOLUTE_LOCATION"` per
+copy. On Windows the script accepts `-Migrate @('ABSOLUTE_LOCATION',
+'ANOTHER_LOCATION')` **inside native Windows PowerShell 5.1**. Native `-File`
+does not forward array parameters; when launching from a different executor
+host, use this quoted `-Command` invocation with the disclosed `$locations` array:
+
+```powershell
+$quote = { param($value) "'" + $value.Replace("'", "''") + "'" }
+$list = ($locations | ForEach-Object { & $quote $_ }) -join ','
+$invoke = "& {0} -PackageRoot {1} -ProjectRoot {2} -Migrate @({3})" -f `
+    (& $quote "$SKILL_DIR\scripts\kkdesign_setup_windows.ps1"), `
+    (& $quote $SKILL_DIR), (& $quote $PROJECT_ROOT), $list
+& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -Command $invoke
+```
+
+Use the runtime consent flag only when the user separately authorized its
+disclosed acquisition (on Windows append ` -Consent` to `$invoke` before
+execution only after that authorization). Setup requires a verified bundle/matching native plugin
+descriptor, trusted runtime and successful real helper validation before moving
+anything. It locks and rechecks all historical owners and discovery before
+mutation; changed contents, new conflicts or busy owners stop migration. Caught
+move failures restore copies and ledgers. Interrupted processes require owner
+inspection of retained locks/archives; do not silently repair them.
+
+Only `migration.status=migrated` reports deactivation complete. Open a fresh
+provider session afterward so cached discovery drops the old registrations;
+filesystem migration cannot prove a running host has reloaded. Native plugin
+registration/enablement stays under provider control. Use native provider controls
+for the plugin, never the archived standalone installer. Helpers verified by Setup
+prove their actual synthetic scope, not human consent or provider usability.
+
 ## Native update, enable/disable and removal
 
 Use the provider's plugin controls for updates, enable/disable and uninstall;
@@ -142,6 +200,6 @@ cache automatically or use arbitrary fallback interpreters.
 The current Python launcher accepts only the private cache matching package
 requirements and runtime contract and its verification receipt. The same OS entrypoints expose helper mode and share the canonical Python
 dispatcher for both providers. Native lifecycle compatibility is implemented as described above; standalone
-conflict discovery and consented migration remain WWA-09. End-to-end provider/OS/authentication/usability
+conflict discovery and consented migration are implemented above. End-to-end provider/OS/authentication/usability
 acceptance remains separate from coding checks. Provider owns plugin lifecycle;
 cache retention never grants tool authentication or approval.
