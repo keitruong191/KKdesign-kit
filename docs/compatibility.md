@@ -20,6 +20,14 @@ Python-free helper startup uses the same verified OS entrypoints as Setup;
 [helper invocation](../references/helpers.md) never provisions. Setup smoke does not establish native
 provider support or live design-tool authentication. Native and usability acceptance remain separate.
 
+Provider-native update/enable/disable/uninstall preserve project data and
+private shared caches. Setup and helper invocation select caches by dependency
+digest plus runtime contract; changed requirements need explicit Setup consent.
+See [native lifecycle verification](verification/native-lifecycle.md) for measured
+provider coverage and pending acceptance. Older dependency-only native caches
+remain untouched; this contract namespace requires Setup consent once rather
+than silently executing or rewriting an older receipt.
+
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and
 authenticate the chosen harness separately; use the native skill paths and
 invocations in [installation](installation.md). Packaging and installation use

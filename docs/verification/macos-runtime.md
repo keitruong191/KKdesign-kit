@@ -87,11 +87,11 @@ native marketplace discovery, authenticated agent interaction or human consent.
 | Trusted repeat Setup, spaces and unrelated CWD; each advertised CPU smoked | Implemented, matrix bounded by evidence | ARM64 smoke is recorded here; Intel artifact acquisition is implemented but native Intel acceptance is pending and Intel support is not advertised. |
 
 WWA-05 adds Linux acquisition to the shared POSIX shell; WWA-06 owns Windows acquisition. WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
-through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own native
-update/uninstall compatibility and standalone migration. Earlier Setup receipts
-without the new runtime tree fingerprint are rejected and preserved for
-inspection rather than silently trusted; compatibility/repair policy remains
-WWA-08. Full native install → agent consent → workflow → update/uninstall and
+through the same OS entrypoint and dispatcher, without system Python.
+[WWA-08 lifecycle verification](native-lifecycle.md) records compatibility and
+native update/remove evidence; WWA-09 retains standalone migration. New native
+contract namespaces preserve earlier caches and require explicit Setup consent;
+unverified matching caches remain errors for inspection. Full native install → agent consent → workflow → update/uninstall and
 non-dev usability remain integrated external acceptance, not a code blocker.
 
 WWA-05 renames the internal shell to `scripts/kkdesign_setup_posix.sh` and the

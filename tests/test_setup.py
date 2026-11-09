@@ -1,4 +1,5 @@
 """Consent, trusted-cache readiness and failure preservation at the Setup boundary."""
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -38,7 +39,7 @@ class SetupTests(unittest.TestCase):
         else:
             self.home.mkdir(mode=0o700)
         self.requirements = (ROOT / 'requirements.txt').read_bytes()
-        self.runtime = kit.runtime_path(self.home, self.requirements)
+        self.runtime = setup.runtime_path(self.home, self.requirements)
 
     def tearDown(self):
         self.temp.cleanup()
@@ -54,7 +55,7 @@ class SetupTests(unittest.TestCase):
         (Path(purelib) / 'suite-dependencies.pth').write_text('\n'.join(site.getsitepackages()) + '\n')
         (self.runtime / 'requirements.txt').write_bytes(self.requirements)
         kit.write_json(self.runtime / 'runtime.json', {'identifier': kit.IDENTIFIER,
-                                                     'requirementsSha256': self.runtime.name})
+                                                     'requirementsSha256': hashlib.sha256(self.requirements).hexdigest()})
         if os.name != 'nt':
             # This fixture provisions its own cache. venv can copy an upstream
             # interpreter's group-write mode on CI; make newly created bytes
@@ -104,6 +105,37 @@ class SetupTests(unittest.TestCase):
             self.assertFalse((self.base / '.kkdesign-kit').exists())
         self.assertEqual((self.runtime / 'setup.json').read_bytes(), original_runtime)
 
+    def test_contract_update_never_executes_or_overwrites_an_old_consumer_cache(self):
+        self.verified_cache()
+        before = setup.fingerprint(self.runtime, self.requirements)
+        with patch.object(setup, 'RUNTIME_CONTRACT', setup.RUNTIME_CONTRACT + 1):
+            with patch.object(kit, 'run_runtime', side_effect=AssertionError('execution before consent')):
+                result = setup.setup(ROOT, self.home)
+            self.assertEqual(result['status'], 'consent-required')
+            self.assertIsNone(setup.trusted_runtime(self.home, self.requirements))
+            self.assertNotEqual(setup.runtime_path(self.home, self.requirements), self.runtime)
+        self.assertEqual(setup.fingerprint(self.runtime, self.requirements), before)
+        self.assertEqual(setup.setup(ROOT, self.home)['status'], 'ready')
+
+    def test_changed_requirements_and_reinstall_preserve_other_consumers_and_project(self):
+        self.verified_cache()
+        before = setup.fingerprint(self.runtime, self.requirements)
+        package = self.base / 'updated package'
+        shutil.copytree(ROOT, package, ignore=shutil.ignore_patterns('.git', '.hoangsa', '__pycache__'))
+        # A syntactically valid dependency change must request consent without
+        # using the retained old interpreter, even for the same package version.
+        (package / 'requirements.txt').write_bytes(self.requirements + b'\n# synthetic new release\n')
+        output = self.base / 'must not be materialized'
+        proc = self.invoke_helper(package, 'materialize_example', '--output', str(output))
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertFalse(output.exists())
+        with patch.object(kit, 'run_runtime', side_effect=AssertionError('execution before consent')):
+            self.assertEqual(setup.setup(package, self.home)['status'], 'consent-required')
+        self.assertEqual(setup.fingerprint(self.runtime, self.requirements), before)
+        shutil.rmtree(package)
+        self.assertEqual(setup.setup(ROOT, self.home)['status'], 'ready')
+        self.assertEqual(setup.fingerprint(self.runtime, self.requirements), before)
+
     def invoke_helper(self, package=ROOT, *arguments):
         return subprocess.run([sys.executable, '-I', '-B',
                                str(package / 'scripts/kkdesign_run.py'),
@@ -142,7 +174,7 @@ class SetupTests(unittest.TestCase):
         self.assertFalse((self.home / '.kkdesign-kit').exists())
         self.runtime.mkdir(parents=True)
         kit.write_json(self.runtime / 'runtime.json', {'identifier': kit.IDENTIFIER,
-                                                     'requirementsSha256': self.runtime.name})
+                                                     'requirementsSha256': hashlib.sha256(self.requirements).hexdigest()})
         before = kit.hashes(self.runtime)
         refused(*arguments)
         self.assertEqual(kit.hashes(self.runtime), before)

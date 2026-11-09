@@ -15,6 +15,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kkdesign_install as kit
 
 
+# Bump when interpreter/provisioning/receipt requirements become incompatible.
+# Package version and provider identity deliberately do not affect reuse.
+RUNTIME_CONTRACT = 1
+
+
+def runtime_path(home, requirements):
+    return kit.runtime_path(home, requirements, contract=RUNTIME_CONTRACT)
+
+
 class SetupError(ValueError):
     def __init__(self, code, message, action):
         super().__init__(message)
@@ -51,7 +60,7 @@ def windows_private(path, home, tree=False):
 
 
 def cache_paths(home, requirements):
-    runtime = kit.runtime_path(home, requirements)
+    runtime = runtime_path(home, requirements)
     windows_private(runtime, home)
     kit.no_links(runtime)
     # Private cache provenance is rooted in the actual user's home, never a
@@ -93,7 +102,7 @@ def fingerprint(runtime, requirements):
         else:
             raise SetupError('runtime-unverified', 'Unexpected managed runtime file type.',
                              'Preserve and inspect the cache before repair.')
-    return {'identifier': kit.IDENTIFIER, 'requirementsSha256': hashlib.sha256(requirements).hexdigest(),
+    return {'identifier': kit.IDENTIFIER, 'runtimeContract': RUNTIME_CONTRACT, 'requirementsSha256': hashlib.sha256(requirements).hexdigest(),
             'pythonSha256': hashlib.sha256(python.read_bytes()).hexdigest(),
             'filesSha256': hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest()}
 
@@ -104,7 +113,7 @@ def trusted_runtime(home, requirements):
         return None
     for name in ('runtime.json', 'setup.json', 'requirements.txt'):
         kit.no_links(runtime / name)
-    marker = {'identifier': kit.IDENTIFIER, 'requirementsSha256': runtime.name}
+    marker = {'identifier': kit.IDENTIFIER, 'requirementsSha256': hashlib.sha256(requirements).hexdigest()}
     if (not (runtime / 'runtime.json').is_file()
             or kit.read_json(runtime / 'runtime.json') != marker
             or not (runtime / 'setup.json').is_file()
@@ -132,8 +141,10 @@ def setup(package, home, consent=False, emit=lambda event: None):
         requirements = (package / 'requirements.txt').read_bytes()
         runtime = trusted_runtime(home, requirements)
         if runtime is None and not consent:
-            phase('consent-required', location=str(kit.runtime_path(home, requirements)),
+            phase('consent-required', location=str(runtime_path(home, requirements)),
                   purpose='Create a private Python environment and download requirements.txt dependencies from the package index.',
+                  runtimeContract=RUNTIME_CONTRACT, requirementsSha256=hashlib.sha256(requirements).hexdigest(),
+                  reason='No verified cache matches this package dependency and runtime contract; retained caches are preserved.',
                   permissions='Network access, user-cache writes and local execution; no admin or system Python changes.',
                   nextAction='Explain these actions and obtain an explicit yes in the agent before retrying with --consent.')
             return dict(state, status='consent-required')
@@ -142,7 +153,7 @@ def setup(package, home, consent=False, emit=lambda event: None):
             # Reuse the existing provisioning transaction, without installing a
             # skill or invoking any standalone lifecycle. Failed smoke removes
             # only the runtime created by this transaction.
-            with kit.prepared_runtime(home, requirements) as runtime:
+            with kit.prepared_runtime(home, requirements, contract=RUNTIME_CONTRACT) as runtime:
                 phase('verifying-helpers')
                 verify_helpers(package, runtime)
                 receipt = runtime / 'setup.json'

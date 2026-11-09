@@ -43,13 +43,22 @@ standalone installer or create another skill copy.
 Use native lifecycle controls, including:
 
 ```text
+claude plugin marketplace update kkdesign-kit-marketplace
+claude plugin update kkdesign-kit@kkdesign-kit-marketplace --scope user
+claude plugin disable kkdesign-kit@kkdesign-kit-marketplace --scope user
+claude plugin enable kkdesign-kit@kkdesign-kit-marketplace --scope user
 claude plugin uninstall kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
 Provider-owned plugin files are separate from project `design/`, lessons, task
 history and any private user runtime cache. No uninstall hook is bundled.
-Retained user runtime/state is outside the host's plugin ownership. This task
-does not implement runtime compatibility on update or standalone migration.
+Retained user runtime/state is outside the host's plugin ownership. After an
+update and host-required restart, choose Setup to verify compatibility. Unchanged
+requirements/runtime contracts reuse a verified cache; changes request consent
+for a separate cache and preserve existing consumers. Enable/disable never
+provisions. Reinstall evaluates cache ownership, compatibility and helpers again.
+See [lifecycle evidence and acceptance limits](verification/native-lifecycle.md).
+Standalone conflict detection/migration remains WWA-09.
 
 ## Build from canonical resources
 

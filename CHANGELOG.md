@@ -11,6 +11,20 @@
   and helpers on macOS ARM64. Intel native/provider/human acceptance remains
   separate.
 
+### Native lifecycle compatibility
+
+- Reuse native runtimes by exact dependency digest and explicit runtime contract,
+  independently of provider, package version, plugin root and project. Isolate
+  changed contracts in new caches; require Setup consent before acquisition and
+  preserve prior environments for other consumers.
+- Keep native lifecycle under provider control. Explain enable/disable,
+  uninstall cache retention and reinstall verification in the agent; do not
+  provision on native installation or run a second installer lifecycle.
+- Add regression coverage for changed dependency/contract refusal and retained
+  consumer reuse, plus an opt-in two-provider native lifecycle probe using
+  isolated profiles, actual updates, real shared runtimes and helper execution.
+  Authenticated agent consent/menus/usability remain external acceptance.
+
 ### Trusted helper runtime
 
 - Both providers invoke the canonical dispatcher through verified POSIX or native
