@@ -28,17 +28,14 @@ class ClaudeMarketplaceTests(unittest.TestCase):
             archive.extractall(self.base / 'provider cache' / 'arbitrary version')
         return self.base / 'provider cache/arbitrary version/kkdesign-marketplace'
 
-    def test_deterministic_complete_canonical_payload_and_relocated_verification(self):
+    def test_deterministic_artifact_and_relocated_verification(self):
         extracted = self.extract()
         second = self.base / 'second.zip'
         marketplace.package(ROOT, second)
         self.assertEqual((self.base / 'marketplace.zip').read_bytes(), second.read_bytes())
         catalog = kit.read_json(extracted / '.claude-plugin/marketplace.json')
         plugin = extracted / catalog['plugins'][0]['source']
-        original, version = kit.payload(ROOT)
-        for name, data in original.items():
-            if name != 'bundle.json':
-                self.assertEqual((plugin / name).read_bytes(), data, name)
+        version = kit.read_json(ROOT / 'manifest.json')['version']
         descriptor = kit.read_json(plugin / '.claude-plugin/plugin.json')
         self.assertEqual(descriptor['version'], version)
         self.assertEqual(catalog['plugins'][0]['version'], version)

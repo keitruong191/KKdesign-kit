@@ -1,7 +1,16 @@
 # WWA-01 native verification
 
-Status: **NOT MET — actual menu/Setup rendering blocked by missing Claude
-authentication in the isolated profile.** This is not release acceptance.
+Implementation/code verification: **ready for coordinator review and integration**.
+Authenticated native menu/Setup acceptance: **pending**. The prior attempts
+failed because the isolated profile lacked Claude authentication; they are not
+native menu passes or release acceptance.
+
+The owner explicitly separated acceptance requiring unavailable resources from
+code integration. The coordinator may merge reviewed, tested implementation to
+`feature/marketplace-installation-setup` while recording native acceptance as
+pending. The owner will arrange an authenticated installation and feedback;
+pending external acceptance does not block code integration. This does not
+authorize a merge to main or publication.
 
 Environment: macOS ARM64, Python 3.9 development venv with `requirements.txt`,
 Claude Code `2.1.308`. No primary provider configuration or credentials were
@@ -15,10 +24,10 @@ are placeholders for temporary locations, not published install endpoints.
 | Criterion | Evidence | Verdict |
 | --- | --- | --- |
 | Clean native marketplace registration/install at the correct version, without end-user clone or standalone installer | Actual Git smart HTTP loopback source from the built marketplace ZIP; native registration/install exit 0; native inventory reports enabled user-scope `kkdesign-kit@kkdesign-kit-marketplace`, version `0.5.0a1`, under provider cache. | Met for local native packaging review; public publication is not claimed. |
-| Actual Claude session discovers namespaced skill and opens menu with Setup without Python just to read it | Session init lists `kkdesign-kit:kkdesign-kit` in both `skills` and `slash_commands`, and plugin version `0.5.0a1`. Both bare invocation and Setup attempt stop with `authentication_failed` / `Not logged in · Please run /login` before rendering. | NOT MET: native discovery observed; rendered menu/Setup not observed. |
+| Actual Claude session discovers namespaced skill and opens menu with Setup without Python just to read it | Session init lists `kkdesign-kit:kkdesign-kit` in both `skills` and `slash_commands`, and plugin version `0.5.0a1`. Both bare invocation and Setup attempt stop with `authentication_failed` / `Not logged in · Please run /login` before rendering. | Pending authenticated acceptance: native discovery observed; rendered menu/Setup not observed. |
 | Canonical complete resources at arbitrary provider cache location without original checkout or standalone copy | Built payload uses the existing allowlist and canonical bytes, plus plugin metadata covered by bundle integrity. Extracted verifier runs from the native cache after removal of the temporary packaged source and transport: 57 files, 35 required resources verified. Native component inventory still works; no standalone skill is created. | Packaging/resource relocation observed; helper workflows intentionally blocked pending runtime integration. |
 | Missing runtime says Setup required; native uninstall preserves project data | Bundled instructions specify Setup required; launcher refuses helper execution. Native uninstall exits 0, installed inventory becomes empty, and synthetic DESIGN/lesson/task-history/user-runtime sentinels survive. | Native lifecycle preservation observed; actual menu readiness message remains unverified due to authentication. |
-| Real install → discovery → menu proof | Native install and real-session discovery succeeded. No model/tool execution occurred before the auth failure, and no menu response was produced. | NOT MET; schema checks are not substituted for menu proof. |
+| Real install → discovery → menu proof | Native install and real-session discovery succeeded. No model/tool execution occurred before the auth failure, and no menu response was produced. | Pending authenticated acceptance; schema checks are not substituted for menu proof. |
 
 ## Checks and commands
 
@@ -26,6 +35,11 @@ are placeholders for temporary locations, not published install endpoints.
 development venv: **128 tests passed**, including four marketplace tests for
 deterministic allowlisted output, relocated verification/tampering, refusing
 helper execution without plugin runtime support, no overwrite and version drift.
+
+The following native evidence comes from the earlier packaging smoke, before
+the continuation's test-policy cleanup and documentation-only changes. The
+continuation reruns the unit suite once; it does not repeat the known failing
+native-auth scenario or claim a new native pass.
 
 The temporary native smoke performed these real commands in order:
 
@@ -67,13 +81,15 @@ Initial transport checks also found that native marketplace registration rejects
 transport limitations, resolved by serving the unmodified packaged Git bytes
 through Git's native smart HTTP backend on loopback.
 
-## Remaining gate
+## Pending external acceptance
 
 Repeat native install/discovery, bare menu and Setup rendering in an isolated
 profile with explicitly authorized authentication. Confirm the actual menu's
 Setup-required state and no provisioning on either read-only route. Do not
-copy credentials from a primary profile to work around this blocker. Automatic
+copy credentials from a primary profile to work around this resource limitation. Automatic
 runtime Setup, OS provisioning, managed plugin launcher, update compatibility,
 migration, public publication and broader provider/platform support remain
-outside WWA-01. Keep this PR open for coordinator review; it is not safe to
-mark WWA-01 accepted or publish the plugin based on this evidence.
+outside WWA-01. The implementation is ready for coordinator review and may be
+integrated under the owner's clarified policy, with authenticated native menu
+acceptance still pending. Do not mark that external acceptance passed or publish
+the plugin based on this evidence. This worker does not merge the PR or main.
