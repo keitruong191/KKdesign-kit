@@ -16,7 +16,8 @@ curl, GNU tar and coreutils; musl and other CPUs are rejected before download.
 [Linux native acceptance](verification/linux-runtime.md) is pending; implementation
 is not a tested-distribution support claim. Windows acquisition is implemented with native PowerShell 5.1 and private ACL
 checks; [native Windows acceptance](verification/windows-runtime.md) is pending.
-General Python-free launcher integration remains WWA-07. Setup smoke does not establish native
+Python-free helper startup uses the same verified OS entrypoints as Setup;
+[helper invocation](../references/helpers.md) never provisions. Setup smoke does not establish native
 provider support or live design-tool authentication. Native and usability acceptance remain separate.
 
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and
@@ -24,15 +25,11 @@ authenticate the chosen harness separately; use the native skill paths and
 invocations in [installation](installation.md). Packaging and installation use
 Python 3.9+ and the Python standard library. Offline contract validation also
 requires `jsonschema >=4.18,<5` from `requirements.txt`.
-The POSIX bootstrap also requires `curl`, network access to the pinned release
-and package index, and Python's working `venv`/`ensurepip`. It always provisions
-the workflow dependencies in `~/.kkdesign-kit/runtimes/`, outside destination
-repositories. Manual installation enables this with `--runtime`; without a
-recorded runtime the launcher uses its invoking interpreter, which must have
-the workflow dependencies installed. An invalid recorded runtime is refused.
-Use `python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER`, without activation.
-A fresh or restarted harness still needs Python 3 available and its separately
-authenticated design tools.
+Marketplace runtime acquisition needs the OS host tools listed in Setup and
+approved network access. Subsequent helpers need only the verified private
+caches and local execution; no system Python/Node, activation, or PATH change.
+Source/legacy standalone maintainer operations retain their Python 3.9+ prerequisites.
+External design tools need separate authentication.
 
 The kit does not install Hoangsa, Impeccable, MCP servers, or hooks. Source
 adapters need access to the sources declared by the project. Design and

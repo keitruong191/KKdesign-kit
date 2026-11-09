@@ -10,7 +10,8 @@ Python/Node, then verify helpers and reuse a trusted private cache without a red
 prompt. macOS ARM64 runtime smoke is recorded in
 [verification](verification/macos-runtime.md). Linux acquisition is implemented with [native acceptance pending](verification/linux-runtime.md).
 Windows PowerShell acquisition is implemented; [native acceptance is pending](verification/windows-runtime.md).
-Intel/Windows native acceptance and general Python-free helper startup remain pending.
+Helper startup now uses the verified OS entrypoints without system Python; see
+[helper invocation](../references/helpers.md). Intel/Windows native acceptance remains pending.
 Native provider/OS acceptance is separate. Do not use
 standalone commands below to set up or manage a plugin. The remainder documents
 the legacy standalone lifecycle.

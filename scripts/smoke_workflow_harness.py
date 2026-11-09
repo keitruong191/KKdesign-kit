@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Opt-in B3 installed-workflow probe. Raw transcripts stay outside the public repo."""
+"""Historical standalone maintainer probe; not a marketplace helper entrypoint.
+
+Opt-in B3 installed-workflow probe. Raw transcripts stay outside the public repo."""
 import argparse
 import hashlib
 import json

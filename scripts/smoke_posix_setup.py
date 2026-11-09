@@ -83,13 +83,28 @@ def main():
             assert again[-1]['result']['reused'] is True, again
             assert all(item['phase'] != 'downloading-python' for item in again)
             output = base / (builder.__name__ + ' example')
-            # This is the existing dispatcher with the returned absolute managed
-            # interpreter. General Python-free helper startup is WWA-07.
-            launcher = [result['python'], '-I', '-B', package / 'scripts/kkdesign_run.py']
+            launcher = [*command, '--helper']
             run([*launcher, 'materialize_example', '--output', output], product, env, events=False)
             validation = json.loads(run([*launcher, 'kkdesign_core', 'validate', '--design', output / 'design'],
                                         product, env, events=False))
             assert (validation['status'], validation['errors'], validation['warnings']) == ('pass', [], [])
+            checked = json.loads(run([*launcher, 'kkdesign_task', 'check', '--project', output,
+                                      '--task-id', 'demo'], product, env, events=False))
+            assert checked['status'] == 'checked', checked
+            run([*launcher, 'kkdesign_learn', 'feedback', '--design', output / 'design',
+                 '--content', 'Synthetic launcher workflow feedback', '--scope', 'web',
+                 '--origin', 'synthetic smoke', '--evidence', 'tasks/demo/audit.json'],
+                product, env, events=False)
+            assert (output / 'design/feedback.json').is_file()
+            retained = Path(result['runtimePath'])
+            receipt = retained / 'setup.json'
+            receipt_bytes = receipt.read_bytes()
+            receipt.write_text('{}')
+            run([*launcher, 'materialize_example', '--output', product / 'forbidden'],
+                product, env, success=False, events=False)
+            assert receipt.read_text() == '{}'
+            assert not (product / 'forbidden').exists()
+            receipt.write_bytes(receipt_bytes)
             assert kit.hashes(extracted) == before
             assert [p.name for p in product.iterdir()] == ['keep.txt']
             outcomes.append({'adapter': builder.__name__, 'acquiredPython': '3.12.12',
@@ -100,6 +115,9 @@ def main():
         acquired = next((home / '.kkdesign-kit/bootstrap').glob('cpython-*'))
         library = acquired / 'python/lib/python3.12/site.py'
         library.write_bytes(library.read_bytes() + b'\n# synthetic tamper\n')
+        run([*launcher, 'materialize_example', '--output', product / 'forbidden'],
+            product, env, success=False, events=False)
+        assert not (product / 'forbidden').exists()
         rejected = run(command, product, env, success=False)
         assert rejected[-1]['runtime'] == 'error', rejected
         assert library.read_bytes().endswith(b'# synthetic tamper\n')

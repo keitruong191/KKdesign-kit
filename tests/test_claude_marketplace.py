@@ -56,7 +56,7 @@ class ClaudeMarketplaceTests(unittest.TestCase):
         plugin = self.extract() / 'plugins/kkdesign-kit'
         before = kit.hashes(plugin)
         output = self.base / 'must not be created'
-        result = subprocess.run([sys.executable, '-B', str(plugin / 'scripts/kkdesign_run.py'),
+        result = subprocess.run([sys.executable, '-B', str(plugin / 'scripts/kkdesign_run.py'), '--package-root', str(plugin),
                                  'materialize_example', '--output', str(output)],
                                 cwd=self.base, env=dict(os.environ, HOME=str(self.base), USERPROFILE=str(self.base)),
                                 capture_output=True, text=True)

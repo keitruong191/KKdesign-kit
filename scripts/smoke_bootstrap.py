@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Maintainer acceptance: real curl/HTTP bootstrap, isolated destinations, real pip.
+"""Historical standalone maintainer probe; not a marketplace helper entrypoint.
+
+Maintainer acceptance: real curl/HTTP bootstrap, isolated destinations, real pip.
 
 Uses loopback release transport, not a public release or native harness discovery.
 No credentials, user configuration, activation, or existing installation is used.

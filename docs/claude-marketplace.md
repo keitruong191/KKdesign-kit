@@ -12,7 +12,7 @@ only file-reading tools. Explicit [Setup](../references/setup.md) checks/reuses
 a trusted private runtime or, after consent, provisions and verifies real helpers. macOS/Linux Setup acquires pinned Python
 internally without existing Python/Node; see [runtime evidence](verification/macos-runtime.md).
 Windows PowerShell acquisition is implemented with [native acceptance pending](verification/windows-runtime.md).
-General Python-free helper startup and native end-to-end acceptance remain pending. No public release or official listing is claimed.
+Python-free helper startup uses the [verified OS entrypoints](../references/helpers.md); native end-to-end acceptance remains pending. No public release or official listing is claimed.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
 ## Native review flow

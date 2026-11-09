@@ -86,10 +86,8 @@ native marketplace discovery, authenticated agent interaction or human consent.
 | Pinned verified artifacts; download/checksum/write errors never ready | Implemented | Pre-execution SHA check, staged download, bounded curl, ownership/write checks, rollback and rejection tests; real organizational firewall/policy acceptance remains external. |
 | Trusted repeat Setup, spaces and unrelated CWD; each advertised CPU smoked | Implemented, matrix bounded by evidence | ARM64 smoke is recorded here; Intel artifact acquisition is implemented but native Intel acceptance is pending and Intel support is not advertised. |
 
-WWA-05 adds Linux acquisition to the shared POSIX shell; WWA-06 owns Windows acquisition. WWA-07 owns general Python-free
-helper startup and migration of all callers: for this item the agent invokes
-the existing dispatcher using the successful Setup result's absolute `python`
-path, and reruns the macOS Setup check in a new session. WWA-08/09 own native
+WWA-05 adds Linux acquisition to the shared POSIX shell; WWA-06 owns Windows acquisition. WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
+through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own native
 update/uninstall compatibility and standalone migration. Earlier Setup receipts
 without the new runtime tree fingerprint are rejected and preserved for
 inspection rather than silently trusted; compatibility/repair policy remains

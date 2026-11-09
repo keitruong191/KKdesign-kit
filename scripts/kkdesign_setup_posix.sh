@@ -14,13 +14,16 @@ fail() {
 }
 package=
 consent=
+helper=
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --package-root) [ "$#" -ge 2 ] || fail 'Missing package root'; package=$2; shift 2 ;;
         --consent) consent=--consent; shift ;;
+        --helper) [ "$#" -ge 2 ] || fail 'Missing helper name'; helper=$2; [ -n "$helper" ] || fail 'Missing helper name'; shift 2; break ;;
         *) fail 'Unknown Setup argument' ;;
     esac
 done
+[ -z "$helper" ] || [ -z "$consent" ] || fail 'Helper invocation cannot provision; choose Setup separately'
 case "$package" in /*) ;; *) fail 'An explicit absolute package root is required' ;; esac
 [ -f "$package/SKILL.md" ] && [ -f "$package/scripts/kkdesign_setup.py" ] || fail 'Invalid package root'
 system=$(/usr/bin/uname -s)
@@ -100,6 +103,9 @@ cache=$root/cpython-3.12.12-20251014-$cache_target
 private_path "$cache"
 [ "$(owner "$HOME")" = "$uid" ] || fail 'User home has another owner'
 [ -z "$(unsafe_permissions "$HOME" -prune)" ] || fail 'User home is writable by another account'
+if [ -n "$helper" ] && [ ! -d "$cache" ]; then
+    fail 'Setup required: managed bootstrap is missing; open the installed skill and choose Setup'
+fi
 if [ ! -e "$cache" ] && [ -z "$consent" ]; then
     printf 'Setup needs pinned CPython 3.12.12 (Astral python-build-standalone release 20251014) from GitHub HTTPS and requirements.txt dependencies from the package index. Storage: %s and %s/runtimes. Network, private user-cache writes and local execution are required; no admin, system Python or shell changes. Obtain explicit consent before --consent.\n' "$cache" "$base" >&2
     printf '%s\n' '{"plugin":"loaded","runtime":"setup-required","externalTools":"unverified","status":"consent-required","phase":"consent-required"}'
@@ -175,6 +181,12 @@ if [ ! -e "$cache" ]; then
     stage=
 fi
 verify_cache
+if [ -n "$helper" ]; then
+    # Only verified bootstrap code may inspect the runtime receipt; helper mode
+    # never calls provisioning, accepts executable paths or consults project state.
+    "$cache/python/bin/python3" -I -B "$package/scripts/kkdesign_run.py" --package-root "$package" "$helper" "$@"
+    exit $?
+fi
 # -I ignores ambient Python configuration, -B prevents plugin/cache bytecode.
 # The same canonical Python Setup handles requirements, locks, helper validation
 # and its readiness receipt. There is no second installer or dispatcher.

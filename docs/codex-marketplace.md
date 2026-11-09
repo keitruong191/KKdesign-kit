@@ -14,7 +14,7 @@ acquire pinned Python internally without Python/Node on PATH; see
 [runtime evidence](verification/macos-runtime.md).
 Plugin loaded, runtime readiness and external tools unverified remain separate.
 Windows PowerShell acquisition is implemented with [native acceptance pending](verification/windows-runtime.md).
-General Python-free helper startup and native end-to-end acceptance are pending;
+Python-free helper startup uses the [verified OS entrypoints](../references/helpers.md); native end-to-end acceptance remains pending;
 this is not a public release or official listing.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 

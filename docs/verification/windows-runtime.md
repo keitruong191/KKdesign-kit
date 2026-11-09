@@ -135,8 +135,8 @@ Never relax policy or acquire credentials to construct acceptance.
 | Integrity/permission failures, valid reuse, unowned cache rejection | Archive/inventory checks, protected DACLs, shared ACL/reparse verification, exclusive locks and preserved errors | Native ACL, denial and reuse smoke pending |
 | Real Windows smoke for each advertised combination | Native harness and acceptance handoff supplied; no Windows combination advertised as verified | Pending owner-arranged Windows/provider resources |
 
-WWA-07 owns general Python-free helper startup and full caller migration;
-WWA-08/09 own native lifecycle compatibility and standalone migration. WWA-10
+WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
+through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own native lifecycle compatibility and standalone migration. WWA-10
 and release gates own published support instructions, provider/OS and non-dev
 acceptance. Provider owns plugin bytes/lifecycle; runtime retention does not
 imply external-tool authentication or human approval.
