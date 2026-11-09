@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Real consented macOS acquisition, relocated Setup/reuse and trust rejection.
+"""Real consented POSIX acquisition, relocated Setup/reuse and trust rejection.
 
 The harness needs a development Python; the launched Setup has no Python/Node
-on PATH and uses only native macOS tools before verified interpreter execution.
+on PATH and uses only native host tools before verified interpreter execution.
 No provider install/authentication or human-consent evidence is implied.
 """
+import argparse
 import json
 import os
 from pathlib import Path
@@ -30,9 +31,20 @@ def run(command, cwd, env, success=True, events=True):
 
 
 def main():
-    if sys.platform != 'darwin':
-        raise SystemExit('This smoke requires native macOS')
-    with tempfile.TemporaryDirectory(prefix='macOS missing Python spaces ') as temp:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--incomplete-python', type=Path,
+                        help='Linux system interpreter genuinely missing venv or ensurepip')
+    args = parser.parse_args()
+    if sys.platform != 'darwin' and not sys.platform.startswith('linux'):
+        raise SystemExit('This smoke requires native macOS or GNU/Linux')
+    if args.incomplete_python:
+        if not sys.platform.startswith('linux') or not args.incomplete_python.is_absolute():
+            raise SystemExit('--incomplete-python requires an absolute Linux interpreter path')
+        probe = subprocess.run([str(args.incomplete_python), '-I', '-c', 'import venv, ensurepip'],
+                               capture_output=True, text=True, timeout=20)
+        if probe.returncode == 0 or 'ModuleNotFoundError' not in probe.stderr:
+            raise SystemExit('The supplied interpreter must genuinely lack venv or ensurepip')
+    with tempfile.TemporaryDirectory(prefix='POSIX missing Python spaces ') as temp:
         base = Path(temp).resolve()
         home, product = base / 'home', base / 'unrelated product'
         home.mkdir(mode=0o700)
@@ -41,6 +53,11 @@ def main():
         env = dict(os.environ, HOME=str(home), USERPROFILE=str(home), PATH='/nonexistent',
                    PYTHONDONTWRITEBYTECODE='1', PIP_TARGET=str(product / 'forbidden target'),
                    PIP_PREFIX=str(product / 'forbidden prefix'), PIP_USER='true')
+        if args.incomplete_python:
+            path_bin = base / 'incomplete system bin'
+            path_bin.mkdir()
+            (path_bin / 'python3').symlink_to(args.incomplete_python)
+            env['PATH'] = str(path_bin)
         outcomes = []
         for builder, relative in ((claude, 'kkdesign-marketplace/plugins/kkdesign-kit'),
                                   (codex, 'kkdesign-codex-marketplace/plugins/kkdesign-kit/skills/kkdesign-kit')):
@@ -51,7 +68,7 @@ def main():
                 stream.extractall(extracted)
             package = extracted / relative
             before = kit.hashes(extracted)
-            command = ['/bin/sh', package / 'scripts/kkdesign_setup_macos.sh', '--package-root', package]
+            command = ['/bin/sh', package / 'scripts/kkdesign_setup_posix.sh', '--package-root', package]
             events = run(command, product, env)
             if not outcomes:
                 assert events[-1]['status'] == 'consent-required', events
@@ -88,9 +105,9 @@ def main():
         assert library.read_bytes().endswith(b'# synthetic tamper\n')
         assert not (acquired.parent / 'lock').exists()
         print(json.dumps({'status': 'pass', 'system': os.uname().sysname,
-                          'architecture': os.uname().machine, 'pathPythonAndNode': 'unavailable',
+                          'architecture': os.uname().machine, 'pathPythonAndNode': 'Python lacks venv/ensurepip; Node unavailable' if args.incomplete_python else 'unavailable',
                           'results': outcomes, 'tamperedLibrary': 'rejected and preserved',
-                          'scope': 'Native macOS shell/acquisition/helper smoke; provider interaction, human consent and other CPUs remain separate.'}, indent=2))
+                          'scope': 'Native host shell/acquisition/helper smoke; provider interaction, human consent and other CPUs remain separate.'}, indent=2))
 
 
 if __name__ == '__main__':

@@ -9,13 +9,14 @@ The descriptor version must match `manifest.json`. The generated Codex catalog i
 
 The menu uses file-reading tools only and does not provision anything. Explicit
 [Setup](../references/setup.md) checks/reuses a trusted private runtime or asks
-for consent before provisioning and verifying real helpers. macOS Setup can
+for consent before provisioning and verifying real helpers. macOS/Linux Setup can
 acquire pinned Python internally without Python/Node on PATH; see
 [runtime evidence](verification/macos-runtime.md).
 Plugin loaded, runtime readiness and external tools unverified remain separate.
-Linux/Windows acquisition, general Python-free helper startup and native
+Windows acquisition, general Python-free helper startup and native
 end-to-end acceptance are pending;
 this is not a public release or official listing.
+Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
 ## Native maintainer review
 

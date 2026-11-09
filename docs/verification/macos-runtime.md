@@ -9,7 +9,7 @@ hook, alternate skill distribution or provider lifecycle command.
 - The agent supplies an explicit absolute skill root. On macOS the shell uses
   bundled OS tools, without discovering or running PATH Python/Node. It always
   selects its pinned CPython with venv/ensurepip rather than relying on an
-  incomplete system installation. Other platforms retain existing-Python Setup.
+  incomplete system installation. Linux now uses the same POSIX entrypoint; Windows retains existing-Python Setup.
 - Download requires explicit agent-observed consent. Initial checking without
   consent returns the source, private storage, purpose and permissions without
   creating cache state. The flag conveys consent; tests cannot establish it.
@@ -53,7 +53,7 @@ artifact is implemented but native Intel support is not claimed.
 | Check | Recorded result | Scope |
 |---|---|---|
 | `python -m unittest discover -s tests -v` in an external Python 3.9 development venv populated from `requirements.txt` | PASS, 145 tests | Core regressions and consent, trust, ownership, real refused-network and write-denial boundaries. |
-| `python -B scripts/smoke_macos_setup.py` | PASS on macOS ARM64 | Actual pinned CPython download, real requirements provisioning and materialize/validate, both relocated marketplace layouts, repeat reuse and acquired-library tamper rejection. |
+| `python -B scripts/smoke_posix_setup.py` | PASS on macOS ARM64 | Actual pinned CPython download, real requirements provisioning and materialize/validate, both relocated marketplace layouts, repeat reuse and acquired-library tamper rejection. |
 | `git diff --check` | PASS | Whitespace check only. |
 
 The first developer invocation found no `python` command; a Python 3.9 run then
@@ -63,7 +63,7 @@ system Python. The first smoke reached readiness/helper execution but found a
 harness parser error for helper output; the parser was corrected before the
 passing smoke. Neither failed attempt is counted as a successful check.
 
-The real changed-path smoke is `python -B scripts/smoke_macos_setup.py`; it downloads
+The real changed-path smoke is `python -B scripts/smoke_posix_setup.py`; it downloads
 CPython and installs requirements into temporary user storage after explicit
 harness consent. Its Setup subprocess has `PATH=/nonexistent`, uses relocated
 real Claude/Codex artifacts and an unrelated synthetic product CWD with spaces,
@@ -86,7 +86,7 @@ native marketplace discovery, authenticated agent interaction or human consent.
 | Pinned verified artifacts; download/checksum/write errors never ready | Implemented | Pre-execution SHA check, staged download, bounded curl, ownership/write checks, rollback and rejection tests; real organizational firewall/policy acceptance remains external. |
 | Trusted repeat Setup, spaces and unrelated CWD; each advertised CPU smoked | Implemented, matrix bounded by evidence | ARM64 smoke is recorded here; Intel artifact acquisition is implemented but native Intel acceptance is pending and Intel support is not advertised. |
 
-WWA-05/06 own Linux/Windows Python acquisition. WWA-07 owns general Python-free
+WWA-05 adds Linux acquisition to the shared POSIX shell; WWA-06 owns Windows acquisition. WWA-07 owns general Python-free
 helper startup and migration of all callers: for this item the agent invokes
 the existing dispatcher using the successful Setup result's absolute `python`
 path, and reruns the macOS Setup check in a new session. WWA-08/09 own native
@@ -95,3 +95,7 @@ without the new runtime tree fingerprint are rejected and preserved for
 inspection rather than silently trusted; compatibility/repair policy remains
 WWA-08. Full native install → agent consent → workflow → update/uninstall and
 non-dev usability remain integrated external acceptance, not a code blocker.
+
+WWA-05 renames the internal shell to `scripts/kkdesign_setup_posix.sh` and the
+maintainer smoke to `scripts/smoke_posix_setup.py`; macOS pins, cache locations
+and inventory format are retained so existing macOS bootstrap caches remain reusable.

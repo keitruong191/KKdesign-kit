@@ -1,6 +1,7 @@
-"""macOS bootstrap refusal and trust failures without acquired-code execution."""
+"""POSIX bootstrap refusal and trust failures without acquired-code execution."""
 import json
 import os
+import shlex
 from pathlib import Path
 import subprocess
 import sys
@@ -10,10 +11,10 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@unittest.skipUnless(sys.platform == 'darwin', 'Uses native macOS system tools')
-class MacSetupTests(unittest.TestCase):
+@unittest.skipUnless(sys.platform == 'darwin' or sys.platform.startswith('linux'), 'Uses native POSIX host tools')
+class PosixSetupTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory(prefix='mac Setup spaces ')
+        self.temp = tempfile.TemporaryDirectory(prefix='POSIX Setup spaces ')
         self.base = Path(self.temp.name).resolve()
         self.home = self.base / 'home'
         self.home.mkdir(mode=0o700)
@@ -22,14 +23,16 @@ class MacSetupTests(unittest.TestCase):
         self.sentinel = self.product / 'keep.txt'
         self.sentinel.write_text('synthetic')
         self.env = dict(os.environ, HOME=str(self.home), PATH='/nonexistent')
-        self.target = 'aarch64' if os.uname().machine == 'arm64' else 'x86_64'
+        self.target = 'aarch64' if os.uname().machine in ('arm64', 'aarch64') else 'x86_64'
+        if sys.platform.startswith('linux'):
+            self.target += '-unknown-linux-gnu'
         self.cache = self.home / '.kkdesign-kit/bootstrap' / ('cpython-3.12.12-20251014-' + self.target)
 
     def tearDown(self):
         self.temp.cleanup()
 
     def invoke(self, *args):
-        return subprocess.run(['/bin/sh', str(ROOT / 'scripts/kkdesign_setup_macos.sh'),
+        return subprocess.run(['/bin/sh', str(ROOT / 'scripts/kkdesign_setup_posix.sh'),
                                '--package-root', str(ROOT), *args], env=self.env, cwd=self.product,
                               capture_output=True, text=True, timeout=20)
 
@@ -45,10 +48,17 @@ class MacSetupTests(unittest.TestCase):
         self.cache.mkdir(parents=True, mode=0o700)
         artifact = self.cache / 'archive.tar.gz'
         artifact.write_bytes(b'synthetic corrupt artifact')
+        executed = self.product / 'untrusted-runtime-executed'
+        python = self.cache / 'python/bin/python3'
+        python.parent.mkdir(parents=True)
+        python.write_text('#!/bin/sh\nprintf untrusted > ' + shlex.quote(str(executed)) + '\n')
+        python.chmod(0o700)
         result = self.invoke('--consent')
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(json.loads(result.stdout)['runtime'], 'error')
         self.assertEqual(artifact.read_bytes(), b'synthetic corrupt artifact')
+        self.assertFalse(executed.exists())
+        self.assertTrue(python.is_file())
         self.assertFalse((self.home / '.kkdesign-kit/runtimes').exists())
         self.assertFalse((self.cache.parent / 'lock').exists())
 
@@ -91,8 +101,20 @@ class MacSetupTests(unittest.TestCase):
         finally:
             base.chmod(0o700)
 
+    def test_interrupted_lock_preserves_state_and_never_starts_download(self):
+        lock = self.home / '.kkdesign-kit/bootstrap/lock'
+        lock.mkdir(parents=True, mode=0o700)
+        receipt = lock / 'owner-note'
+        receipt.write_text('synthetic interrupted transaction')
+        result = self.invoke('--consent')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(json.loads(result.stdout)['runtime'], 'error')
+        self.assertEqual(receipt.read_text(), 'synthetic interrupted transaction')
+        self.assertEqual(list(lock.parent.iterdir()), [lock])
+        self.assertFalse((self.home / '.kkdesign-kit/runtimes').exists())
+
     def test_relative_package_is_rejected_before_cache_writes(self):
-        result = subprocess.run(['/bin/sh', str(ROOT / 'scripts/kkdesign_setup_macos.sh'),
+        result = subprocess.run(['/bin/sh', str(ROOT / 'scripts/kkdesign_setup_posix.sh'),
                                  '--package-root', '.', '--consent'], env=self.env, cwd=self.product,
                                 capture_output=True, text=True, timeout=20)
         self.assertNotEqual(result.returncode, 0)

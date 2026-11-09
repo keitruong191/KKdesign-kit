@@ -9,10 +9,11 @@ The canonical version and both descriptors must agree (`0.5.0a1`).
 Native install makes instructions available; it does not provision Python,
 verify helpers, authenticate design tools or grant approval. The menu needs
 only file-reading tools. Explicit [Setup](../references/setup.md) checks/reuses
-a trusted private runtime or, after consent, provisions and verifies real helpers. macOS Setup acquires pinned Python
+a trusted private runtime or, after consent, provisions and verifies real helpers. macOS/Linux Setup acquires pinned Python
 internally without existing Python/Node; see [runtime evidence](verification/macos-runtime.md).
-Linux/Windows acquisition, general Python-free helper startup and native end-to-end
+Windows acquisition, general Python-free helper startup and native end-to-end
 acceptance remain pending. No public release or official listing is claimed.
+Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
 ## Native review flow
 

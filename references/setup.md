@@ -13,20 +13,26 @@ When the user explicitly chooses Setup:
    policy denies execution, report the denial and ask the administrator for an
    approved environment; never disable policy or repeatedly retry a denial.
 2. **Check the environment.** Identify the OS using the local executor. On
-   macOS use the internal shell entrypoint, even if system Python is present:
+   macOS and GNU/Linux use the internal shell entrypoint, even if system Python
+   is present:
 
    ```sh
-   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_macos.sh" --package-root "$SKILL_DIR"
+   /bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR"
    ```
 
    It needs no Python, Node or developer tooling on PATH. It uses a pinned
    CPython distribution with venv/ensurepip, so missing or unsuitable system
-   Python, venv or pip does not send the user to manual installation. Native
+   Python, venv or pip does not send the user to manual installation. On Linux
+   it uses host curl, GNU tar/coreutils and GNU libc 2.28+
+   (x86_64 or ARM64); musl/other CPUs fail before acquisition. Native
    macOS ARM64 smoke is recorded separately from provider acceptance; the Intel
    artifact is implemented with native acceptance pending. See
    [macOS runtime verification](../docs/verification/macos-runtime.md).
 
-   On other OSes, WWA-05/06 acquisition remains pending. With an existing Python
+   Linux acquisition is implemented; native Linux acceptance is pending; see
+   [Linux verification](../docs/verification/linux-runtime.md).
+
+   On Windows, WWA-06 acquisition remains pending. With an existing Python
    3.9+ and working venv/ensurepip, the existing shared Setup remains usable:
 
    ```sh
@@ -43,10 +49,10 @@ When the user explicitly chooses Setup:
    the returned exact cache location, downloads, purpose and permissions in
    plain language.
 
-   On macOS also disclose the pinned CPython 3.12.12 archive from Astral's
+   On macOS/Linux also disclose the pinned CPython 3.12.12 archive from Astral's
    python-build-standalone GitHub release 20251014, stored under
    `~/.kkdesign-kit/bootstrap/`; its HTTPS source and SHA-256 are pinned in the
-   bundled entrypoint. It uses macOS system curl, tar and shasum, without a
+   bundled entrypoint. It uses host curl, tar and SHA-256 tools, without a
    second downloaded bootstrap executable. For example:
 
    “KKdesign needs to create a private Python environment and download its
@@ -61,14 +67,14 @@ When the user explicitly chooses Setup:
    rerun the same OS entrypoint with `--consent`. This flag conveys the agent's
    observed permission; no file or test can establish human approval.
 4. **Show progress.** Translate streamed JSON phase events into short updates:
-   checking → consent required (if needed) → downloading pinned Python (macOS,
+   checking → consent required (if needed) → downloading pinned Python (macOS/Linux,
    if needed) → preparing runtime → verifying helpers → complete or failed. Preparation uses venv and requirements.txt in
    the private user cache, with bounded subprocess execution. No standalone
    install lifecycle, hooks or alternate installer is invoked.
-5. **Use the result.** On macOS use the absolute `python` path returned by a
+5. **Use the result.** On macOS/Linux use the absolute `python` path returned by a
    successful Setup to invoke the existing `scripts/kkdesign_run.py` dispatcher,
    with `-I -B`, for the remainder of this agent session. Never substitute a
-   project-provided executable or PATH Python. In a new session run the macOS
+   project-provided executable or PATH Python. In a new session run the POSIX
    Setup check again to verify/reuse the cache and obtain that path. General
    Python-free helper startup and full caller migration remain WWA-07.
 6. **Report the result.** Only `ready` following actual synthetic workspace
@@ -90,7 +96,7 @@ is insufficient verification; preserve it for explicit inspection/repair.
 
 ## Remaining integration contracts
 
-macOS Setup acquires pinned CPython internally and reuses it only after checking
+macOS/Linux Setup acquires pinned CPython internally and reuses it only after checking
 its archive and full file/link/directory inventory. The user-owned private cache
 is the trust boundary; hashes detect corruption/modification, not publisher
 identity or protection against an attacker controlling the same user account.
@@ -99,9 +105,9 @@ archive remains in the private cache to verify reuse. Cache conflicts and
 checksum failures preserve existing data and stop; never delete a suspicious
 cache automatically or use arbitrary fallback interpreters.
 
-Linux and Windows acquisition remain WWA-05/06. Without suitable Python on
-those OSes, explain that their bootstrap integration is pending, without asking
-for manual Python installation or offering a standalone fallback. Their adapters
+Windows acquisition remains WWA-06. Without suitable Python on
+Windows, explain that its bootstrap integration is pending, without asking
+for manual Python installation or offering a standalone fallback. Its adapter
 must preserve the same package-root, consent, private-cache, integrity and real
 helper-validation contracts.
 
