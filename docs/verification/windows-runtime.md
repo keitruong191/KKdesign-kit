@@ -35,7 +35,9 @@ This historical pin is not a claim about the latest security patch.
 
 Without explicit consent, a missing bootstrap returns consent-required and
 explains source, purpose, storage, network/write/execution permissions without
-creating cache data or starting a downloaded executable. After agent-observed
+creating KKdesign cache data or starting a downloaded executable. The native
+PowerShell host can maintain its own AppData module-analysis cache; this is not
+KKdesign runtime provisioning. After agent-observed
 consent, `-Consent` authorizes acquisition. A test flag never proves human consent.
 
 Executable storage is under the user's profile, outside plugin and project:
@@ -68,7 +70,9 @@ paths support the existing dispatcher for this session without activation.
 The available development host is macOS ARM64; there is no Windows machine,
 VM or authenticated Windows provider session available. Portable integrity,
 parser and coding results below establish only their stated scope. Native
-Windows execution, ACL behavior and policy handling remain external acceptance;
+acquisition/helper Setup, account/policy observation and provider behavior
+remain external acceptance. Existing Windows CI can test individual ACL and
+transaction boundaries; its results are reported separately in PR checks;
 missing resources do not block code-ready integration under the owner decision.
 
 The required coding suite is `python -m unittest discover -s tests -v` using a

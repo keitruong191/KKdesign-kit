@@ -49,7 +49,7 @@ When the user explicitly chooses Setup:
    Codex's nested layout; never infer it from product CWD.
 3. **Explain and ask when needed.** The entrypoint emits checking and either
    verifies an existing trusted runtime or returns `consent-required` without
-   writes, dependency downloads, venv creation or new-runtime execution. Explain
+   KKdesign runtime/state writes, dependency downloads, venv creation or new-runtime execution. Explain
    the returned exact cache location, downloads, purpose and permissions in
    plain language.
 
