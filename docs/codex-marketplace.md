@@ -7,11 +7,12 @@ format, declares `./skills/` and `requires_local_executor: true`.
 The descriptor version must match `manifest.json`. The generated Codex catalog is
 `.agents/plugins/marketplace.json`; it is distinct from Claude's catalog.
 
-This preview supports packaging review, not release or runtime readiness.
-The menu and **Setup** route use file-reading tools only; neither needs Python
-nor downloads anything. They show plugin loaded, **Setup required**, and
-external tools unverified. Runtime provisioning and trusted helper dispatch
-are later integration work. The launcher refuses plugin helper execution.
+The menu uses file-reading tools only and does not provision anything. Explicit
+[Setup](../references/setup.md) checks/reuses a trusted private runtime or asks
+for consent before provisioning with available Python and verifying real helpers.
+Plugin loaded, runtime readiness and external tools unverified remain separate.
+Python-free acquisition/launch and native end-to-end acceptance are pending;
+this is not a public release or official listing.
 
 ## Native maintainer review
 
@@ -44,8 +45,8 @@ codex plugin marketplace remove kkdesign-kit-codex
 ```
 
 Project design data, lessons, task history and private user runtime/state have
-separate ownership. No uninstall hook deletes them. Runtime update/reuse and
-standalone migration are not implemented by this packaging adapter.
+separate ownership. No uninstall hook deletes them. Setup can reuse a compatible verified runtime; native update compatibility and
+standalone migration remain separate integration work.
 
 ## Canonical build
 

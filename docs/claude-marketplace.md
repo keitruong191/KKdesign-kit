@@ -6,13 +6,12 @@ provider-specific skill. `.claude-plugin/plugin.json` declares `skills: ["./"]`;
 the source repository also supplies `.claude-plugin/marketplace.json`.
 The canonical version and both descriptors must agree (`0.5.0a1`).
 
-This is a packaging preview, not a public release or a working runtime Setup
-release. Native install can make instructions available; it does not provision
-Python, verify helpers, authenticate design tools, or grant approval. The menu
-and **Setup** route need only the host's file-reading tools. They report
-**Setup required**; helper-dependent workflows remain blocked. Automatic Setup
-and trusted helper execution from plugin caches are separate work still needed
-before release. The plugin launcher refuses helper execution in this preview.
+Native install makes instructions available; it does not provision Python,
+verify helpers, authenticate design tools or grant approval. The menu needs
+only file-reading tools. Explicit [Setup](../references/setup.md) checks/reuses
+a trusted private runtime or, after consent, provisions with available Python
+and verifies real helpers. Python-free acquisition/launch and native end-to-end
+acceptance remain pending. No public release or official listing is claimed.
 
 ## Native review flow
 
@@ -34,10 +33,10 @@ Start a new Claude session in the selected product project and invoke:
 /kkdesign-kit:kkdesign-kit Setup
 ```
 
-The bare menu must show Setup, plugin loaded, runtime Setup required and external
-tools unverified. The Setup route describes the current capability boundary;
-it does not complete runtime setup. Do not run the standalone installer, create
-another skill copy, or download dependencies from either route.
+The bare menu shows Setup, plugin loaded, runtime not checked/Setup required
+and external tools unverified. Explicit Setup follows the shared consent flow;
+only a successful helper check establishes runtime ready. Do not invoke the
+standalone installer or create another skill copy.
 
 Use native lifecycle controls, including:
 

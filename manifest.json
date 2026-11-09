@@ -30,7 +30,8 @@
     "prototype",
     "learn",
     "extracted-package-verification",
-    "managed-helper-runtime"
+    "managed-helper-runtime",
+    "agent-setup-consent"
   ],
   "planned": [
     "optional-hooks"
@@ -96,6 +97,7 @@
     "scripts/kkdesign_review.py",
     "scripts/kkdesign_learn.py",
     "scripts/figma_prototype.js",
-    "docs/codex-marketplace.md"
+    "docs/codex-marketplace.md",
+    "scripts/kkdesign_setup.py"
   ]
 }

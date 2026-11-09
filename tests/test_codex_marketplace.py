@@ -1,5 +1,6 @@
 """Consumer regression coverage for the distributable Codex package."""
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -40,7 +41,8 @@ class CodexMarketplaceTests(unittest.TestCase):
             result = subprocess.run([sys.executable, '-I', '-B',
                                      str(skill / 'scripts/kkdesign_run.py'),
                                      'materialize_example', '--output', str(destination)],
-                                    cwd=base, capture_output=True, text=True)
+                                    cwd=base, env=dict(os.environ, HOME=str(base), USERPROFILE=str(base)),
+                                    capture_output=True, text=True)
             self.assertNotEqual(result.returncode, 0)
             self.assertFalse(destination.exists())
             self.assertEqual(kit.hashes(plugin), before)

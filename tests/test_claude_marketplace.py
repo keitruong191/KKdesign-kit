@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -43,7 +44,8 @@ class ClaudeMarketplaceTests(unittest.TestCase):
         result = subprocess.run([sys.executable, '-I', '-B',
                                  str(plugin / 'scripts/kkdesign_install.py'),
                                  'verify', '--source', str(plugin)],
-                                cwd=self.base, capture_output=True, text=True)
+                                cwd=self.base, env=dict(os.environ, HOME=str(self.base), USERPROFILE=str(self.base)),
+                                capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(json.loads(result.stdout)['status'], 'verified')
         (plugin / 'references/commands.md').write_text('tampered', encoding='utf-8')
@@ -56,7 +58,8 @@ class ClaudeMarketplaceTests(unittest.TestCase):
         output = self.base / 'must not be created'
         result = subprocess.run([sys.executable, '-B', str(plugin / 'scripts/kkdesign_run.py'),
                                  'materialize_example', '--output', str(output)],
-                                cwd=self.base, capture_output=True, text=True)
+                                cwd=self.base, env=dict(os.environ, HOME=str(self.base), USERPROFILE=str(self.base)),
+                                capture_output=True, text=True)
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(output.exists())
         self.assertEqual(kit.hashes(plugin), before)
