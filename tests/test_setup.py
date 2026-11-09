@@ -117,6 +117,8 @@ class SetupTests(unittest.TestCase):
         self.verified_cache()
         package = self.base / 'arbitrary cache with spaces'
         shutil.copytree(ROOT, package, ignore=shutil.ignore_patterns('.git', '.hoangsa', '__pycache__'))
+        for marker in ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', 'plugin.json'):
+            (package / marker).unlink(missing_ok=True)
         # No provider descriptor at this location; explicit roots still require
         # a trusted runtime, and executable paths in product data are irrelevant.
         (self.base / 'runtime.json').write_text(json.dumps({'python': str(sys.executable)}))

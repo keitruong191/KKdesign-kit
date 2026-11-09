@@ -25,8 +25,8 @@ prerequisites; they do not establish marketplace acceptance.
 
 Coding checks and changed-path smoke results are recorded with the PR. The smoke
 runs both relocated provider payloads with no Python/Node on PATH, real acquired
-CPython/venv/dependencies, materialization, validation, task integrity and feedback
-capture. It also verifies runtime-receipt/bootstrap-library rejection and checks
+CPython/venv/dependencies, materialization, validation, task integrity, feedback capture, and package →
+clean extraction → verification through the extracted unified helper entrypoint. It also verifies runtime-receipt/bootstrap-library rejection and checks
 that plugin bytes and unrelated project data remain unchanged.
 
 This proves only the host architecture and artifact/helper execution actually
@@ -62,3 +62,10 @@ Per WWA-07 acceptance criterion:
 Code-ready integration is distinct from completion of external acceptance and
 release gates. The owner-arranged resource policy permits implementation review
 without treating missing native provider/account/OS resources as a code failure.
+
+PR review corrections also migrate the active package/verify guide to explicit-root
+POSIX and native Windows helper forms; direct Python commands are identified as
+historical source-only maintainer operations. The arbitrary-root fixture removes
+root provider descriptors before real materialization/validation, so its behavior
+actually exercises dispatch without provider markers. Final revision checks are
+recorded separately from the earlier SHA's CI/native evidence in the PR handoff.

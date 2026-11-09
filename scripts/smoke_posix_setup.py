@@ -96,6 +96,20 @@ def main():
                  '--origin', 'synthetic smoke', '--evidence', 'tasks/demo/audit.json'],
                 product, env, events=False)
             assert (output / 'design/feedback.json').is_file()
+            exported = base / (builder.__name__ + ' portable.zip')
+            packaged = json.loads(run([*launcher, 'kkdesign_install', 'package', '--output', exported],
+                                      product, env, events=False))
+            assert packaged['status'] == 'packaged', packaged
+            clean = base / (builder.__name__ + ' clean extraction')
+            with zipfile.ZipFile(exported) as stream:
+                stream.extractall(clean)
+            clean_package = clean / 'kkdesign-kit'
+            clean_before = kit.hashes(clean_package)
+            verified = json.loads(run(['/bin/sh', clean_package / 'scripts/kkdesign_setup_posix.sh',
+                                       '--package-root', clean_package, '--helper', 'kkdesign_install',
+                                       'verify', '--source', clean_package], product, env, events=False))
+            assert verified['status'] == 'verified', verified
+            assert kit.hashes(clean_package) == clean_before
             retained = Path(result['runtimePath'])
             receipt = retained / 'setup.json'
             receipt_bytes = receipt.read_bytes()
@@ -109,6 +123,7 @@ def main():
             assert [p.name for p in product.iterdir()] == ['keep.txt']
             outcomes.append({'adapter': builder.__name__, 'acquiredPython': '3.12.12',
                              'runtime': 'ready', 'reuse': True, 'helpers': 'pass',
+                             'packageAndExtractedVerification': 'pass',
                              'pluginAndProjectPreserved': True, 'externalTools': 'unverified'})
         # Corrupt a library, keeping interpreter and artifact bytes intact:
         # bootstrap must reject it before starting acquired Python.

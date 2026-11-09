@@ -19,7 +19,10 @@
 - Verify bootstrap integrity before startup and runtime ownership, requirements
   and receipts before dispatch; reject missing/tampered caches and project
   executable paths. Keep plugin/project bytes unchanged on trust failures.
-- Migrate active skill/workflow instructions and OS smoke callers. Legacy
+- Migrate active skill/workflow instructions, including package and extracted
+  verification, and OS smoke callers. Exercise the package/verify route through
+  unified helper mode without PATH Python; descriptor-free regression fixtures
+  remove root provider markers before dispatch. Legacy
   standalone maintainer tooling retains its separate historical prerequisites.
 - Native provider sessions and Linux/Windows/Intel acceptance remain pending;
   relocated package execution is separate from native provider discovery.
