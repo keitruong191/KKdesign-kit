@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased — Claude marketplace packaging preview
+## Unreleased — Codex and Claude marketplace packaging preview
+
+- Add native Codex catalog/descriptor packaging from canonical resources, with
+  local-executor metadata, isolated lifecycle verification and explicit surface
+  limits. Menu/Setup remain readable without Python; runtime integration is pending.
 
 - Add a Claude Code plugin descriptor and private-marketplace catalog sharing
   the canonical root skill and resources, with a deterministic allowlisted

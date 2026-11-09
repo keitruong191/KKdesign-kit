@@ -1,5 +1,10 @@
 # Compatibility, prerequisites and verification
 
+Codex marketplace packaging has native CLI evidence on macOS ARM64; see
+[Codex packaging and surface limits](codex-marketplace.md). Native discovery
+uses `$kkdesign-kit:kkdesign-kit`; authenticated menu/Setup acceptance is pending.
+No IDE/cloud/desktop-app or other OS/CPU support is inferred.
+
 The [Claude marketplace adapter](claude-marketplace.md) is a packaging preview:
 menu/Setup instructions require no Python, but plugin runtime provisioning and
 helper execution are not available. The plugin reports Setup required and

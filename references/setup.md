@@ -3,7 +3,7 @@
 Use the installed skill's absolute directory, supplied by the host, to read
 resources. No Python is needed to read this guide or the command menu.
 
-For the Claude Code plugin packaging preview, report:
+For the Codex or Claude Code plugin packaging preview, report:
 
 1. **Plugin loaded**: the host has made this skill's instructions available.
 2. **Setup required**: there is no supported plugin runtime provisioner or

@@ -20,7 +20,8 @@ selected project, outside this installed directory.
 
 ## Invocation and routing
 
-Codex: `$kkdesign-kit [command]`. Claude Code plugin:
+Codex plugin: `$kkdesign-kit:kkdesign-kit [command]`; legacy standalone Codex:
+`$kkdesign-kit [command]`. Claude Code plugin:
 `/kkdesign-kit:kkdesign-kit [command]`. Legacy standalone Claude skill:
 `/kkdesign-kit [command]`.
 Interpret the command from the user's invocation (Claude supplies `$ARGUMENTS`).
@@ -53,7 +54,8 @@ For unknown commands, show the menu and explain that the command is unknown.
 Read the menu and Setup instructions using file-reading tools only. Do not run
 Python, shell checks, installers or downloads just to open either route.
 If this skill is loaded as a plugin (the host supplies a plugin location, or
-`.claude-plugin/plugin.json` is present beside this file), show these states:
+a `.claude-plugin/plugin.json`, `.codex-plugin/plugin.json` or root `plugin.json`
+is present beside this file), show these states:
 
 - Plugin: loaded; this only confirms that the instructions are available.
 - Runtime: **Setup required**. Plugin runtime provisioning and managed helper
