@@ -82,6 +82,22 @@ class WindowsSetupTests(unittest.TestCase):
         self.ps('$acl = Get-Acl -LiteralPath $testPaths[0]; '
                 'if (-not ($acl.GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier]) | Where-Object { $_.IdentityReference.Value -eq "S-1-1-0" })) { throw "ACL was changed" }', cache)
 
+    def test_owner_rights_grant_applies_only_to_already_trusted_owner(self):
+        cache = self.home / '.kkdesign-kit'
+        self.ps('. $testPaths[0]; New-PrivateDirectory $testPaths[1]; '
+                '$acl = Get-Acl -LiteralPath $testPaths[1]; '
+                '$sid = New-Object Security.Principal.SecurityIdentifier("S-1-3-4"); '
+                '$rule = New-Object Security.AccessControl.FileSystemAccessRule($sid,"FullControl","Allow"); '
+                '$acl.AddAccessRule($rule); Set-Acl -LiteralPath $testPaths[1] -AclObject $acl',
+                self.security, cache)
+        result = self.invoke()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)['status'], 'consent-required')
+        self.assertEqual(list(cache.iterdir()), [])
+        self.ps('$acl = Get-Acl -LiteralPath $testPaths[0]; '
+                'if (-not ($acl.GetAccessRules($true,$true,[Security.Principal.SecurityIdentifier]) | '
+                'Where-Object { $_.IdentityReference.Value -eq "S-1-3-4" })) { throw "ACL was changed" }', cache)
+
     def test_actual_write_denial_preserves_existing_cache(self):
         cache = self.home / '.kkdesign-kit'
         cache.mkdir()

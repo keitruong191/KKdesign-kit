@@ -52,10 +52,13 @@ function Assert-PrivateEntry($Entry, [string]$Sid) {
     # A missing DACL grants everyone access. Deny entries need not grant trust.
     $raw = New-Object Security.AccessControl.RawSecurityDescriptor($acl.Sddl)
     if ($null -eq $raw.DiscretionaryAcl) { throw 'Cache has no protective DACL' }
+    # OWNER RIGHTS refers to the already verified object owner, not a
+    # separate account (modern CPython uses it for mode=0700 directories).
+    $writers = $trusted + @('S-1-3-4')
     foreach ($rule in $acl.GetAccessRules($true, $true, [Security.Principal.SecurityIdentifier])) {
         if ($rule.AccessControlType -eq [Security.AccessControl.AccessControlType]::Allow -and
             ([long]$rule.FileSystemRights -band 0x500D0156) -and
-            $rule.IdentityReference.Value -notin $trusted) {
+            $rule.IdentityReference.Value -notin $writers) {
             throw ('Cache is writable by another account; preserve and inspect its ACL: ' + $Entry.FullName + ' (' + $rule.IdentityReference.Value + ')')
         }
     }

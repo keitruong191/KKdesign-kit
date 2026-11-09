@@ -45,12 +45,15 @@ Executable storage is under the user's profile, outside plugin and project:
 and requirements-matched `.kkdesign-kit/runtimes/`. New private directories are
 created atomically with protected inheritable DACLs. Existing data is never
 re-ACLed or silently repaired. The shared security helper checks ownership by the current user, SYSTEM or Administrators and rejects write grants to principals other than that user, SYSTEM
-and Administrators, null DACLs and reparse points, including cache ancestry.
+and Administrators (including OWNER RIGHTS grants to that already verified
+owner), null DACLs and reparse points, including cache ancestry.
 Windows can assign Administrators ownership to newly created files for an
 elevated account; this is the same privileged authority allowed write access,
 not trust in another ordinary user. The child PowerShell process selects only
 its native built-in modules so a PowerShell 7 executor cannot redirect 5.1
 autoloading to incompatible modules. No system module/PATH setting changes.
+OWNER RIGHTS denotes the verified object owner, as defined by
+[Microsoft well-known SID structures](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/81d92bba-d22b-4a8c-908a-554ab29148ab).
 Tree walking rejects junctions before traversal. Python Setup/readiness uses the
 same checks for managed runtimes, including files and metadata, before execution.
 A compromised same-user account or trusted administrator remains outside this
@@ -85,7 +88,7 @@ They are skipped on other OSes; a skip is not native proof.
 
 | Coding/available check | Result | Evidence boundary |
 |---|---|---|
-| `python -m unittest discover -s tests -v` | PASS: 153 tests, 7 native Windows skips, Python 3.9.6 with requirements.txt | Shared regressions pass; Windows skips are pending, not native evidence |
+| `python -m unittest discover -s tests -v` | PASS: 154 tests, 8 native Windows skips, Python 3.9.6 with requirements.txt | Shared regressions pass; Windows skips are pending, not native evidence |
 | `python -B scripts/smoke_windows_setup.py --inspect-artifacts` | PASS, x64 and ARM64 | Real upstream downloads, pinned SHA-256 and archive contents; no Windows execution |
 | PowerShell AST parse of both shipped scripts | PASS, development PowerShell 7.6.9 on macOS ARM64 | Syntax only; not Windows PowerShell 5.1 execution |
 | Actual unsupported-host entrypoint invocation | PASS: error JSON, nonzero exit, no ready | PowerShell 7 on macOS is rejected; not native Windows evidence |
