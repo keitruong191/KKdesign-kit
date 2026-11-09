@@ -33,8 +33,9 @@ This proves only the host architecture and artifact/helper execution actually
 observed. Native provider install/discovery/agent workflow in authenticated Codex
 and Claude Code sessions, native Linux/Windows/Intel execution, live design tools
 and human consent/usability remain external acceptance pending owner resources.
-No unobserved platform is advertised as supported. WWA-08 owns update/cache
-compatibility and native lifecycle integration; WWA-09 owns standalone conflicts
+No unobserved platform is advertised as supported.
+[WWA-08](native-lifecycle.md) now records update/cache compatibility and measured
+native lifecycle evidence; WWA-09 owns standalone conflicts
 and consented migration; WWA-10 owns published onboarding and support evidence.
 
 Observed coding checks on macOS ARM64:

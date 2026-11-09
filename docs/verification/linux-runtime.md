@@ -106,6 +106,7 @@ not authenticated agent consent, native marketplace or usability evidence.
 | Repeat Setup, arbitrary CWD and spaces preserve valid runtime/project | Implemented and covered by relocated harness | Linux native repeat smoke pending |
 
 WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
-through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own lifecycle compatibility/repair and
-standalone migration. Provider native install/update/remove, authentication,
+through the same OS entrypoint and dispatcher, without system Python.
+[WWA-08 lifecycle compatibility](native-lifecycle.md) is implemented with macOS
+native evidence; WWA-09 owns standalone migration. Linux provider lifecycle, authentication,
 human consent and non-dev usability remain separate integrated acceptance.

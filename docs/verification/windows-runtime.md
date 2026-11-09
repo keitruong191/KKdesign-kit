@@ -136,7 +136,9 @@ Never relax policy or acquire credentials to construct acceptance.
 | Real Windows smoke for each advertised combination | Native harness and acceptance handoff supplied; no Windows combination advertised as verified | Pending owner-arranged Windows/provider resources |
 
 WWA-07 now supplies [verified helper invocation](../../references/helpers.md)
-through the same OS entrypoint and dispatcher, without system Python. WWA-08/09 own native lifecycle compatibility and standalone migration. WWA-10
+through the same OS entrypoint and dispatcher, without system Python.
+[WWA-08 lifecycle compatibility](native-lifecycle.md) is implemented; its macOS
+native evidence does not establish Windows acceptance. WWA-09 owns standalone migration. WWA-10
 and release gates own published support instructions, provider/OS and non-dev
 acceptance. Provider owns plugin bytes/lifecycle; runtime retention does not
 imply external-tool authentication or human approval.

@@ -44,13 +44,21 @@ copy, run the legacy installer, or write runtime/state into the plugin cache.
 Native lifecycle remains owned by Codex:
 
 ```text
+codex plugin marketplace upgrade kkdesign-kit-codex
+codex plugin add kkdesign-kit@kkdesign-kit-codex
 codex plugin remove kkdesign-kit@kkdesign-kit-codex
 codex plugin marketplace remove kkdesign-kit-codex
 ```
 
 Project design data, lessons, task history and private user runtime/state have
-separate ownership. No uninstall hook deletes them. Setup can reuse a compatible verified runtime; native update compatibility and
-standalone migration remain separate integration work.
+separate ownership. No uninstall hook deletes them. Native update refreshes the
+marketplace snapshot and installs its current plugin version; the host controls
+its files and enable/disable settings. After updates, open the new session and
+choose Setup to verify compatibility. Unchanged requirements and runtime
+contracts reuse a verified cache; changes require explicit consent to provision
+a separate cache. Remove/reinstall preserves and reevaluates shared runtimes.
+See [lifecycle evidence and acceptance limits](verification/native-lifecycle.md).
+Standalone conflict detection/migration remains WWA-09.
 
 ## Canonical build
 

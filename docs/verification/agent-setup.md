@@ -69,9 +69,10 @@ smoke above. Package integrity verifies resource hashes, not publisher identity.
   existing Python dispatcher so a successful Setup is usable now. A descriptor
   at either skill root or enclosing plugin root takes precedence over a
   standalone-shaped directory; standalone behavior remains covered by tests.
-- WWA-08/09 own native update/lifecycle compatibility and legacy migration.
-  Existing caches without this Setup verification receipt are preserved and
-  reported for inspection, never silently executed or overwritten.
+- [WWA-08](native-lifecycle.md) now implements native update/lifecycle
+  compatibility; WWA-09 retains legacy migration. New native contract namespaces
+  preserve earlier caches and require explicit consent for Setup; unverified
+  matching caches remain errors, never silently executed or overwritten.
 - Pending external acceptance: real authenticated native agent menu → consent
   → Setup interaction, native policy/local-executor failures, other OS/CPU
   combinations, live external tools and non-dev usability. None is inferred

@@ -98,6 +98,34 @@ cache silently. A failed new-runtime transaction removes only its own incomplete
 runtime and never records ready. A directory or old standalone marker alone
 is insufficient verification; preserve it for explicit inspection/repair.
 
+## Native update, enable/disable and removal
+
+Use the provider's plugin controls for updates, enable/disable and uninstall;
+never invoke the historical standalone installer for a marketplace plugin.
+Native install/update/enable is not consent to provision. After a provider
+update (and the new session/restart the host requires), run Setup without the
+consent flag to evaluate the installed package before workflow use.
+
+A package version change alone reuses a compatible runtime after full cache
+verification and real helper checks. Native compatibility includes the exact
+`requirements.txt` digest and the bundled `RUNTIME_CONTRACT` version. Dependency
+or runtime-contract changes select a separate private cache and request explicit
+consent before provisioning. Declining leaves the previous caches intact; the
+new package cannot execute its helpers with the old environment. The dispatcher
+checks compatibility even if Setup was skipped after updating.
+
+Enable/disable changes availability in the host, without running Setup or
+creating standalone copies. Uninstall removes the provider's installed
+registration and whatever plugin bytes that provider chooses to remove; some
+hosts retain plugin caches. It preserves project design data, lessons, task
+history and private runtime/bootstrap caches. Those private caches are retained
+because another project, provider or older compatible plugin can still use them.
+There is no automatic garbage collection or custom uninstall/rollback command.
+Reinstallation evaluates retained caches using the same ownership, requirements,
+receipt and helper checks; a directory's existence alone never establishes ready.
+An unowned or corrupt matching cache remains an error for explicit inspection,
+even with consent, and is never overwritten automatically.
+
 ## Remaining integration contracts
 
 Setup acquires pinned CPython internally and reuses it only after checking
@@ -112,8 +140,8 @@ checksum failures preserve existing data and stop; never delete a suspicious
 cache automatically or use arbitrary fallback interpreters.
 
 The current Python launcher accepts only the private cache matching package
-requirements and its verification receipt. The same OS entrypoints expose helper mode and share the canonical Python
-dispatcher for both providers. Native lifecycle compatibility and migration
-belong to WWA-08/09. End-to-end provider/OS/authentication/usability
+requirements and runtime contract and its verification receipt. The same OS entrypoints expose helper mode and share the canonical Python
+dispatcher for both providers. Native lifecycle compatibility is implemented as described above; standalone
+conflict discovery and consented migration remain WWA-09. End-to-end provider/OS/authentication/usability
 acceptance remains separate from coding checks. Provider owns plugin lifecycle;
 cache retention never grants tool authentication or approval.

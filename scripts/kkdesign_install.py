@@ -195,8 +195,13 @@ def runtime_root(home):
     return home / '.kkdesign-kit' / 'runtimes'
 
 
-def runtime_path(home, requirements):
-    return runtime_root(home) / hashlib.sha256(requirements).hexdigest()
+def runtime_path(home, requirements, contract=None):
+    digest = hashlib.sha256(requirements).hexdigest()
+    # Native contract namespaces coexist: updating one consumer must never
+    # overwrite a cache still used by another provider/version. Legacy
+    # standalone paths retain their historical dependency-only identity.
+    name = digest if contract is None else 'contract-' + str(contract) + '-' + digest
+    return runtime_root(home) / name
 
 
 def runtime_python(runtime):
@@ -227,16 +232,16 @@ def run_runtime(command):
 
 
 @contextmanager
-def prepared_runtime(home, requirements):
+def prepared_runtime(home, requirements, contract=None):
     """Build/reuse only a user-private cache; project markers prove no provenance."""
     root = runtime_root(home)
-    runtime = runtime_path(home, requirements)
+    runtime = runtime_path(home, requirements, contract)
     no_links(runtime)
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     # Different installations can share this cache. Hold its lock through smoke
     # and ledger commit so failed creation cannot remove a runtime another uses.
     with locked(root):
-        marker = {'identifier': IDENTIFIER, 'requirementsSha256': runtime.name}
+        marker = {'identifier': IDENTIFIER, 'requirementsSha256': hashlib.sha256(requirements).hexdigest()}
         created = False
         if runtime.exists():
             no_links(runtime / 'runtime.json')
