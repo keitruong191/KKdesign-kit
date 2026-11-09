@@ -97,7 +97,7 @@ class SetupTests(unittest.TestCase):
         destination = self.base / 'legacy shaped example'
         proc = subprocess.run([sys.executable, '-I', '-B', str(package / 'scripts/kkdesign_run.py'),
                                'materialize_example', '--output', str(destination)],
-                              cwd=self.base, env=dict(os.environ, HOME=str(self.home)),
+                              cwd=self.base, env=dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home)),
                               capture_output=True, text=True)
         self.assertEqual(proc.returncode, 0, proc.stderr)
         self.assertTrue((destination / 'design/tasks/demo/task.json').is_file())

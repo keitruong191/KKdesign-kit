@@ -11,7 +11,7 @@ populated from `requirements.txt`:
 
 | Check | Result | Actual scope |
 |---|---|---|
-| `python -m unittest discover -s tests -v` | PASS, 138 tests, 17.518 seconds | Existing core regressions plus consent refusal without writes/execution, real cached-helper reuse, integrity/requirements/missing-interpreter rejection, symlink and unsafe permission rejection, failed provisioning cleanup, failed actual helper validation and both relocated plugin layouts. |
+| `python -m unittest discover -s tests -v` | PASS, 138 tests, 17.921 seconds | Existing core regressions plus consent refusal without writes/execution, real cached-helper reuse, integrity/requirements/missing-interpreter rejection, symlink and unsafe permission rejection, failed provisioning cleanup, failed actual helper validation and both relocated plugin layouts. |
 | `python -B scripts/smoke_agent_setup.py` | PASS | Real venv/pip dependency provisioning after explicit test consent, then repeated Setup and actual materialize/validate helpers for Claude and Codex marketplace artifacts in arbitrary temporary paths with spaces and unrelated product CWD. |
 | `git diff --check` | PASS | Whitespace/error check only. |
 
