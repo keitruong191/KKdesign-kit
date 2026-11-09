@@ -20,13 +20,17 @@ selected project, outside this installed directory.
 
 ## Invocation and routing
 
-Codex: `$kkdesign-kit [command]`. Claude Code: `/kkdesign-kit [command]`.
+Codex: `$kkdesign-kit [command]`. Claude Code plugin:
+`/kkdesign-kit:kkdesign-kit [command]`. Legacy standalone Claude skill:
+`/kkdesign-kit [command]`.
 Interpret the command from the user's invocation (Claude supplies `$ARGUMENTS`).
 Bare invocation: read [references/commands.md](references/commands.md) and show
 its full command menu and availability. Do not run a design operation by default.
 For a named command, read the same reference and follow only that command's route.
 For unknown commands, show the menu and explain that the command is unknown.
 
+- `Setup` (case-insensitive): read [references/setup.md](references/setup.md).
+  This is an assessment/instructions route, not an implemented runtime provisioner.
 - `package`: implemented; read [references/packaging.md](references/packaging.md).
 - `init`, `refresh`: implemented; read [references/project-kit.md](references/project-kit.md).
   Scan only declared sources, stage and inspect the plan, then apply only with
@@ -43,6 +47,28 @@ For unknown commands, show the menu and explain that the command is unknown.
 - `learn`: read [references/learn.md](references/learn.md). Preserve direct feedback
   separately from inferred lessons and regenerate the canonical source's index.
   Never restamp old task decisions or invent prior reading/new pass results.
+
+### Plugin readiness before execution
+
+Read the menu and Setup instructions using file-reading tools only. Do not run
+Python, shell checks, installers or downloads just to open either route.
+If this skill is loaded as a plugin (the host supplies a plugin location, or
+`.claude-plugin/plugin.json` is present beside this file), show these states:
+
+- Plugin: loaded; this only confirms that the instructions are available.
+- Runtime: **Setup required**. Plugin runtime provisioning and managed helper
+  execution are not available in this packaging preview. A standalone runtime
+  or Python found on PATH does not establish plugin runtime readiness.
+- External design tools: unverified; authenticate and verify them separately
+  when the requested workflow needs them.
+
+Always show **Setup** in the bare menu. Mark helper-dependent operations as
+blocked pending runtime Setup in plugin mode; the command guides describe their
+behavior after a supported runtime is available. Do not execute Python helpers
+directly, bypass the launcher, invoke the standalone installer, create another
+skill copy, or write runtime/state into the provider's plugin directory.
+If asked to start a blocked operation, explain this preview's runtime limitation
+and show the Setup route. Native install does not authorize provisioning.
 
 Load [docs/contracts.md](docs/contracts.md) only for a contract question;
 [docs/product-profiles.md](docs/product-profiles.md) only for profile provenance;

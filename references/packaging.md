@@ -1,5 +1,11 @@
 # Package the kit
 
+For the new Claude Code marketplace artifact, use the maintainer builder and
+native review flow in [docs/claude-marketplace.md](../docs/claude-marketplace.md).
+It reuses this package's canonical allowlisted resources. The portable package
+and release workflow below are legacy and are not a plugin installation or
+Setup fallback. Building an artifact does not authorize release/publication.
+
 Run Python 3.9+ with the installed skill's absolute path:
 
 ```sh

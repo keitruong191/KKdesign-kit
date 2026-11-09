@@ -17,6 +17,9 @@ def main():
         sys.stderr.write('Usage: python3 kkdesign_run.py {' + ','.join(HELPERS) + '} [arguments]\n')
         return 2
     root = Path(__file__).resolve().parent.parent
+    if (root / '.claude-plugin/plugin.json').is_file():
+        raise ValueError('Setup required: plugin runtime execution is not available in this packaging preview; '
+                         'open /kkdesign-kit:kkdesign-kit Setup. No helper was run.')
     python = Path(sys.executable)
     adapter = root.parent.parent.name
     if root.parent.name == 'skills' and adapter in installer.ADAPTERS.values():

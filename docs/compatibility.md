@@ -1,5 +1,12 @@
 # Compatibility, prerequisites and verification
 
+The [Claude marketplace adapter](claude-marketplace.md) is a packaging preview:
+menu/Setup instructions require no Python, but plugin runtime provisioning and
+helper execution are not available. The plugin reports Setup required and
+external tools unverified. No other provider, OS/CPU matrix or runtime support
+is inferred from this adapter. The Python requirements below describe existing
+standalone/helper behavior, not requirements just to open the plugin menu.
+
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and
 authenticate the chosen harness separately; use the native skill paths and
 invocations in [installation](installation.md). Packaging and installation use
