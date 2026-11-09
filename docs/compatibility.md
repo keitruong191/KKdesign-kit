@@ -5,12 +5,13 @@ Codex marketplace packaging has native CLI evidence on macOS ARM64; see
 uses `$kkdesign-kit:kkdesign-kit`; authenticated menu/Setup acceptance is pending.
 No IDE/cloud/desktop-app or other OS/CPU support is inferred.
 
-The [Claude marketplace adapter](claude-marketplace.md) is a packaging preview:
-menu/Setup instructions require no Python, but plugin runtime provisioning and
-helper execution are not available. The plugin reports Setup required and
-external tools unverified. No other provider, OS/CPU matrix or runtime support
-is inferred from this adapter. The Python requirements below describe existing
-standalone/helper behavior, not requirements just to open the plugin menu.
+Both [Claude](claude-marketplace.md) and [Codex](codex-marketplace.md) use the
+shared [Setup](../references/setup.md): the menu requires no Python; explicit
+Setup can provision with available Python 3.9+ and venv/ensurepip after consent.
+A trusted runtime is reused only after actual helper verification. Python-free
+OS bootstrap and launcher integration remain pending (WWA-04–07). Setup smoke
+with available Python does not establish native OS/provider support or live
+design-tool authentication. Native and usability acceptance remain separate.
 
 KKdesign-kit is packaged as a skill for Codex and Claude Code. Install and
 authenticate the chosen harness separately; use the native skill paths and

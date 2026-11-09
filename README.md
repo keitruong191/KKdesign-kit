@@ -10,8 +10,9 @@ The new distribution direction is marketplace-only. The Codex
 [marketplace packaging preview](docs/codex-marketplace.md) uses `$kkdesign-kit:kkdesign-kit`. The Claude Code
 [marketplace packaging preview](docs/claude-marketplace.md) loads the canonical
 skill as `/kkdesign-kit:kkdesign-kit`, including a readable **Setup** route.
-It reports **Setup required**: plugin runtime provisioning/execution is not yet
-available. No public marketplace release or official listing is claimed.
+Choose **Setup** to check/reuse a trusted runtime or, after explicit consent,
+prepare one using available Python and verify real helpers. Automatic Python
+acquisition and Python-free launch integration remain pending. No public marketplace release or official listing is claimed.
 Do not use the old standalone installer as a plugin Setup fallback.
 
 ### Legacy standalone instructions
@@ -81,7 +82,7 @@ See [installation and lifecycle](docs/installation.md) for manual acquisition/ex
 
 | Command | What it does | Guide |
 | --- | --- | --- |
-| `Setup` | Explain current plugin/runtime/tool states; runtime provisioning is unavailable in the packaging preview. | [Setup](references/setup.md) |
+| `Setup` | Check, request consent, prepare/reuse and verify the private runtime; keep external-tool state separate. | [Setup](references/setup.md) |
 | `init` | Scan declared design-system sources and stage a project-kit plan for review. | [Project setup](references/project-kit.md) |
 | `refresh` | Compare source changes and stage an update while preserving project history. | [Project setup](references/project-kit.md) |
 | `design` | Resolve scope and lesson decisions, execute with authorized tools, then inspect saved structure and rendered output. | [Design](references/design.md) |
@@ -95,8 +96,9 @@ Design and review never create prototype interactions as a side effect. Review g
 ## Set up a project
 
 The helper commands in this section describe legacy standalone installations.
-The marketplace preview exposes the guides but blocks helper execution until
-supported plugin runtime Setup is available.
+The marketplace Setup route can prepare a verified runtime with available Python;
+helper execution then uses that trusted cache. See [Setup](references/setup.md)
+for current prerequisites and remaining integration boundaries.
 
 Create a `sources.json` using the [supported local, Git or Figma input formats](docs/source-adapters.md). Give the agent the product-project path, source-config path and relevant platform or surface. Source locations resolve relative to the configuration file.
 
@@ -140,8 +142,8 @@ Contract validation checks saved schemas, references, hashes and task records. I
 For design work, inspect the actual destination, read back saved properties and view rendered output. For prototypes, check effective timing in the design tool and run the requested transitions, including back/cancel with valid history. Label simulated data, APIs, validation and timing. Human design approval remains separate.
 
 For repository development, use a dependency-equipped Python environment.
-The source checkout now also carries the plugin descriptor, so its launcher
-reports Setup required, just like the plugin preview. Maintainer verification
+The source checkout also carries the plugin descriptor, so its launcher
+requires the same verified runtime as the installed plugin. Maintainer verification
 can run the helper scripts directly; this is not a plugin Setup fallback:
 ```sh
 python3 -m venv "$HOME/.venvs/kkdesign-dev"

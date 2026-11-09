@@ -2,7 +2,7 @@
 
 | Command | Availability | Purpose |
 |---|---|---|
-| Setup | Instructions and capability assessment available; automatic runtime setup unavailable in plugin preview | Explain plugin, runtime and external-tool states; see [setup.md](setup.md). |
+| Setup | Available with local execution and existing Python; Python-free OS bootstrap integration pending | Check, request consent when needed, prepare and verify runtime; see [setup.md](setup.md). |
 | init | Available | Scan declared sources and stage a project-kit initialization plan. |
 | refresh | Available | Compare source revisions, review changes and authorize a recoverable update. |
 | design | Available; live tool required for canvas mutation | Execute a scoped task; read back structure and inspect renders. |
@@ -12,10 +12,11 @@
 | package | Available | Build a versioned portable ZIP; validate extracted resources and checksums. |
 
 Bare invocation shows this menu using file-reading tools, without Python or
-provisioning. In plugin mode, report **Setup required**, and mark all
-helper-dependent operations as blocked: this preview has no plugin runtime
-provisioner or managed plugin launcher yet. Instructions remain readable.
-Do not infer readiness from a standalone install or Python on PATH.
+provisioning. Show plugin loaded, runtime not checked/Setup required and external
+tools unverified separately. Explicit Setup verifies/reuses a trusted runtime or
+asks for permission before provisioning. Helper-dependent commands require a
+verified runtime and use the stable launcher; missing or untrusted runtime
+reports Setup/inspection required. Do not infer readiness from Python on PATH.
 Missing tools/access block only the dependent
 operation. Never simulate design edits, screenshots, navigation or native approval.
 Plugin installation and removal belong to the host's native plugin controls;

@@ -6,7 +6,9 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kkdesign_install as installer
+import kkdesign_setup as setup
 
 HELPERS = ('kkdesign_core', 'kkdesign_project', 'kkdesign_sources', 'kkdesign_task',
            'kkdesign_review', 'kkdesign_learn', 'kkdesign_install', 'materialize_example')
@@ -17,14 +19,20 @@ def main():
         sys.stderr.write('Usage: python3 kkdesign_run.py {' + ','.join(HELPERS) + '} [arguments]\n')
         return 2
     root = Path(__file__).resolve().parent.parent
-    plugin_root = root.parent.parent if root.parent.name == 'skills' else root
-    if any((plugin_root / name).is_file() for name in
-           ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', 'plugin.json')):
-        raise ValueError('Setup required: plugin runtime execution is not available in this packaging preview; '
-                         'open the installed kkdesign-kit skill and choose Setup. No helper was run.')
-    python = Path(sys.executable)
+    plugin_roots = [root]
+    if root.parent.name == 'skills':
+        plugin_roots.append(root.parent.parent)
+    is_plugin = any((plugin_root / name).is_file() for plugin_root in plugin_roots
+                    for name in ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', 'plugin.json'))
+    if is_plugin:
+        runtime = setup.trusted_runtime(Path.home(), (root / 'requirements.txt').read_bytes())
+        if runtime is None:
+            raise ValueError('Setup required: open the installed skill and choose Setup. No helper was run.')
+        python = installer.runtime_python(runtime)
+    else:
+        python = Path(sys.executable)
     adapter = root.parent.parent.name
-    if root.parent.name == 'skills' and adapter in installer.ADAPTERS.values():
+    if not is_plugin and root.parent.name == 'skills' and adapter in installer.ADAPTERS.values():
         base = root.parents[2]
         harness = next(key for key, value in installer.ADAPTERS.items() if value == adapter)
         state = base / '.kkdesign-kit/installations' / harness

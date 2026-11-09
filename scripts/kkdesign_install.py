@@ -21,7 +21,7 @@ DIRECTORIES = ('agents', 'references', 'docs', 'schemas', 'templates', 'examples
 SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
            'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py',
            'kkdesign_task.py', 'kkdesign_review.py', 'kkdesign_learn.py',
-           'figma_prototype.js', 'kkdesign_run.py')
+           'figma_prototype.js', 'kkdesign_run.py', 'kkdesign_setup.py')
 
 
 def canonical(path):
@@ -204,8 +204,19 @@ def run_runtime(command):
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
     env.pop('PYTHONHOME', None)
     env.pop('PYTHONPATH', None)
-    result = subprocess.run([str(arg) for arg in command], env=env,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if '-m' in command and command[command.index('-m') + 1] == 'pip':
+        # User pip configuration must not redirect cache provisioning into a
+        # project, user site or system prefix. Network/index environment remains
+        # available for approved enterprise access; never change its config.
+        for name in ('PIP_TARGET', 'PIP_PREFIX', 'PIP_USER', 'PYTHONUSERBASE'):
+            env.pop(name, None)
+        env['PIP_CONFIG_FILE'] = os.devnull
+        env['PIP_REQUIRE_VIRTUALENV'] = 'true'
+    try:
+        result = subprocess.run([str(arg) for arg in command], env=env,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+    except subprocess.TimeoutExpired as exc:
+        raise ValueError('Runtime command timed out; check network or local execution policy before retrying') from exc
     if result.returncode:
         raise ValueError('Runtime command failed: ' + str(command[0]) + '\n' +
                          result.stdout + result.stderr)
