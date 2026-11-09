@@ -1,7 +1,7 @@
 {
   "name": "kkdesign-kit",
   "version": "0.5.0a1",
-  "description": "Shared design workflows. Explicit Setup provisions with consent and verifies/reuses a trusted private cache; macOS and Linux can acquire pinned Python internally without system Python/Node. Native Linux/provider and incomplete-system-Python acceptance remain pending; Windows acquisition and general Python-free helper startup are not yet implemented.",
+  "description": "Shared design workflows. Explicit Setup can acquire pinned Python on macOS, Linux and Windows with consent, provision dependencies and verify/reuse a trusted private user cache without system Python/Node. Helpers use the managed interpreter returned by Setup; see references/setup.md and docs/compatibility.md for helper startup and native acceptance requirements.",
   "author": {
     "name": "KKdesign-kit contributors"
   },
