@@ -51,7 +51,13 @@ esac
 if [ "${KKDESIGN_BOOTSTRAP_TEST_BASE_URL+x}" = x ]; then
   base=$KKDESIGN_BOOTSTRAP_TEST_BASE_URL
   case "$base" in
-    http://127.0.0.1:*|http://127.0.0.1) ;;
+    http://127.0.0.1) ;;
+    http://127.0.0.1:*)
+      port=${base#http://127.0.0.1:}
+      case "$port" in
+        ''|*[!0-9]*) fail 'KKDESIGN_BOOTSTRAP_TEST_BASE_URL must be an http:// loopback URL with a numeric port.' ;;
+      esac
+      ;;
     *) fail 'KKDESIGN_BOOTSTRAP_TEST_BASE_URL must be an http:// loopback URL.' ;;
   esac
 else

@@ -109,10 +109,12 @@ class BootstrapTests(unittest.TestCase):
         result = self.run_bootstrap('--harness', 'codex', env=env)
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('Python 3.9 or newer', result.stderr)
-        env = dict(self.env, KKDESIGN_BOOTSTRAP_TEST_BASE_URL='http://example.com')
-        result = self.run_bootstrap('--harness', 'codex', env=env)
-        self.assertNotEqual(result.returncode, 0)
-        self.assertIn('loopback', result.stderr)
+        for url in ('http://example.com', 'http://127.0.0.1:80@example.com'):
+            with self.subTest(url=url):
+                env = dict(self.env, KKDESIGN_BOOTSTRAP_TEST_BASE_URL=url)
+                result = self.run_bootstrap('--harness', 'codex', env=env)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn('loopback', result.stderr)
 
     def test_missing_required_harness_is_actionable(self):
         result = self.run_bootstrap('--scope', 'project')
