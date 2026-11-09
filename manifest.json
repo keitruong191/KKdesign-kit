@@ -1,7 +1,7 @@
 {
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
-  "version": "0.4.0a1",
+  "version": "0.5.0a1",
   "status": "workflow-preview",
   "targets": [
     "codex",
@@ -29,7 +29,8 @@
     "review",
     "prototype",
     "learn",
-    "extracted-package-verification"
+    "extracted-package-verification",
+    "managed-helper-runtime"
   ],
   "planned": [
     "optional-hooks"
@@ -85,6 +86,7 @@
     "schemas/product-profile.schema.json",
     "schemas/source-registry.schema.json",
     "scripts/kkdesign_install.py",
+    "scripts/kkdesign_run.py",
     "scripts/kkdesign_core.py",
     "scripts/kkdesign_project.py",
     "scripts/kkdesign_sources.py",

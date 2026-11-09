@@ -20,7 +20,7 @@ sys.dont_write_bytecode = True
 from kkdesign_install import ROOT, lifecycle, package
 
 
-def run_probe(harness, output, python, auth_file=None, credentials=None):
+def run_probe(harness, output, auth_file=None, credentials=None):
     executable = shutil.which('codex' if harness == 'codex' else 'claude')
     if not executable:
         raise ValueError('Harness executable unavailable')
@@ -43,7 +43,7 @@ def run_probe(harness, output, python, auth_file=None, credentials=None):
         with zipfile.ZipFile(archive) as bundle:
             bundle.extractall(base / 'artifact')
         source = base / 'artifact/kkdesign-kit'
-        lifecycle('install', harness, 'project', home, project, source)
+        lifecycle('install', harness, 'project', home, project, source, runtime=True)
         shutil.rmtree(source)
         (project / 'ds').mkdir()
         source_data = {'schemaVersion': '1.0.0',
@@ -58,8 +58,8 @@ def run_probe(harness, output, python, auth_file=None, credentials=None):
         prompt = invocation + ' init\n' + (
             'This is an authorized live acceptance probe in a disposable synthetic project. '
             'Use the discovered installed skill, read its project-kit routing, and execute '
-            'its actual bundled kkdesign_project.py (not replacement code). Use Python '
-            + str(python) + '. Selected project is the current directory, sources.json '
+            'its actual bundled helpers via python3 -B SKILL_DIR/scripts/kkdesign_run.py '
+            'kkdesign_project (not replacement code). Selected project is the current directory, sources.json '
             'is the declared source config. First init, inspect the plan and apply it. '
             'I explicitly authorize applying each non-conflicting plan in this synthetic '
             'probe after inspection. Validate the resulting kit. Then edit only '
@@ -98,10 +98,10 @@ def run_probe(harness, output, python, auth_file=None, credentials=None):
         (output / 'stderr.txt').write_text(stderr, encoding='utf-8')
         registry_path = project / 'design/sources.json'
         registry = json.loads(registry_path.read_text()) if registry_path.is_file() else None
-        validation = subprocess.run([str(python), str(project / (
+        validation = subprocess.run([sys.executable, '-B', str(project / (
             '.agents' if harness == 'codex' else '.claude') /
-            'skills/kkdesign-kit/scripts/kkdesign_project.py'),
-            'validate', '--project', str(project)], capture_output=True, text=True)
+            'skills/kkdesign-kit/scripts/kkdesign_run.py'),
+            'kkdesign_project', 'validate', '--project', str(project)], capture_output=True, text=True)
         (output / 'validation.json').write_text(validation.stdout + validation.stderr)
         checks = {
             'harnessExitZero': code == 0,
@@ -128,7 +128,6 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--harness', required=True, choices=('codex', 'claude-code'))
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--python', type=Path, default=Path(sys.executable))
     parser.add_argument('--codex-auth-file', type=Path)
     parser.add_argument('--claude-credentials-file', type=Path)
     args = parser.parse_args()
@@ -136,8 +135,7 @@ def main():
     if output.is_relative_to(ROOT):
         parser.error('Keep private raw evidence outside the repository')
     try:
-        return run_probe(args.harness, output, args.python.absolute(),
-                         args.codex_auth_file, args.claude_credentials_file)
+        return run_probe(args.harness, output, args.codex_auth_file, args.claude_credentials_file)
     except (OSError, ValueError) as exc:
         parser.exit(1, str(exc) + '\n')
 

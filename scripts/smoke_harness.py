@@ -45,7 +45,7 @@ def run_probe(harness, scope, output, auth_file=None, claude_credentials=None):
         with zipfile.ZipFile(archive) as z:
             z.extractall(base / 'artifact')
         source = base / 'artifact/kkdesign-kit'
-        install = lifecycle('install', harness, scope, home, project, source)
+        install = lifecycle('install', harness, scope, home, project, source, runtime=True)
         shutil.rmtree(source)  # Discovery/read must use only the relocated installed copy.
         env = {k: v for k, v in os.environ.items()
                if not k.startswith(('CODEX_', 'CLAUDE_', 'ANTHROPIC_')) and k != 'HOME'}

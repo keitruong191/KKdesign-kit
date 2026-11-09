@@ -70,7 +70,7 @@ When evidence is insufficient, keep the finding provisional, record the gap, and
 For deterministic readback of structured, observed records:
 
 ```sh
-python "<SKILL_DIR>/scripts/kkdesign_review.py" "<PATH_TO_REVIEW_RECORD.json>"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_review "<PATH_TO_REVIEW_RECORD.json>"
 ```
 
 The input is a `design-review-record` JSON object with `schemaVersion`,

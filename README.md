@@ -6,36 +6,62 @@ The skill includes command guides, Python helpers, schemas and synthetic example
 
 ## Install
 
-You need Python 3.9+ and an installed, authenticated Codex CLI or Claude Code. Installation and packaging use the Python standard library; project workflows and contract validation also need the packages in `requirements.txt`.
+The approved one-command bootstrap and public release are **pending PR approval and release**. There is no public download URL ready to use yet; do not run a guessed `curl` command. After the exact release artifact and checksum are published, the release instructions will provide a pinned command and that exact command will be smoke-tested before it is called ready.
 
-From this checkout or an extracted portable `kkdesign-kit/` folder, create an environment **outside the skill directory**:
+Run the future bootstrap from the **destination product directory**; project scope defaults to that directory. It will require an explicit `--harness codex` or `--harness claude-code`, with `--project "/absolute/other project"` and `--scope user` available. The checked-in `install.sh` still downloads the pinned release; running it from a checkout is not a source fallback before publication.
 
-```sh
-# macOS / Linux
-python3 -m venv ../kkdesign-env
-source ../kkdesign-env/bin/activate
-python -m pip install -r requirements.txt
-```
+### Source route while release is gated
 
-On Windows, use `py -3 -m venv ..\kkdesign-env` and activate it with `..\kkdesign-env\Scripts\Activate.ps1` in PowerShell. You can also invoke the environment's Python directly without activation.
-
-Install into your product project:
+Acquire the public source into a new path, then enter it (reviewers must use the PR revision containing this change):
 
 ```sh
-python scripts/kkdesign_install.py install --harness codex --scope project --project "/path/to/your-project"
-python scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/your-project"
+git clone https://github.com/keitruong191/KKdesign-kit.git "$HOME/KKdesign-kit-source"
+cd "$HOME/KKdesign-kit-source"
 ```
 
-For Claude Code, replace `codex` with `claude-code`. Use `--scope user` for a personal installation instead. Restart the agent in your product project after installation.
+Do not overwrite an existing checkout; use that checkout's reviewed revision instead. From the source root, install into an existing destination you own:
+
+```sh
+python3 -I -B scripts/kkdesign_install.py install --harness codex --scope project --project "/absolute/path/to/product project" --runtime
+```
+
+To install for the product project that is your current working directory, call the checkout installer by its absolute path:
+
+```sh
+python3 -I -B "/path/to/kkdesign-kit/scripts/kkdesign_install.py" install --harness codex --scope project --project "$PWD" --runtime
+```
+
+To target another project, provide its quoted absolute path:
+
+```sh
+python3 -I -B scripts/kkdesign_install.py install --harness claude-code --scope project --project "/path/to/another-project" --runtime
+```
+
+For personal scope, choose the harness and pass `--scope user` (plus `--project` as context for conflict checks):
+
+```sh
+python3 -I -B scripts/kkdesign_install.py install --harness codex --scope user --project "/path/to/project-for-conflict-check" --runtime
+python3 -I -B scripts/kkdesign_install.py install --harness claude-code --scope user --project "/path/to/project-for-conflict-check" --runtime
+```
+
+Requirements: Python 3.9+ (`python3` on macOS/Linux; Windows `py -3`), `curl` and network access for bootstrap downloads, and working `venv`/`ensurepip` plus network/package-index access for runtime provisioning. Bootstrap always provisions a workflow runtime in the user's private cache; manual stdlib install/update may omit `--runtime` and use the launcher's current dependency-equipped interpreter instead. Neither route needs activation or system pip.
+
+These are usable local-source commands from the checkout; for the manual secondary route after release, acquire `kkdesign-kit-0.5.0a1.zip` and its `.sha256` from a trusted release, verify the checksum, extract it, `cd` into `kkdesign-kit/`, then run the installer command there. This upcoming version is not evidence that the public archive exists. On Windows use `py -3 -I -B scripts\kkdesign_install.py install --harness codex --scope project --project "C:\Work\Your Project" --runtime`.
+
+Use `--harness claude-code` for Claude Code and `--scope user` for personal scope. Project installation should receive an explicit absolute `--project` path, which may contain spaces.
 
 | Agent | Project installation | Invocation |
 | --- | --- | --- |
 | Codex | `.agents/skills/kkdesign-kit` | `$kkdesign-kit` |
 | Claude Code | `.claude/skills/kkdesign-kit` | `/kkdesign-kit` |
 
-Bare invocation shows the command menu. For example, use `$kkdesign-kit init` in Codex or `/kkdesign-kit init` in Claude Code. Helper commands need the dependency-equipped Python environment; give the agent its absolute interpreter path if it does not inherit that environment.
+After installation, restart the agent in the intended product project. A bare `$kkdesign-kit` or `/kkdesign-kit` shows the command menu; it is not an installer, discovery guarantee, or proof of live-tool readiness. Invoke a route explicitly, such as `$kkdesign-kit init` or `/kkdesign-kit init`. Live design work still requires separately authenticated design tools.
 
-See [installation and lifecycle](docs/installation.md) for personal scope, updates, rollback, uninstall and conflicts, or [requirements and tool access](docs/compatibility.md) for environment limitations.
+The installed launcher resolves helper scripts from the absolute installed `SKILL_DIR`, not the product's current working directory. You can work from another CWD; do not construct `../scripts/...` paths from there. If `python` is missing or resolves to Python 2, use Python 3 explicitly (`python3`, or `py -3` on Windows).
+
+Installation writes `<BASE>/.agents/skills/kkdesign-kit` (Codex) or `<BASE>/.claude/skills/kkdesign-kit` (Claude Code), plus ownership/rollback state in `<BASE>/.kkdesign-kit/installations/<harness>/`. `BASE` is the destination project or your home for personal scope. Managed runtimes always live in `~/.kkdesign-kit/runtimes/<requirements-sha256>/`, shared across installations and outside destination repositories; both scopes require a writable user home. A marker or runtime path supplied by a project is never trusted as executable provenance. No hooks, MCP settings, shell profiles, login or product design files are changed.
+
+See [installation and lifecycle](docs/installation.md) for manual acquisition/extraction, inspect, update, rollback, uninstall, and troubleshooting. SHA-256 verifies integrity, not publisher authenticity. See [requirements and tool access](docs/compatibility.md) for environment limitations.
 
 ## Commands
 
@@ -55,13 +81,13 @@ Design and review never create prototype interactions as a side effect. Review g
 
 Create a `sources.json` using the [supported local, Git or Figma input formats](docs/source-adapters.md). Give the agent the product-project path, source-config path and relevant platform or surface. Source locations resolve relative to the configuration file.
 
-For direct CLI use, run these from the checkout or extracted skill folder:
+For direct CLI use from an installed skill, invoke the stable launcher with the helper name (without `.py`). Set `SKILL_DIR` to the absolute installed directory containing `SKILL.md`; the launcher resolves scripts there, independently of the product CWD:
 
 ```sh
-python scripts/kkdesign_project.py init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
-python scripts/kkdesign_project.py plan --project "/path/to/your-project" --plan PLAN_ID
-python scripts/kkdesign_project.py apply --project "/path/to/your-project" --plan PLAN_ID
-python scripts/kkdesign_project.py validate --project "/path/to/your-project"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project init --project "/path/to/your-project" --sources "/path/to/your-project/sources.json"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project plan --project "/path/to/your-project" --plan PLAN_ID
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project "/path/to/your-project" --plan PLAN_ID
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project validate --project "/path/to/your-project"
 ```
 
 Replace `PLAN_ID` with the ID returned by `init`. Inspect its file changes, conflicts and source limitations before authorizing `apply`. Use `refresh` when those sources change, then review and apply its new plan in the same way.
@@ -79,9 +105,9 @@ Design-system sources and design destinations are independent: a Git token sourc
 Choose fresh output and extraction paths. Existing archives are not overwritten.
 
 ```sh
-python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.4.0a1.zip
-python -m zipfile -e ../kkdesign-kit-0.4.0a1.zip ../kkdesign-kit-extracted
-python ../kkdesign-kit-extracted/kkdesign-kit/scripts/kkdesign_install.py verify --source ../kkdesign-kit-extracted/kkdesign-kit
+python3 -I -B scripts/kkdesign_install.py package --output ../kkdesign-kit-0.5.0a1.zip
+python3 -m zipfile -e ../kkdesign-kit-0.5.0a1.zip ../kkdesign-kit-extracted
+python3 -I -B ../kkdesign-kit-extracted/kkdesign-kit/scripts/kkdesign_install.py verify --source ../kkdesign-kit-extracted/kkdesign-kit
 ```
 
 The extracted script checks the payload inventory, required resources, version and SHA-256 integrity. This does not authenticate the publisher or approve a design.
@@ -94,12 +120,18 @@ Contract validation checks saved schemas, references, hashes and task records. I
 
 For design work, inspect the actual destination, read back saved properties and view rendered output. For prototypes, check effective timing in the design tool and run the requested transitions, including back/cancel with valid history. Label simulated data, APIs, validation and timing. Human design approval remains separate.
 
-For repository development, use the dependency-equipped Python environment:
-
+For repository development, use the dependency-equipped Python environment. In
+the source checkout, set `SKILL_DIR` to that checkout's absolute path; launcher
+calls then use the current Python environment:
 ```sh
-python -m unittest discover -s tests -v
-python scripts/materialize_example.py --output ../kkdesign-example
-python scripts/kkdesign_core.py validate --design ../kkdesign-example/design
+SKILL_DIR="$(pwd -P)"
+
+python3 -m venv "$HOME/.venvs/kkdesign-dev"
+"$HOME/.venvs/kkdesign-dev/bin/python" -m pip install -r requirements.txt
+"$HOME/.venvs/kkdesign-dev/bin/python" -B -m unittest discover -s tests -v
+"$HOME/.venvs/kkdesign-dev/bin/python" -B "$SKILL_DIR/scripts/kkdesign_run.py" materialize_example --output ../kkdesign-example
+"$HOME/.venvs/kkdesign-dev/bin/python" -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_core validate --design ../kkdesign-example/design
 ```
 
-Use an unused example-output directory. The example is synthetic; passing it is not evidence of live design-tool or product behavior. See [data contracts](docs/contracts.md) for the saved formats and validation rules.
+Use an unused example-output directory. The example is synthetic; passing it is not evidence of live design-tool or product behavior. See [data contracts](docs/contracts.md) for the saved formats and validation rules. 
+

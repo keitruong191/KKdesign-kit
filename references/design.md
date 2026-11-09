@@ -6,12 +6,14 @@ run a visual check, or publish. Resolve the request with the user and use the
 user-authorized design tool manually. The design task record is the pre-mutation
 contract; do not begin canvas changes until it is complete and stored.
 
-Resolve resource paths from the installed directory containing `SKILL.md`, never
-from the current directory. With that directory in `SKILL_DIR`, the helper is
-`"$SKILL_DIR/scripts/kkdesign_task.py"`. Run it with Python 3.9+ and the package's
-`jsonschema` dependency installed. `PROJECT` is the user's selected project kit.
-The generic synthetic example is `"$SKILL_DIR/examples/minimal"`; never copy
-private data into this public package.
+Resolve `SKILL_DIR` to the absolute installed directory containing `SKILL.md`,
+never from the current directory. Invoke the helper as
+`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task ...` (helper name
+without `.py`). The installed launcher uses the external runtime recorded at
+installation; source/manual use needs Python 3.9+ and `jsonschema` from
+`requirements.txt` in the current environment. `PROJECT` is the user's selected
+project kit. The generic synthetic example is `"$SKILL_DIR/examples/minimal"`;
+never copy private data into this public package.
 
 ## 1. Resolve and record before mutation
 
@@ -44,7 +46,7 @@ private data into this public package.
    using the provided request and observations, and pass that file to:
 
    ```sh
-   python "$SKILL_DIR/scripts/kkdesign_task.py" begin \
+   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task begin \
      --project "$PROJECT" --record /path/to/complete-task.json
    ```
 
@@ -74,7 +76,7 @@ private data into this public package.
    pass-result payload from this helper. Example:
 
    ```sh
-   python "$SKILL_DIR/scripts/kkdesign_task.py" evidence \
+   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task evidence \
      --project "$PROJECT" --task-id "$TASK_ID" --type snapshot \
      --description "Actual saved settings frame readback and viewport capture" \
      --payload /path/to/real-readback.json --historical-status current \
@@ -94,7 +96,7 @@ private data into this public package.
    Run the offline integrity check before handoff:
 
    ```sh
-   python "$SKILL_DIR/scripts/kkdesign_task.py" check \
+   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task check \
      --project "$PROJECT" --task-id "$TASK_ID"
    ```
 
@@ -107,7 +109,7 @@ private data into this public package.
    evidence filename in its `evidence` array. Example:
 
    ```sh
-   python "$SKILL_DIR/scripts/kkdesign_task.py" handoff \
+   python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_task handoff \
      --project "$PROJECT" --task-id "$TASK_ID" \
      --record /path/to/evidence-linked-handoff.json --status design_delivered
    ```

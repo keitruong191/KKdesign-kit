@@ -17,7 +17,7 @@ from materialize_example import materialize
 from kkdesign_core import build_lesson_index
 
 
-def run_probe(harness, output, python, credential=None):
+def run_probe(harness, output, credential=None):
     executable = shutil.which('codex' if harness == 'codex' else 'claude')
     if not executable:
         raise ValueError('Harness executable unavailable')
@@ -45,15 +45,15 @@ def run_probe(harness, output, python, credential=None):
             bundle.extractall(base / 'extracted')
         source = base / 'extracted/kkdesign-kit'
         verify(source)
-        lifecycle('install', harness, 'project', home, project, source)
+        lifecycle('install', harness, 'project', home, project, source, runtime=True)
         shutil.rmtree(source)
         installed = project / ('.agents' if harness == 'codex' else '.claude') / 'skills/kkdesign-kit'
         invocation = '$kkdesign-kit' if harness == 'codex' else '/kkdesign-kit'
         prompt = invocation + ' design\n' + (
             'Authorized B3 acceptance probe in this disposable SYNTHETIC project. Use only '
             'the discovered installed skill and its actual bundled helpers, not replacement '
-            'implementations. Read the command routes needed below. Python interpreter: '
-            + str(python) + '. Project is the current directory. No network, MCP, installed '
+            'implementations. Read the command routes needed below. Use python3 -B '
+            'SKILL_DIR/scripts/kkdesign_run.py HELPER. Project is the current directory. No network, MCP, installed '
             'Impeccable/Hoangsa, original checkout, user config or credential reads. '
             '1. Read project context, scoped example-web profile and canonical lessons. '
             'Begin a task named harness-design: Operate-mode web settings with default, '
@@ -104,8 +104,8 @@ def run_probe(harness, output, python, credential=None):
             stderr, code = 'Harness timed out after 600 seconds', 124
         (output / 'stdout.jsonl').write_text(stdout, encoding='utf-8')
         (output / 'stderr.txt').write_text(stderr, encoding='utf-8')
-        validation = subprocess.run([str(python), str(installed / 'scripts/kkdesign_core.py'),
-                                     'validate', '--design', str(project / 'design')],
+        validation = subprocess.run([sys.executable, '-B', str(installed / 'scripts/kkdesign_run.py'),
+                                     'kkdesign_core', 'validate', '--design', str(project / 'design')],
                                     capture_output=True, text=True)
         (output / 'validation.json').write_text(validation.stdout + validation.stderr)
         index = build_lesson_index(project / 'design')
@@ -155,14 +155,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--harness', required=True, choices=('codex', 'claude-code'))
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--python', type=Path, default=Path(sys.executable))
     parser.add_argument('--credential', type=Path)
     args = parser.parse_args()
     output = args.output.resolve()
     if output.is_relative_to(ROOT):
         parser.error('Keep private raw evidence outside the repository')
     try:
-        return run_probe(args.harness, output, args.python.absolute(), args.credential)
+        return run_probe(args.harness, output, args.credential)
     except (OSError, ValueError) as exc:
         parser.exit(1, str(exc) + '\n')
 

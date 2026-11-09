@@ -1,8 +1,10 @@
 # Initialize and refresh a project kit
 
-Use `scripts/kkdesign_project.py` relative to the installed skill directory.
-Python 3.9+ and `requirements.txt` dependencies must be available outside the
-installed skill. Do not install project files into the skill directory.
+Use `python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project ...`
+from the installed skill; `SKILL_DIR` is the absolute directory containing
+`SKILL.md`, independent of the shell CWD. The installed launcher uses its
+recorded external runtime. Source/manual use requires Python 3.9+ and the
+`requirements.txt` dependencies in the current environment.
 
 ## Inputs and authority
 
@@ -21,8 +23,8 @@ installed skill. Do not install project files into the skill directory.
 ## Plan, inspect, authorize
 
 ```sh
-python "<SKILL_DIR>/scripts/kkdesign_project.py" init --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
-python "<SKILL_DIR>/scripts/kkdesign_project.py" refresh --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project init --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project refresh --project "<PROJECT>" --sources "<SOURCE_CONFIG>"
 ```
 
 Both commands stage a reviewable plan, not an implicit write authorization.
@@ -35,8 +37,8 @@ Apply only when the user authorized the specific plan. A request to initialize
 or refresh authorizes scanning/planning, not overwriting conflicting files.
 
 ```sh
-python "<SKILL_DIR>/scripts/kkdesign_project.py" apply --project "<PROJECT>" --plan "<PLAN_ID>"
-python "<SKILL_DIR>/scripts/kkdesign_project.py" validate --project "<PROJECT>"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project "<PROJECT>" --plan "<PLAN_ID>"
+python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project validate --project "<PROJECT>"
 ```
 
 If source access or formats fail, report the exact missing prerequisite and do
