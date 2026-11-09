@@ -126,9 +126,23 @@ is separate and never authorizes migration.
 
 After explicit consent for **all** disclosed managed locations, repeat Setup
 with the same explicit project root and one `--migrate "ABSOLUTE_LOCATION"` per
-copy; on Windows pass `-Migrate @('ABSOLUTE_LOCATION', 'ANOTHER_LOCATION')`.
+copy. On Windows the script accepts `-Migrate @('ABSOLUTE_LOCATION',
+'ANOTHER_LOCATION')` **inside native Windows PowerShell 5.1**. Native `-File`
+does not forward array parameters; when launching from a different executor
+host, use this quoted `-Command` invocation with the disclosed `$locations` array:
+
+```powershell
+$quote = { param($value) "'" + $value.Replace("'", "''") + "'" }
+$list = ($locations | ForEach-Object { & $quote $_ }) -join ','
+$invoke = "& {0} -PackageRoot {1} -ProjectRoot {2} -Migrate @({3})" -f `
+    (& $quote "$SKILL_DIR\scripts\kkdesign_setup_windows.ps1"), `
+    (& $quote $SKILL_DIR), (& $quote $PROJECT_ROOT), $list
+& "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -Command $invoke
+```
+
 Use the runtime consent flag only when the user separately authorized its
-disclosed acquisition. Setup requires a verified bundle/matching native plugin
+disclosed acquisition (on Windows append ` -Consent` to `$invoke` before
+execution only after that authorization). Setup requires a verified bundle/matching native plugin
 descriptor, trusted runtime and successful real helper validation before moving
 anything. It locks and rechecks all historical owners and discovery before
 mutation; changed contents, new conflicts or busy owners stop migration. Caught
