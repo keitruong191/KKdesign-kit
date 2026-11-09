@@ -55,7 +55,7 @@ class RuntimeTests(unittest.TestCase):
         target = Path(installed['target'])
         runtime = Path(installed['runtime'])
         before = kit.hashes(target)
-        env = dict(os.environ, HOME=str(self.home))
+        env = dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home))
         for key in ('VIRTUAL_ENV', 'PYTHONHOME', 'PYTHONPATH'):
             env.pop(key, None)
         example = self.base / 'fresh shell example'
@@ -91,7 +91,7 @@ class RuntimeTests(unittest.TestCase):
         target, state = kit.locations('codex', 'project', self.home, self.project)
         self.assertFalse(target.exists())
         self.assertFalse((state / 'state.json').exists())
-        self.assertFalse(kit.runtime_path(state, (ROOT / 'requirements.txt').read_bytes()).exists())
+        self.assertFalse(kit.runtime_path(self.home, (ROOT / 'requirements.txt').read_bytes()).exists())
         self.assertFalse((state / 'lock').exists())
         self.assertEqual(self.act('inspect')['status'], 'absent')
 
@@ -129,7 +129,7 @@ class RuntimeTests(unittest.TestCase):
 
     def test_unowned_runtime_is_preserved_without_installing_skill(self):
         target, state = kit.locations('codex', 'project', self.home, self.project)
-        runtime = kit.runtime_path(state, (ROOT / 'requirements.txt').read_bytes())
+        runtime = kit.runtime_path(self.home, (ROOT / 'requirements.txt').read_bytes())
         runtime.mkdir(parents=True)
         marker = runtime / 'user-file.txt'
         marker.write_text('preserve this environment')
@@ -138,6 +138,103 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(marker.read_text(), 'preserve this environment')
         self.assertFalse(target.exists())
         self.assertEqual(self.act('inspect')['status'], 'absent')
+
+    @unittest.skipIf(os.name == 'nt', 'synthetic executable uses a POSIX shell')
+    def test_project_supplied_runtime_is_never_executed(self):
+        _, state = kit.locations('codex', 'project', self.home, self.project)
+        digest = kit.runtime_path(self.home, (ROOT / 'requirements.txt').read_bytes()).name
+        untrusted = state / 'runtimes' / digest
+        python = kit.runtime_python(untrusted)
+        python.parent.mkdir(parents=True)
+        executed = self.base / 'untrusted-executed'
+        python.write_text('#!/bin/sh\nprintf executed > "' + str(executed) + '"\nexit 23\n')
+        python.chmod(0o755)
+        kit.write_json(untrusted / 'runtime.json',
+                       {'identifier': kit.IDENTIFIER, 'requirementsSha256': digest})
+        malicious_bytes = python.read_bytes()
+        installed = self.install()
+        self.assertFalse(executed.exists())
+        self.assertEqual(python.read_bytes(), malicious_bytes)
+        self.assertFalse(Path(installed['runtime']).is_relative_to(self.project))
+        self.assertEqual(Path(installed['runtime']).parent, self.home / '.kkdesign-kit/runtimes')
+        # Even a forged project ledger cannot redirect the launcher into that executable.
+        record = kit.read_json(state / 'state.json')
+        record['runtime'] = str(untrusted)
+        kit.write_json(state / 'state.json', record)
+        proc = subprocess.run(
+            [sys.executable, '-B', str(Path(installed['target']) / 'scripts/kkdesign_run.py'),
+             'kkdesign_core', '--help'], env=dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home)),
+            cwd=self.home, capture_output=True, text=True)
+        self.assertNotEqual(proc.returncode, 0)
+        self.assertIn('No matching managed runtime', proc.stderr)
+        self.assertFalse(executed.exists())
+
+    def test_manual_install_and_baseline_update_use_current_interpreter(self):
+        source = self.base / 'baseline source'
+        shutil.copytree(ROOT, source, ignore=shutil.ignore_patterns('.git', '.hoangsa', '__pycache__'))
+        manifest = kit.read_json(source / 'manifest.json')
+        manifest['version'] = '0.4.0a1'
+        kit.write_json(source / 'manifest.json', manifest)
+        self.assertEqual(self.act('install', source)['status'], 'installed')
+        for step in ('install', 'update'):
+            if step == 'update':
+                self.assertEqual(self.act('update')['status'], 'updated')
+            target, state = kit.locations('codex', 'project', self.home, self.project)
+            self.assertNotIn('runtime', kit.read_json(state / 'state.json'))
+            launcher = str(target / 'scripts/kkdesign_run.py')
+            example = self.base / (step + ' manual example')
+            env = dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home))
+            for args in (['materialize_example', '--output', str(example)],
+                         ['kkdesign_core', 'validate', '--design', str(example / 'design')]):
+                proc = subprocess.run([sys.executable, '-B', launcher, *args], cwd=self.home,
+                                      env=env, capture_output=True, text=True)
+                self.assertEqual(proc.returncode, 0, proc.stderr)
+            result = json.loads(proc.stdout)
+            self.assertEqual((result['status'], result['errors'], result['warnings']), ('pass', [], []))
+            # An explicit but invalid runtime must never fall back to this interpreter.
+            record = kit.read_json(state / 'state.json')
+            for invalid in (None, '', str(self.home / '.kkdesign-kit/runtimes/wrong-hash')):
+                record['runtime'] = invalid
+                kit.write_json(state / 'state.json', record)
+                refused = subprocess.run([sys.executable, '-B', launcher, 'kkdesign_core', '--help'],
+                                         cwd=self.home, env=env, capture_output=True, text=True)
+                self.assertNotEqual(refused.returncode, 0)
+                self.assertIn('No matching managed runtime', refused.stderr)
+            record.pop('runtime')
+            kit.write_json(state / 'state.json', record)
+        self.assertFalse(kit.runtime_root(self.home).exists())
+
+    def test_shared_user_cache_survives_another_project_uninstall(self):
+        installed = self.install()
+        other = self.base / 'second project'
+        other.mkdir()
+        with kit.locked(kit.runtime_root(self.home)):
+            with self.assertRaisesRegex(ValueError, 'busy'):
+                kit.lifecycle('install', 'claude-code', 'project', self.home, other, ROOT, True)
+        second = kit.lifecycle('install', 'claude-code', 'project', self.home, other, ROOT, True)
+        self.assertEqual(second['runtime'], installed['runtime'])
+        removed = self.act('uninstall')
+        self.assertEqual(removed['retainedRuntimeRoot'], str(kit.runtime_root(self.home)))
+        target = Path(second['target'])
+        example = self.base / 'shared-runtime example'
+        env = dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home))
+        launcher = str(target / 'scripts/kkdesign_run.py')
+        for args in (['materialize_example', '--output', str(example)],
+                     ['kkdesign_core', 'validate', '--design', str(example / 'design')]):
+            proc = subprocess.run([sys.executable, '-B', launcher, *args], cwd=other,
+                                  env=env, capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, proc.stderr)
+        self.assertEqual(json.loads(proc.stdout)['status'], 'pass')
+
+    def test_project_cannot_contain_the_trusted_user_runtime_cache(self):
+        nested_home = self.project / 'nested home'
+        nested_home.mkdir()
+        with self.assertRaisesRegex(ValueError, 'outside the destination project'):
+            kit.lifecycle('install', 'codex', 'project', nested_home, self.project, ROOT, True)
+        target, state = kit.locations('codex', 'project', nested_home, self.project)
+        self.assertFalse(target.exists())
+        self.assertFalse((state / 'state.json').exists())
+        self.assertFalse(kit.runtime_root(nested_home).exists())
 
 
 if __name__ == '__main__':

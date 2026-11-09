@@ -52,13 +52,15 @@ Code, or `--scope user` for a personal installation. The shell bootstrap takes
 current working directory. Run there, or pass an explicit quoted `--project`.
 The bootstrap performs an install; use the installer lifecycle commands below to update existing
 installations.
-`--runtime` provisions the dependency-equipped environment outside the
-installed skill, under the installation state area. The skill itself stays in
-the harness discovery directory and its integrity hash tree; runtime bytes are
-not included in that tree. Do not activate the runtime in a shell. Installer
-operations use the standard library; project workflow commands use that
-separately provisioned runtime. Source/manual helper commands require
-dependencies in the current Python environment.
+`--runtime` provisions dependencies in the user's private cache at
+`~/.kkdesign-kit/runtimes/<requirements-sha256>/`, outside the destination
+repository and hash-managed skill. Both scopes need a writable user home.
+Bootstrap always enables this option; the stdlib manual installer keeps it
+optional. Without a recorded runtime, the launcher uses its current Python
+interpreter, which must already have `requirements.txt` installed. This also
+applies after updating a manual installation from `0.4.0a1`. No activation is
+needed. An explicitly recorded but mismatched/missing runtime is an error,
+never a reason to silently fall back to another interpreter.
 
 | Harness | User scope | Project scope | Invoke after restarting harness |
 |---|---|---|---|
@@ -92,13 +94,14 @@ python3 -I -B scripts/kkdesign_install.py uninstall --harness codex --scope proj
 
 Identical payload bytes are unchanged; a different payload uses `update`.
 Updates retain one previous version. Rollback swaps current and previous, so it
-can be undone. Runtime environments are stored outside the hash-protected skill
-tree under the installation state area; state records the runtime corresponding
-to the active skill. Runtime-enabled updates and rollback reuse or provision
-the matching environment before commit. Uninstall removes owned skill/state
-records but deliberately retains external runtime directories; remove a
-retained runtime manually only after uninstall and only when you have confirmed
-it is no longer shared or needed. Project DESIGN.md, lessons, profiles, task
+can be undone. Managed runtime environments live only in the user's private
+cache, shared across harnesses/projects with the same requirements. Project
+markers and project-supplied executable paths are not trusted as provenance.
+State records the corresponding trusted runtime; runtime-enabled updates and
+rollback reuse or provision it under a shared cache lock before commit.
+Uninstall removes owned skill/state records but deliberately retains the shared
+user cache. Remove a retained runtime manually only after confirming no other
+installation needs it. Project DESIGN.md, lessons, profiles, task
 history, unrelated settings and credentials are not managed.
 
 The uninstall result reports `runtimeReady: false` and, when a cache exists,
@@ -108,9 +111,11 @@ it is no longer shared or needed.
 
 The managed target is the harness skill directory in the table above. Installer
 ownership and lifecycle state are kept outside that discovery directory under
-`<BASE>/.kkdesign-kit/installations/<harness>/`, including `state.json`,
-`previous/` and `runtimes/`. Project-scope files are limited to the selected
-project's skill and this installation state; user scope uses the user base.
+`<BASE>/.kkdesign-kit/installations/<harness>/`, including `state.json` and
+`previous/`. Runtime bytes and creation markers live separately in the private
+user cache `~/.kkdesign-kit/runtimes/`, never in project installation state.
+Project-scope writes therefore include that user cache as well as the selected
+project's skill and ledger; personal scope uses the user base for both.
 
 SHA-256 covers the installed skill tree and the transport checksum covers the
 ZIP. They detect corruption or modification but are not publisher signatures
@@ -141,6 +146,11 @@ and do not establish authenticity. Acquire from a trusted source.
   with `sudo`, which can create root-owned state and bypass normal user scope.
 - Symlinked installation ancestors or payload files are rejected. Choose a real
   directory rather than a linked home/project path.
+- A managed runtime from an older, unreleased bootstrap under project
+  installation state is not trusted or reused. Preserve that directory for
+  inspection; do not redirect the launcher to it or copy its marker into the
+  user cache. Project-scope managed runtime provisioning refuses a destination
+  containing the private user-cache path; select a separate project instead.
 - Locking prevents concurrent mutations. After interruption preserve and inspect
   target, `state.json`, `previous/`, staging and lock before recovery. Remove a
   stale lock only after confirming no installer is running; staging can contain

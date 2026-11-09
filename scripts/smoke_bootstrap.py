@@ -70,6 +70,17 @@ def main():
                     env = dict(os.environ, HOME=str(home), KKDESIGN_BOOTSTRAP_TEST_BASE_URL=url)
                     for key in ('VIRTUAL_ENV', 'PYTHONHOME', 'PYTHONPATH'):
                         env.pop(key, None)
+                    executed = case / 'project-runtime-executed'
+                    if harness == 'codex' and scope == 'project':
+                        digest = hashlib.sha256((ROOT / 'requirements.txt').read_bytes()).hexdigest()
+                        untrusted = project / '.kkdesign-kit/installations/codex/runtimes' / digest
+                        fake_python = untrusted / 'bin/python'
+                        fake_python.parent.mkdir(parents=True)
+                        fake_python.write_text('#!/bin/sh\nprintf executed > ' +
+                                               shlex.quote(str(executed)) + '\nexit 23\n')
+                        fake_python.chmod(0o755)
+                        (untrusted / 'runtime.json').write_text(json.dumps(
+                            {'identifier': 'kkdesign-kit', 'requirementsSha256': digest}))
                     # Exact release-shaped pipe. Only transport is loopback, explicitly set above.
                     command = 'curl -fsSL ' + shlex.quote(url + '/install.sh') + ' | sh -s -- --harness ' + harness
                     cwd = project
@@ -85,6 +96,8 @@ def main():
                     inspected = json.loads(run(installer + ['inspect', *flags], elsewhere, env))
                     if inspected['status'] != 'managed' or not inspected.get('runtimeReady') or inspected['conflicts']:
                         raise ValueError('Unexpected inspect: ' + json.dumps(inspected))
+                    if executed.exists() or Path(inspected['runtime']).parent != home / '.kkdesign-kit/runtimes':
+                        raise ValueError('Runtime crossed the trusted user-cache boundary')
                     before = hashes(target)
                     example = case / 'fresh shell example'
                     launcher = str(target / 'scripts/kkdesign_run.py')
@@ -127,7 +140,8 @@ def main():
                         raise ValueError('Uninstall violated skill removal/runtime retention contract')
                     records.append({'harness': harness, 'scope': scope, 'inspect': 'managed',
                                     'validation': 'pass', 'reinstall': 'unchanged', 'uninstall': 'uninstalled',
-                                    'runtimeRetained': True, 'explicitOtherCwd': harness == 'claude-code' and scope == 'project'})
+                                    'runtimeRetained': True, 'runtimeLocation': 'user-private-cache',
+                                    'explicitOtherCwd': harness == 'claude-code' and scope == 'project'})
         finally:
             server.shutdown()
             server.server_close()
@@ -135,7 +149,8 @@ def main():
         print(json.dumps({'platform': platform.platform(), 'python': platform.python_version(),
                           'transport': 'actual curl HTTP loopback; not public release',
                           'artifactSha256': artifact['sha256'], 'cases': records,
-                          'updateRollbackRuntimeSwitch': 'pass', 'nativeHarnessDiscovery': 'not checked'}, indent=2))
+                          'updateRollbackRuntimeSwitch': 'pass', 'projectRuntimeNeverExecuted': 'pass',
+                          'nativeHarnessDiscovery': 'not checked'}, indent=2))
     return 0
 
 

@@ -7,11 +7,13 @@ Python 3.9+ and the Python standard library. Offline contract validation also
 requires `jsonschema >=4.18,<5` from `requirements.txt`.
 The POSIX bootstrap also requires `curl`, network access to the pinned release
 and package index, and Python's working `venv`/`ensurepip`. It always provisions
-the workflow dependencies outside the skill; manual installation enables this
-with `--runtime`. Helpers use the recorded interpreter through
-`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER`, without activation or
-an inherited environment. A fresh or restarted harness still needs Python 3
-available and its separately authenticated design tools.
+the workflow dependencies in `~/.kkdesign-kit/runtimes/`, outside destination
+repositories. Manual installation enables this with `--runtime`; without a
+recorded runtime the launcher uses its invoking interpreter, which must have
+the workflow dependencies installed. An invalid recorded runtime is refused.
+Use `python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER`, without activation.
+A fresh or restarted harness still needs Python 3 available and its separately
+authenticated design tools.
 
 The kit does not install Hoangsa, Impeccable, MCP servers, or hooks. Source
 adapters need access to the sources declared by the project. Design and

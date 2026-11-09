@@ -37,6 +37,7 @@ retain its evidence and origin. Canonical authored advice lives only in
 
 ```sh
 python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_learn author \
+  --design "/path/to/project/design" \
   --title "Keep control states distinguishable" \
   --body "When documenting a control, explain how its relevant states differ. This is an inferred practice, not a claim that a live implementation was tested." \
   --verification "On a later task, inspect the specified states and record task-specific evidence before claiming verification." \

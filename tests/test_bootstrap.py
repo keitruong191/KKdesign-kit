@@ -145,6 +145,17 @@ class BootstrapTests(unittest.TestCase):
         finally:
             self.project.chmod(0o700)
 
+    @unittest.skipIf(hasattr(os, 'geteuid') and os.geteuid() == 0, 'root bypasses write permissions')
+    def test_project_bootstrap_requires_writable_private_home(self):
+        self.home.chmod(0o500)
+        try:
+            result = self.run_bootstrap('--harness', 'codex')
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn('writable user home', result.stderr)
+            self.assertFalse((self.project / '.kkdesign-kit').exists())
+        finally:
+            self.home.chmod(0o700)
+
 
 if __name__ == '__main__':
     unittest.main()

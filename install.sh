@@ -67,9 +67,8 @@ fi
 if [ "$scope" = project ]; then
   case "$project" in /*) ;; *) project="$PWD/$project" ;; esac
   [ -d "$project" ] && [ -w "$project" ] || fail "project destination is not an existing writable directory: $project"
-else
-  [ -d "${HOME:-}" ] && [ -w "$HOME" ] || fail 'user destination is not an existing writable home directory.'
 fi
+[ -d "${HOME:-}" ] && [ -w "$HOME" ] || fail 'a writable user home is required for the private runtime cache (both scopes).'
 
 # The release checksum detects corruption; it is not a publisher signature.
 work=$(mktemp -d "${TMPDIR:-/tmp}/kkdesign-install.XXXXXX") || fail 'cannot create temporary download directory.'
@@ -126,7 +125,7 @@ python3 -I -B "$installed/scripts/kkdesign_install.py" inspect --harness "$harne
 python3 -B "$installed/scripts/kkdesign_run.py" materialize_example --output "$work/bootstrap-example"
 python3 -B "$installed/scripts/kkdesign_run.py" kkdesign_core validate --design "$work/bootstrap-example/design" >/dev/null
 printf '\nKKdesign-kit installed and helpers verified: %s\n' "$installed"
-printf 'Runtime is managed outside the skill tree; no activation is needed.\n'
+printf 'Runtime cache: %s/.kkdesign-kit/runtimes (outside the project); no activation needed.\n' "$HOME"
 printf 'Helper launcher: python3 -B "%s/scripts/kkdesign_run.py" HELPER [arguments]\n' "$installed"
 if [ "$harness" = codex ]; then
   printf 'Restart Codex in the destination project, then invoke $kkdesign-kit for the menu.\n'

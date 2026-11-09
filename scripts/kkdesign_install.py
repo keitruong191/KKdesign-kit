@@ -173,8 +173,8 @@ def inspect(harness, scope, home, project):
         actual = hashes(target) if target.is_dir() else None
         result.update(status='managed' if actual == data['files'] else 'modified',
                       version=data['version'], rollbackAvailable=(state / 'previous').is_dir())
-        if data.get('runtime'):
-            expected = state / 'runtimes' / data['files']['requirements.txt']
+        if 'runtime' in data:
+            expected = runtime_root(home) / data['files']['requirements.txt']
             if data['runtime'] != str(expected):
                 raise ValueError('Runtime ownership mismatch')
             no_links(expected)
@@ -187,8 +187,13 @@ def inspect(harness, scope, home, project):
     return result
 
 
-def runtime_path(state, requirements):
-    return state / 'runtimes' / hashlib.sha256(requirements).hexdigest()
+def runtime_root(home):
+    """Executable cache belongs to the user, never to a destination repository."""
+    return home / '.kkdesign-kit' / 'runtimes'
+
+
+def runtime_path(home, requirements):
+    return runtime_root(home) / hashlib.sha256(requirements).hexdigest()
 
 
 def runtime_python(runtime):
@@ -208,32 +213,37 @@ def run_runtime(command):
 
 
 @contextmanager
-def prepared_runtime(state, requirements):
-    """Build at its final path: venv entry points are not relocatable."""
-    runtime = runtime_path(state, requirements)
+def prepared_runtime(home, requirements):
+    """Build/reuse only a user-private cache; project markers prove no provenance."""
+    root = runtime_root(home)
+    runtime = runtime_path(home, requirements)
     no_links(runtime)
-    marker = {'identifier': IDENTIFIER, 'requirementsSha256': runtime.name}
-    created = False
-    if runtime.exists():
-        no_links(runtime / 'runtime.json')
-        if not (runtime / 'runtime.json').is_file() or read_json(runtime / 'runtime.json') != marker:
-            raise ValueError('Unowned or incomplete runtime; preserve and inspect: ' + str(runtime))
-    else:
-        runtime.mkdir(parents=True)
-        created = True
-    try:
-        if created:
-            run_runtime([sys.executable, '-I', '-B', '-m', 'venv', runtime])
-            requirement_file = runtime / 'requirements.txt'
-            requirement_file.write_bytes(requirements)
-            run_runtime([runtime_python(runtime), '-I', '-B', '-m', 'pip',
-                         '--disable-pip-version-check', 'install', '-r', requirement_file])
-            write_json(runtime / 'runtime.json', marker)
-        yield runtime
-    except BaseException:
-        if created:
-            shutil.rmtree(runtime)
-        raise
+    root.mkdir(mode=0o700, parents=True, exist_ok=True)
+    # Different installations can share this cache. Hold its lock through smoke
+    # and ledger commit so failed creation cannot remove a runtime another uses.
+    with locked(root):
+        marker = {'identifier': IDENTIFIER, 'requirementsSha256': runtime.name}
+        created = False
+        if runtime.exists():
+            no_links(runtime / 'runtime.json')
+            if not (runtime / 'runtime.json').is_file() or read_json(runtime / 'runtime.json') != marker:
+                raise ValueError('Unowned or incomplete runtime; preserve and inspect: ' + str(runtime))
+        else:
+            runtime.mkdir(mode=0o700)
+            created = True
+        try:
+            if created:
+                run_runtime([sys.executable, '-I', '-B', '-m', 'venv', runtime])
+                requirement_file = runtime / 'requirements.txt'
+                requirement_file.write_bytes(requirements)
+                run_runtime([runtime_python(runtime), '-I', '-B', '-m', 'pip',
+                             '--disable-pip-version-check', 'install', '-r', requirement_file])
+                write_json(runtime / 'runtime.json', marker)
+            yield runtime
+        except BaseException:
+            if created:
+                shutil.rmtree(runtime)
+            raise
 
 
 def smoke_runtime(target, runtime, state):
@@ -290,8 +300,8 @@ def lifecycle(action, harness, scope, home, project, source, runtime=False):
                 (state / 'previous-state.json').unlink()
             (state / 'state.json').unlink()
             result = dict(current, status='uninstalled', rollbackAvailable=False, runtimeReady=False)
-            if (state / 'runtimes').exists():
-                result['retainedRuntimeRoot'] = str(state / 'runtimes')
+            if runtime_root(home).exists():
+                result['retainedRuntimeRoot'] = str(runtime_root(home))
             return result
         if action in ('update', 'rollback') and current['status'] == 'absent':
             raise ValueError('No managed installation; run install first')
@@ -312,7 +322,10 @@ def lifecycle(action, harness, scope, home, project, source, runtime=False):
             raise ValueError('Different version already installed; use update explicitly')
         environment = None
         if runtime or (old_record and old_record.get('runtime')):
-            environment = resources.enter_context(prepared_runtime(state, files['requirements.txt']))
+            if scope == 'project' and runtime_root(home).is_relative_to(project):
+                raise ValueError('User runtime cache must be outside the destination project; '
+                                 'choose another project or --scope user')
+            environment = resources.enter_context(prepared_runtime(home, files['requirements.txt']))
         new_record = {'identifier': IDENTIFIER, 'version': version, 'target': str(target), 'files': new_hashes}
         if environment:
             new_record['runtime'] = str(environment)

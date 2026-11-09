@@ -27,17 +27,20 @@ def main():
         record = installer.read_json(state / 'state.json')
         if record.get('identifier') != installer.IDENTIFIER or record.get('target') != str(root):
             raise ValueError('Installation record does not own this skill')
-        expected = installer.runtime_path(state, (root / 'requirements.txt').read_bytes())
-        if record.get('runtime') != str(expected):
-            raise ValueError('No matching managed runtime; rerun install/update with --runtime')
-        installer.no_links(expected / 'runtime.json')
-        installer.no_links(expected)
-        marker = installer.read_json(expected / 'runtime.json')
-        if marker != {'identifier': installer.IDENTIFIER, 'requirementsSha256': expected.name}:
-            raise ValueError('Runtime ownership mismatch; inspect the installation')
-        python = installer.runtime_python(expected)
-        if not python.is_file():
-            raise ValueError('Managed runtime is missing; rerun install with --runtime')
+        # No recorded runtime means an intentionally stdlib/manual installation:
+        # use the caller's dependency-equipped interpreter, including after update.
+        # A recorded runtime is binding and must resolve inside this user's cache.
+        if 'runtime' in record:
+            expected = installer.runtime_path(Path.home(), (root / 'requirements.txt').read_bytes())
+            if record['runtime'] != str(expected):
+                raise ValueError('No matching managed runtime in user cache; inspect the installation')
+            installer.no_links(expected / 'runtime.json')
+            marker = installer.read_json(expected / 'runtime.json')
+            if marker != {'identifier': installer.IDENTIFIER, 'requirementsSha256': expected.name}:
+                raise ValueError('Runtime ownership mismatch; inspect the installation')
+            python = installer.runtime_python(expected)
+            if not python.is_file():
+                raise ValueError('Managed runtime is missing; rerun install with --runtime')
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
     env.pop('PYTHONHOME', None)
     env.pop('PYTHONPATH', None)

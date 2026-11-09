@@ -44,7 +44,7 @@ python3 -I -B scripts/kkdesign_install.py install --harness codex --scope user -
 python3 -I -B scripts/kkdesign_install.py install --harness claude-code --scope user --project "/path/to/project-for-conflict-check" --runtime
 ```
 
-Requirements: Python 3.9+ (`python3` on macOS/Linux; Windows `py -3`), `curl` and network access for bootstrap downloads, and working `venv`/`ensurepip` plus network/package-index access when provisioning the optional workflow runtime. The bootstrap installer itself uses Python's standard library and needs no `pip` packages. Workflow helpers use a separate dependency-equipped runtime outside the installed skill, with no shell activation. Never put that runtime inside the skill or product data tree.
+Requirements: Python 3.9+ (`python3` on macOS/Linux; Windows `py -3`), `curl` and network access for bootstrap downloads, and working `venv`/`ensurepip` plus network/package-index access for runtime provisioning. Bootstrap always provisions a workflow runtime in the user's private cache; manual stdlib install/update may omit `--runtime` and use the launcher's current dependency-equipped interpreter instead. Neither route needs activation or system pip.
 
 These are usable local-source commands from the checkout; for the manual secondary route after release, acquire `kkdesign-kit-0.5.0a1.zip` and its `.sha256` from a trusted release, verify the checksum, extract it, `cd` into `kkdesign-kit/`, then run the installer command there. This upcoming version is not evidence that the public archive exists. On Windows use `py -3 -I -B scripts\kkdesign_install.py install --harness codex --scope project --project "C:\Work\Your Project" --runtime`.
 
@@ -59,7 +59,7 @@ After installation, restart the agent in the intended product project. A bare `$
 
 The installed launcher resolves helper scripts from the absolute installed `SKILL_DIR`, not the product's current working directory. You can work from another CWD; do not construct `../scripts/...` paths from there. If `python` is missing or resolves to Python 2, use Python 3 explicitly (`python3`, or `py -3` on Windows).
 
-Only `<BASE>/.agents/skills/kkdesign-kit` (Codex) or `<BASE>/.claude/skills/kkdesign-kit` (Claude Code), plus `<BASE>/.kkdesign-kit/installations/<harness>/`, are installed. `BASE` is the destination project or your home for personal scope. The latter directory holds ownership/rollback state and external runtime caches; no hooks, MCP settings, shell profiles, login or product design files are changed.
+Installation writes `<BASE>/.agents/skills/kkdesign-kit` (Codex) or `<BASE>/.claude/skills/kkdesign-kit` (Claude Code), plus ownership/rollback state in `<BASE>/.kkdesign-kit/installations/<harness>/`. `BASE` is the destination project or your home for personal scope. Managed runtimes always live in `~/.kkdesign-kit/runtimes/<requirements-sha256>/`, shared across installations and outside destination repositories; both scopes require a writable user home. A marker or runtime path supplied by a project is never trusted as executable provenance. No hooks, MCP settings, shell profiles, login or product design files are changed.
 
 See [installation and lifecycle](docs/installation.md) for manual acquisition/extraction, inspect, update, rollback, uninstall, and troubleshooting. SHA-256 verifies integrity, not publisher authenticity. See [requirements and tool access](docs/compatibility.md) for environment limitations.
 
