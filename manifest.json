@@ -95,6 +95,7 @@
     "scripts/kkdesign_task.py",
     "scripts/kkdesign_review.py",
     "scripts/kkdesign_learn.py",
-    "scripts/figma_prototype.js"
+    "scripts/figma_prototype.js",
+    "docs/codex-marketplace.md"
   ]
 }

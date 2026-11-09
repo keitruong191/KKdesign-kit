@@ -1,0 +1,88 @@
+# Codex marketplace packaging preview
+
+The Codex adapter packages the canonical skill/resources under
+`skills/kkdesign-kit/`, without a second workflow source. The generated
+`.codex-plugin/plugin.json` uses the supported compatibility
+format, declares `./skills/` and `requires_local_executor: true`.
+The descriptor version must match `manifest.json`. The generated Codex catalog is
+`.agents/plugins/marketplace.json`; it is distinct from Claude's catalog.
+
+This preview supports packaging review, not release or runtime readiness.
+The menu and **Setup** route use file-reading tools only; neither needs Python
+nor downloads anything. They show plugin loaded, **Setup required**, and
+external tools unverified. Runtime provisioning and trusted helper dispatch
+are later integration work. The launcher refuses plugin helper execution.
+
+## Native maintainer review
+
+Use a clean isolated HOME and CODEX_HOME with a reviewed marketplace source.
+No published marketplace endpoint or public-directory approval is claimed.
+Register the source using native controls (the marketplace argument to plugin
+add is its name, not its repository URL):
+
+```text
+codex plugin marketplace add <reviewed-marketplace-source>
+codex plugin add kkdesign-kit@kkdesign-kit-codex
+codex plugin list
+```
+
+Start a new session in the selected product project, then invoke:
+
+```text
+$kkdesign-kit:kkdesign-kit
+$kkdesign-kit:kkdesign-kit Setup
+```
+
+Resolve bundled resources from the activation-provided skill directory, never
+from product CWD or the author's checkout. Do not create a standalone skill
+copy, run the legacy installer, or write runtime/state into the plugin cache.
+Native lifecycle remains owned by Codex:
+
+```text
+codex plugin remove kkdesign-kit@kkdesign-kit-codex
+codex plugin marketplace remove kkdesign-kit-codex
+```
+
+Project design data, lessons, task history and private user runtime/state have
+separate ownership. No uninstall hook deletes them. Runtime update/reuse and
+standalone migration are not implemented by this packaging adapter.
+
+## Canonical build
+
+Maintainers need Python 3.9+ to build, independently of the end-user menu:
+
+```sh
+python3 -B scripts/build_codex_marketplace.py --output ../kkdesign-codex-marketplace.zip
+python3 -m zipfile -e ../kkdesign-codex-marketplace.zip ../codex-review
+```
+
+Descriptor/catalog build inputs live under `packaging/codex/`; the source
+checkout is not itself the Codex marketplace. Register the built artifact.
+The deterministic ZIP contains `kkdesign-codex-marketplace/` with the native
+catalog and `plugins/kkdesign-kit/` containing the canonical allowlisted payload
+under `skills/kkdesign-kit/`, plus the Codex descriptor at plugin root.
+The skill inventory covers canonical resources; the archive SHA-256 covers
+the entire artifact including provider metadata. Output cannot
+replace existing files or live inside source. This is a marketplace artifact,
+not a standalone installer. No runtime, hooks, MCP server or binaries are added.
+Register the extracted marketplace for local review; a Git marketplace at a
+reviewed ref can instead distribute it through the host's clone/cache flow.
+
+## Surface boundaries
+
+Native review targets Codex CLI on macOS ARM64 only. This does not advertise
+working Setup/runtime support on that combination. Linux, Windows, other CPUs,
+and the ChatGPT desktop app have no native evidence for this adapter yet.
+The Codex IDE extension does not support plugins. Cloud/web/mobile sessions
+without a local executor cannot run helper workflows; no fallback installer is
+provided. Public-directory local-execution plugins have Desktop only limits;
+local CLI marketplace evidence does not establish public-directory coverage.
+Unsupported surfaces should use a supported local host when a verified release
+is available. Provider installation never establishes design-tool access or
+human approval.
+
+See [native verification](verification/codex-marketplace.md) for observed
+results and pending acceptance. Official sources:
+[packaging and catalog](https://developers.openai.com/plugins/build/plugins),
+[Codex surfaces and new sessions](https://learn.chatgpt.com/docs/plugins),
+[local-executor metadata and Desktop only publication](https://developers.openai.com/plugins/deploy/desktop-only).

@@ -1,5 +1,7 @@
 # Install and maintain KKdesign-kit
 
+For the Codex adapter, see [Codex marketplace packaging](codex-marketplace.md)
+and use its native namespaced invocation `$kkdesign-kit:kkdesign-kit`.
 For the new Claude Code adapter, see [marketplace packaging preview](claude-marketplace.md).
 It uses native plugin lifecycle and `/kkdesign-kit:kkdesign-kit`; its menu and
 Setup instructions do not require Python. Runtime Setup is still required and

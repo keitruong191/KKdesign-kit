@@ -6,7 +6,8 @@ The skill includes command guides, Python helpers, schemas and synthetic example
 
 ## Install
 
-The new distribution direction is marketplace-only. The Claude Code
+The new distribution direction is marketplace-only. The Codex
+[marketplace packaging preview](docs/codex-marketplace.md) uses `$kkdesign-kit:kkdesign-kit`. The Claude Code
 [marketplace packaging preview](docs/claude-marketplace.md) loads the canonical
 skill as `/kkdesign-kit:kkdesign-kit`, including a readable **Setup** route.
 It reports **Setup required**: plugin runtime provisioning/execution is not yet
