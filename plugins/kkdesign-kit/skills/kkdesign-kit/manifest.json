@@ -1,0 +1,111 @@
+{
+  "name": "KKdesign-kit",
+  "identifier": "kkdesign-kit",
+  "version": "0.5.0a1",
+  "status": "workflow-preview",
+  "targets": [
+    "codex",
+    "claude-code"
+  ],
+  "implemented": [
+    "lesson-index",
+    "product-profile-contract",
+    "task-contract",
+    "task-evidence-contract",
+    "offline-validation",
+    "skill-installation",
+    "command-menu",
+    "package",
+    "installation-inspection",
+    "update",
+    "rollback",
+    "uninstall",
+    "init",
+    "refresh",
+    "source-adapters",
+    "source-migration",
+    "project-recovery",
+    "design",
+    "review",
+    "prototype",
+    "learn",
+    "extracted-package-verification",
+    "managed-helper-runtime",
+    "agent-setup-consent",
+    "macos-python-bootstrap",
+    "linux-python-bootstrap",
+    "windows-python-bootstrap",
+    "standalone-migration"
+  ],
+  "planned": [
+    "optional-hooks"
+  ],
+  "externalRuntimeDependencies": [
+    "Python >=3.9",
+    "jsonschema >=4.18,<5"
+  ],
+  "requiresInstalledImpeccable": false,
+  "requiresInstalledHoangsa": false,
+  "supportGuide": "docs/compatibility.md",
+  "harnessAdapters": {
+    "codex": {
+      "user": "~/.agents/skills/kkdesign-kit",
+      "project": ".agents/skills/kkdesign-kit",
+      "invocation": "$kkdesign-kit"
+    },
+    "claude-code": {
+      "user": "~/.claude/skills/kkdesign-kit",
+      "project": ".claude/skills/kkdesign-kit",
+      "invocation": "/kkdesign-kit"
+    }
+  },
+  "hooks": "not-installed; opt-in integration deferred",
+  "compatibility": {
+    "toolAccess": "Codex CLI or Claude Code must be installed and authenticated separately; live design operations need a separately authorized design-tool connection",
+    "optionalIntegrations": "Hoangsa, Impeccable, MCP servers and hooks are not installed or required",
+    "verificationBoundary": "Offline validation checks contracts and package integrity; live behavior, rendered results and owner approval require separate verification"
+  },
+  "requiredResources": [
+    "SKILL.md",
+    "manifest.json",
+    "LICENSE",
+    "requirements.txt",
+    "agents/openai.yaml",
+    "references/commands.md",
+    "references/setup.md",
+    "references/project-kit.md",
+    "references/design.md",
+    "references/review.md",
+    "references/prototype.md",
+    "references/learn.md",
+    "references/packaging.md",
+    "references/review/lenses.md",
+    "references/review/platforms.md",
+    "references/review/report-template.md",
+    "docs/review-attribution.md",
+    "docs/compatibility.md",
+    "docs/claude-marketplace.md",
+    "examples/review/flawed-design.json",
+    "examples/review/expected-findings.json",
+    "schemas/task.schema.json",
+    "schemas/task-evidence.schema.json",
+    "schemas/lesson-index.schema.json",
+    "schemas/product-profile.schema.json",
+    "schemas/source-registry.schema.json",
+    "scripts/kkdesign_install.py",
+    "scripts/kkdesign_run.py",
+    "scripts/kkdesign_core.py",
+    "scripts/kkdesign_project.py",
+    "scripts/kkdesign_sources.py",
+    "scripts/kkdesign_task.py",
+    "scripts/kkdesign_review.py",
+    "scripts/kkdesign_learn.py",
+    "scripts/figma_prototype.js",
+    "docs/codex-marketplace.md",
+    "scripts/kkdesign_setup.py",
+    "scripts/kkdesign_setup_posix.sh",
+    "scripts/kkdesign_setup_windows.ps1",
+    "scripts/kkdesign_windows_security.ps1",
+    "scripts/kkdesign_migration.py"
+  ]
+}

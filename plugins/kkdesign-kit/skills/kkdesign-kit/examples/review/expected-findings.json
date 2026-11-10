@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "kind": "design-review-evidence-readback",
+  "assessment": "evidence-only",
+  "approval": "not-assessed",
+  "findings": [
+    {
+      "location": "Settings/Notifications/Reference",
+      "severity": "P2",
+      "userImpact": "A reference from another platform can lead to inappropriate navigation, controls, or layout for the intended platform.",
+      "evidenceKind": "recorded-reference-metadata",
+      "verificationStatus": "evidence-only",
+      "recommendation": "Use an approved reference for the intended platform or record an explicit rationale for the divergence."
+    },
+    {
+      "location": "Settings/Notifications/SaveButton",
+      "severity": "P2",
+      "userImpact": "A local component override can drift from canonical design-system styling and make later updates inconsistent.",
+      "evidenceKind": "recorded-instance-overrides",
+      "verificationStatus": "evidence-only",
+      "recommendation": "Confirm each override is intentional; use the canonical component property or variant when it is not."
+    },
+    {
+      "location": "Settings/Notifications/Heading",
+      "severity": "P2",
+      "userImpact": "Unbound or mismatched typography may become inconsistent and fail to track approved type-system changes.",
+      "evidenceKind": "recorded-text-style-binding",
+      "verificationStatus": "evidence-only",
+      "recommendation": "Restore the approved text-style binding if the detachment was not intentional."
+    },
+    {
+      "location": "Settings/Notifications/PreferenceDescription",
+      "severity": "P1",
+      "userImpact": "Content exceeds the recorded available region; users may lose access to text or controls in this long-content case.",
+      "evidenceKind": "recorded-layout-measurements",
+      "verificationStatus": "evidence-only",
+      "recommendation": "Provide sufficient layout growth or an intentional scroll path so the complete content and related actions remain reachable."
+    },
+    {
+      "location": "Settings/Notifications/DisabledHint",
+      "severity": "P1",
+      "userImpact": "The recorded contrast ratio is below the supplied requirement, which can make this text difficult to perceive.",
+      "evidenceKind": "recorded-contrast-measurement",
+      "verificationStatus": "evidence-only",
+      "recommendation": "Choose colors that meet the applicable contrast requirement while preserving the intended visual hierarchy."
+    }
+  ],
+  "unassessed": [],
+  "limitations": [
+    "Fixture only: not evidence from Figma, product source, a native app, or runtime.",
+    "The readback is not a complete human design review and does not establish approval or native/runtime/accessibility/performance pass."
+  ]
+}
