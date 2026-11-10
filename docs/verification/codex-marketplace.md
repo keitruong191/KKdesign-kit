@@ -1,5 +1,9 @@
 # WWA-02 native verification
 
+Current persistent review sources and remote native install/discovery/removal
+are recorded in [WWA-11 verification](marketplace-sources.md). The older local
+transport and publication statements below describe this item's historical run.
+
 This is an item-specific historical verification record. For current integrated
 behavior and remaining external acceptance, use the [support matrix](../compatibility.md)
 and [onboarding handoff](onboarding.md); earlier implementation gaps below are

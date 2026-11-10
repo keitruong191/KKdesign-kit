@@ -12,7 +12,7 @@ review; production release approval and official directory listings remain
 pending. Use the provider you already have, with Git and HTTPS access to GitHub:
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/wwa11-codex-0.5.0a1
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
 
@@ -21,7 +21,7 @@ claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
-These named Git branches are mutable review channels, not immutable pins.
+Codex uses an immutable commit pin; Claude uses a mutable review branch.
 See [source provenance and snapshot revisions](docs/marketplace-sources.md)
 for the exact canonical/distribution commits, integrity and tested pin syntax.
 The default repository branch is not the built marketplace. No source clone or

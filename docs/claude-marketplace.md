@@ -32,6 +32,11 @@ claude plugin list --json
 The `#ref` is part of Claude's Git source syntax; quote it. This branch is
 mutable, not an immutable pin. [Source provenance](marketplace-sources.md)
 records the exact distribution snapshot and measured native pin limitations.
+Claude Code 2.1.308 rejects raw commit SHAs here: it tries to clone a branch
+with that name. Before installing, verify the cloned marketplace as described
+in the source record; expected HEAD is
+`bea7e433f4f576068bcf2eec15317d7d73e5e065`. A different HEAD needs owner review;
+no immutable client-side pin is claimed for this Claude command.
 
 Start a new Claude session in the selected product project and invoke:
 

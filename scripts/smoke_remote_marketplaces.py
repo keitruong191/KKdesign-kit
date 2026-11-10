@@ -6,6 +6,7 @@ approved network access. Logs stay in a new private directory outside source.
 Setup consent here applies only to this disposable synthetic probe.
 """
 import argparse
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -50,7 +51,19 @@ def exchange(process, output, payload, accepts):
         selector.close()
 
 
-def probe(output, codex_ref, claude_ref):
+def private_state(root):
+    # Managed Python includes legitimate symlinks. Preserve link targets without
+    # following them, plus file bytes/ownership/mode for the whole private tree.
+    result = {}
+    for path in sorted(root.rglob('*')):
+        info = path.lstat()
+        value = (os.readlink(path) if path.is_symlink() else
+                 hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None)
+        result[path.relative_to(root).as_posix()] = (info.st_uid, info.st_gid, info.st_mode, value)
+    return result
+
+
+def probe(output, codex_ref, claude_ref, claude_sha):
     if output.absolute().resolve().is_relative_to(ROOT):
         raise ValueError('Output must be outside source')
     providers = {name: shutil.which(name) for name in ('codex', 'claude')}
@@ -106,6 +119,16 @@ def probe(output, codex_ref, claude_ref):
             native('register', 'marketplace', 'add', REPOSITORY + '#' + ref, '--scope', 'user')
         market = 'kkdesign-kit-codex' if name == 'codex' else 'kkdesign-kit-marketplace'
         identifier = 'kkdesign-kit@' + market
+        # Record the actual native clone revision, including when the CLI only
+        # accepts a named branch. A branch name itself is never an immutable pin.
+        clones = [path.parent for path in config.rglob('.git')]
+        revisions = [run('clone-' + str(i), ['git', '-C', path, 'rev-parse', 'HEAD']).strip()
+                     for i, path in enumerate(clones)]
+        assert revisions, 'No native Git marketplace clone found'
+        (base / 'native-revisions.json').write_text(json.dumps(revisions, indent=2) + '\n')
+        expected = codex_ref if name == 'codex' else claude_sha
+        assert re.fullmatch(r'[0-9a-f]{40}', expected), 'Expected immutable SHA required'
+        assert expected in revisions, revisions
         args = ['add' if name == 'codex' else 'install', identifier]
         if name == 'claude':
             args += ['--scope', 'user']
@@ -118,16 +141,6 @@ def probe(output, codex_ref, claude_ref):
         plugin = config / 'plugins/cache' / market / 'kkdesign-kit/0.5.0a1'
         skill = plugin / 'skills/kkdesign-kit' if name == 'codex' else plugin
         kit.verify(skill)
-        # Record the actual native clone revision, including when the CLI only
-        # accepts a named branch. A branch name itself is never an immutable pin.
-        clones = [path.parent for path in config.rglob('.git')]
-        revisions = [run('clone-' + str(i), ['git', '-C', path, 'rev-parse', 'HEAD']).strip()
-                     for i, path in enumerate(clones)]
-        assert revisions, 'No native Git marketplace clone found'
-        (base / 'native-revisions.json').write_text(json.dumps(revisions, indent=2) + '\n')
-        if re.fullmatch(r'[0-9a-f]{40}', ref):
-            assert ref in revisions, revisions
-
         # Fresh process, no source override and no user/model prompt.
         command = ([providers[name], 'app-server'] if name == 'codex' else
                    [providers[name], '--print', '--input-format', 'stream-json',
@@ -164,14 +177,14 @@ def probe(output, codex_ref, claude_ref):
         prefix = ['/bin/sh', skill / 'scripts/kkdesign_setup_posix.sh', '--package-root', skill]
         run('setup', prefix + ['--consent'], helper_env)
         run('helper', prefix + ['--helper', 'kkdesign_install', 'verify', '--source', skill], helper_env)
-        private_before = kit.hashes(home / '.kkdesign-kit')
+        private_before = private_state(home / '.kkdesign-kit')
         assert kit.hashes(skill) == package_before
         native('remove', 'remove' if name == 'codex' else 'uninstall', identifier)
         inventory = json.loads(native('removed-inventory', 'list', '--json'))
         assert not (inventory['installed'] if name == 'codex' else inventory), inventory
         native('unregister', 'marketplace', 'remove', market)
         assert kit.hashes(product) == before
-        assert kit.hashes(home / '.kkdesign-kit') == private_before
+        assert private_state(home / '.kkdesign-kit') == private_before
         assert sentinel.read_text() == 'Synthetic shared-state preservation sentinel\n'
         for relative in ('.agents/skills/kkdesign-kit', '.claude/skills/kkdesign-kit'):
             assert not (home / relative).exists()
@@ -184,8 +197,9 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--codex-ref', required=True)
     parser.add_argument('--claude-ref', required=True)
+    parser.add_argument('--claude-sha', required=True, help='Expected immutable distribution commit; checked before install')
     args = parser.parse_args()
-    probe(args.output, args.codex_ref, args.claude_ref)
+    probe(args.output, args.codex_ref, args.claude_ref, args.claude_sha)
 
 
 if __name__ == '__main__':

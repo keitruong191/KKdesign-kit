@@ -27,13 +27,14 @@ are required. For isolated testing use a clean HOME, USERPROFILE and CODEX_HOME;
 these commands otherwise affect the current native profile.
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/wwa11-codex-0.5.0a1
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 codex plugin list --json
 ```
 
-The branch is mutable. For immutable review use the distribution commit with
-`--ref` as recorded in [source provenance](marketplace-sources.md). The plugin
+This command pins the immutable distribution commit. The corresponding mutable
+review branch is `review/wwa11-codex-0.5.0a1`; both point at the snapshot in
+[source provenance](marketplace-sources.md). The plugin
 add marketplace argument is the catalog name, not its repository URL.
 
 Start a new session in the selected product project, then invoke:

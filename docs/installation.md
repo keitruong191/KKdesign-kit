@@ -10,7 +10,7 @@ native Git sources; the provider must already be installed. No manual source
 clone, build or Python installation is required to install the plugin.
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/wwa11-codex-0.5.0a1
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
 
@@ -19,7 +19,8 @@ claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
-The branches are mutable review channels. [Source provenance](marketplace-sources.md)
+Codex is pinned to an immutable snapshot. Claude uses a mutable review branch;
+verify its cloned revision before installing as described in the source record. [Source provenance](marketplace-sources.md)
 records immutable snapshots and provider pin limitations. Use the
 [Codex guide](codex-marketplace.md) or [Claude Code guide](claude-marketplace.md)
 for scope, discovery and removal. The [handoff](verification/onboarding.md)

@@ -18,6 +18,51 @@ snapshot/provenance record is in each distribution root's `PROVENANCE.json`;
 the final distribution commit IDs and native measurements are recorded in
 [verification](verification/marketplace-sources.md).
 
+## Immutable snapshots and artifact integrity
+
+Canonical build source: `a9a51940746e6940e038792a1e4a7e9f7e2d2587`.
+Both distribution commits are parentless generated snapshots, version `0.5.0a1`.
+
+| Provider | Immutable distribution commit | Deterministic builder ZIP SHA-256 |
+| --- | --- | --- |
+| Codex | `e108483e7756e3ad4167531b524667a5f0beadb9` | `5284c352873a37141e1f14584a130358093d04e1280ade085781b6d35e4fd582` |
+| Claude Code | `bea7e433f4f576068bcf2eec15317d7d73e5e065` | `e535ee44a5574d576fbb20ee2b2766e9fe23228a690a56a34342d5d11271e2a6` |
+
+Public provenance inventories:
+[Codex snapshot](https://github.com/keitruong191/KKdesign-kit/blob/e108483e7756e3ad4167531b524667a5f0beadb9/PROVENANCE.json),
+[Claude snapshot](https://github.com/keitruong191/KKdesign-kit/blob/bea7e433f4f576068bcf2eec15317d7d73e5e065/PROVENANCE.json).
+The ZIP hashes describe builder outputs; no GitHub release assets were created.
+
+Codex CLI 0.167.0 accepts `--ref e108483e7756e3ad4167531b524667a5f0beadb9`,
+and its native clone HEAD was verified against that commit. Claude Code 2.1.308
+accepts the named `#review/wwa11-claude-0.5.0a1` branch. It **rejects a raw SHA**
+in `#ref` with "Remote branch … not found". This is a measured client limitation,
+not an immutable pin. Do not replace it with a fake SHA-named branch.
+
+For Claude on the measured POSIX surface, register first and inspect the native
+clone before plugin install:
+
+```sh
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
+```
+
+Expected output: `bea7e433f4f576068bcf2eec15317d7d73e5e065`. Stop if it differs;
+ask the owner to review the new snapshot rather than treating the branch as
+pinned. Only after it matches, run:
+
+```sh
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
+claude plugin list --json
+```
+
+That check measures the native clone at registration time; it does not prevent
+future branch updates. Inspect HEAD again after marketplace update. A future
+provider with a true commit-pin mechanism needs its own native verification.
+Neither command registers a separate installation channel or requires users
+to clone/build source themselves. In a primary profile, they affect that profile;
+maintainer probes instead use fresh private homes/configs and copy no credentials.
+
 ## Provenance and maintenance
 
 The canonical workflow remains in the integration/task source branch. Each
