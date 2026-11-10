@@ -7,22 +7,17 @@ permission to release, tag, submit a listing or merge main.
 
 ## Publication observation
 
-Read-only checks on 2026-11-09 found no release entries in the public repository's
-[releases page](https://github.com/keitruong191/KKdesign-kit/releases) or GitHub
-releases API (`gh api repos/keitruong191/KKdesign-kit/releases` returned `[]`).
-The default-branch Claude catalog request returned HTTP 404. No remote tags
-were returned by `git ls-remote --tags origin`. These checks did not find an
-approved published marketplace source/version; they do not prove that every
-private catalog or provider directory was searched. No KKdesign official listing
-or publishing approval has been verified. Canonical review version: `0.5.0a1`.
+WWA-11 supersedes the historical WWA-10 no-source observation: author-operated
+review/prerelease sources now exist in the public repository for both providers,
+at version `0.5.0a1`. See [source provenance](../marketplace-sources.md) and
+[remote native evidence](marketplace-sources.md) for exact commands, immutable
+snapshots and measured pin limitations. The default branch is not the built
+marketplace. Review-channel availability does not establish production release
+approval, authenticated menu/Setup or observed non-dev usability.
 
-The maintainer must supply an approved reachable catalog source, immutable
-revision and matching package version, then verify clean native installation
-from that exact source for each provider. Only then replace the pending notice
-with that source/version, native installation steps and measured surfaces.
 A repo marketplace, OpenAI public directory, Anthropic Directory and
-claude-plugins-official are separate publication/review states. Do not dispatch
-legacy release workflows or invent a download URL to satisfy this handoff.
+claude-plugins-official are separate publication/review states. No release,
+tag, legacy release-workflow dispatch or official submission was performed.
 
 ## Available maintainer entrypoints
 
@@ -55,6 +50,7 @@ Actual installed-package execution probes:
 | `python -B scripts/smoke_posix_setup.py --incomplete-python '<absolute-Linux-interpreter>'` | Same native Linux smoke after independently confirming this actual system Python lacks venv or ensurepip. Do not fake the interpreter or remove system modules. |
 | `python -B scripts/smoke_windows_setup.py --inspect-artifacts` | Downloads and checks both pinned Windows archives and contents without executing Windows bytes; portable integrity only. |
 | `python -B scripts/smoke_windows_setup.py` | On each native Windows CPU: actual Windows PowerShell acquisition/helpers/reuse, spaces/CWD, trust rejection/preservation. Skips or syntax parsing on another OS are not Windows acceptance. |
+| `python -B scripts/smoke_remote_marketplaces.py --output '<new-outside-source>/remote' --codex-ref e108483e7756e3ad4167531b524667a5f0beadb9 --claude-ref review/wwa11-claude-0.5.0a1 --claude-sha bea7e433f4f576068bcf2eec15317d7d73e5e065` | Persistent public Git sources: separate clean profiles, exact clone revisions before install, enabled inventory/fresh discovery without model calls, real Setup/helpers and removal/preservation. See [results](marketplace-sources.md). |
 | `python -B scripts/smoke_native_lifecycle.py --output '<new-outside-source>/lifecycle'` | On native macOS/GNU Linux with both provider CLIs: isolated Git smart-HTTP marketplaces, native install/update/enable/disable/remove/reinstall, real shared runtimes and surviving consumers/project data. No model credentials or human interaction. |
 | `python -B scripts/smoke_standalone_migration.py` | POSIX relocated plugin Setup: actual synthetic managed migration, retained ledgers/backups/project data, both provider layouts. Historical copies are test fixtures, not fallback installation. |
 
@@ -103,12 +99,12 @@ Do not repeat the previously known unauthenticated menu failure as evidence.
 | Existing and broken cache | Repeat Setup, remove only a disposable owned test runtime, tamper a disposable receipt/library, change test requirements | Valid reuse; missing/incompatible runtime needs Setup/consent; changed/unowned cache rejected and retained, no arbitrary interpreter |
 | Duplicate copies and migration | Synthetic intact managed, modified and unmanaged user/project/ancestor copies; decline then separately authorize migration of every eligible copy | Exact versions/locations disclosed; separate migration consent; modified/unmanaged copies preserved; fresh-session discovery reflects completed moves |
 | Shared native lifecycle | Run lifecycle probe, then observe provider update/uninstall in agent | Same contract reuses; changed requirements need consent; enable/disable never provisions; other consumer, project data and private caches survive removal |
-| Non-dev usability — at least one participant | Ask someone unfamiliar with dev environments to follow README → native install → menu → Setup on an authorized measured surface, using only approved source once available | Observer records completion, prompts, assistance, misunderstandings and failure point; no runtime terminal homework; do not infer success from automated tests |
+| Non-dev usability — at least one participant | Ask someone unfamiliar with dev environments to follow README → native install → menu → Setup on an authorized measured surface, using the recorded review source and exact version | Observer records completion, prompts, assistance, misunderstandings and failure point; no runtime terminal homework; do not infer success from automated tests |
 | Live design tools | Authorize the specific external connection in a synthetic workspace, run the requested design/review operation | Read back saved structure and inspect render/playback as appropriate; runtime/schema checks alone do not establish live results or human design approval |
 
 Until these cases are observed, the [matrix](../compatibility.md) keeps the
-relevant combinations pending. Public non-dev onboarding also waits for the
-approved published source/version. A maintainer review observation may be
+relevant combinations pending. Production onboarding still waits for owner approval; the persistent review
+sources are now available for owner-arranged observation. A maintainer review observation may be
 recorded earlier but must name that limited source scope. No participant has
 been observed for WWA-10 yet; no improvement or usability pass is claimed.
 
@@ -145,7 +141,7 @@ what was actually observed and never imply publishing or design approval.
 
 | Criterion | Implementation/docs verdict | External acceptance |
 | --- | --- | --- |
-| Published source/version, provider-specific install/Setup/workflow | Native maintainer flows and exact discovered invocations documented; no invented public commands | Approved publication and exact public-source installation pending |
+| Published source/version, provider-specific install/Setup/workflow | Native maintainer flows and exact discovered invocations documented; no invented public commands | Review sources published and native installation recorded by WWA-11; production approval pending |
 | Truthful native matrix and separated channels/execution/tools | Consolidated measured macOS ARM64 evidence, implementation-only targets and channel boundaries | Other OS/CPU/surfaces and authenticated journeys pending |
 | Missing Python goes to agent Setup, no terminal or standalone fallback | README/install flow uses agent Setup and init; historical maintenance separated | Human observation pending |
 | Actionable consent/network/policy/write/runtime/duplicate errors | Recovery table and shared Setup/migration/lifecycle guides document real current behavior | Native denial/account observations on pending platforms remain pending |
@@ -153,5 +149,5 @@ what was actually observed and never imply publishing or design approval.
 
 No remaining integration API is delegated to a later backlog item: WWA-01–09
 supply packaging, runtime, trusted helpers, lifecycle and migration. Remaining
-work is owner review/publication and external acceptance, plus fixing any real
+work is owner production review and external acceptance, plus fixing any real
 defect those observations uncover. Code readiness is not release readiness.

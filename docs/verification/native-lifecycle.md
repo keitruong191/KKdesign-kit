@@ -1,5 +1,9 @@
 # WWA-08 native lifecycle verification
 
+Current persistent review sources and remote native install/discovery/removal
+are recorded in [WWA-11 verification](marketplace-sources.md). The older local
+transport and publication statements below describe this item's historical run.
+
 Implementation and coding verification are assessed separately from authenticated
 agent/native usability acceptance, under the owner's clarified acceptance policy.
 This item keeps lifecycle in the provider; it adds no update/rollback/uninstall

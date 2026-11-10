@@ -2,26 +2,45 @@
 
 ## Installation availability
 
-The sole distribution channel for new users is a provider-native marketplace
-plugin. **Public installation is pending**: no approved published marketplace
-source/version or public-directory listing is verified. `0.5.0a1` identifies the
-canonical review payload, not an available public release. Do not guess a URL
-or install from the default repository branch. The owner must publish and verify
-an exact source/revision and package version before adding user-ready commands.
+The distribution channel for new users is a provider-native marketplace plugin.
+Author-operated **review/prerelease** sources for version `0.5.0a1` are available
+in the existing public repository; production release approval and official
+listings remain pending. Git and HTTPS access to GitHub are needed for these
+native Git sources; the provider must already be installed. No manual source
+clone, build or Python installation is required to install the plugin.
 
-Maintainers can review actual packages now through the
-[Codex native flow](codex-marketplace.md) and
-[Claude Code native flow](claude-marketplace.md). Their placeholder sources refer
-to disposable reviewed catalogs, not live install endpoints. The
-[handoff](verification/onboarding.md) gives build/smoke commands and the remaining
-acceptance cases. No public standalone, curl, npm or Homebrew fallback is offered.
+```sh
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
+codex plugin add kkdesign-kit@kkdesign-kit-codex
+```
+
+```sh
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
+```
+
+On the measured POSIX surface, verify that the output is exactly
+`bea7e433f4f576068bcf2eec15317d7d73e5e065`. **Stop if it differs** and ask the
+owner to review that snapshot. The branch is mutable; this check is required
+before installation. Only after it matches, install:
+
+```sh
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
+```
+
+Codex is pinned to an immutable snapshot. Claude uses a mutable review branch;
+verify its cloned revision before installing as described in the source record. [Source provenance](marketplace-sources.md)
+records immutable snapshots and provider pin limitations. Use the
+[Codex guide](codex-marketplace.md) or [Claude Code guide](claude-marketplace.md)
+for scope, discovery and removal. The [handoff](verification/onboarding.md)
+tracks remaining authenticated/native human acceptance. No approved production
+release or directory listing is implied by this public review publication.
 
 ## In the installed agent
 
-1. In the provider's native plugin browser, select the owner-verified marketplace,
-   KKdesign-kit version and intended scope. Install using that provider's controls;
-   reopen the session when required. This step becomes user-ready only after
-   the publication and native acceptance above.
+1. In the provider's native plugin browser, select the review marketplace,
+   KKdesign-kit version and intended scope, or use the commands above. Install
+   using that provider's controls and reopen the session when required.
 2. Open `$kkdesign-kit:kkdesign-kit` in Codex or
    `/kkdesign-kit:kkdesign-kit` in Claude Code. The namespaced skill was observed
    in native discovery; authenticated menu rendering remains pending. The menu
@@ -45,7 +64,7 @@ acceptance cases. No public standalone, curl, npm or Homebrew fallback is offere
 
 | What you see | Next action |
 | --- | --- |
-| Marketplace/version cannot be found | Ask the maintainer for the approved published source, revision and version; public installation is currently pending. Do not guess download URLs. |
+| Marketplace/version cannot be found | Check the exact provider source/ref above, GitHub access and installed provider version; report a redacted error and the expected snapshot from the provenance record. Do not substitute the default branch. |
 | Skill/menu missing or multiple copies | Check the provider's installed/enabled inventory and selected scope, then open a fresh session. Give Setup the selected project so it can inspect user, project and ancestor duplicates. |
 | Consent declined or cancelled | Stop; no new runtime should be downloaded or executed. Choose Setup later if you decide to grant the disclosed permission. |
 | No local executor or host blocks execution | Use an authorized local provider surface or ask your administrator for an approved environment. Do not disable policy or change security settings. |
