@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["schemaVersion", "kind", "sources", "assets", "precedence", "overrides"],
+  "properties": {
+    "$schema": {"type": "string"},
+    "schemaVersion": {"const": "1.0.0"},
+    "kind": {"const": "source-registry"},
+    "precedence": {"const": "later-source-wins"},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "provider", "location", "revision", "contentHash", "capturedAt", "coverage", "limitations", "assets"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+          "provider": {"enum": ["local", "git", "figma"]},
+          "location": {"type": "string", "minLength": 1},
+          "revision": {"type": "string", "minLength": 1},
+          "contentHash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+          "capturedAt": {"type": "string", "format": "date-time"},
+          "coverage": {
+            "type": "object",
+            "required": ["tokens", "styles", "components", "variants", "modes"],
+            "additionalProperties": {"enum": ["available", "empty", "partial", "unavailable", "undeclared"]}
+          },
+          "limitations": {"type": "array", "items": {"type": "string"}},
+          "assets": {"$ref": "#/$defs/assets"},
+          "transport": {"enum": ["rest", "plugin-capture"]},
+          "selection": {
+            "type": "object",
+            "properties": {
+              "subdir": {"type": "string", "minLength": 1},
+              "nodeIds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "assets": {"$ref": "#/$defs/assets"},
+    "overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["category", "id", "fromSourceId", "toSourceId"],
+        "properties": {
+          "category": {"enum": ["tokens", "styles", "components", "variants", "modes"]},
+          "id": {"type": "string", "minLength": 1},
+          "fromSourceId": {"type": "string", "minLength": 1},
+          "toSourceId": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "required": ["id", "name", "sourceId", "data"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "name": {"type": "string", "minLength": 1},
+        "sourceId": {"type": "string", "minLength": 1},
+        "data": {"type": "object"}
+      },
+      "additionalProperties": false
+    },
+    "assets": {
+      "type": "object",
+      "required": ["tokens", "styles", "components", "variants", "modes"],
+      "properties": {
+        "tokens": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+        "styles": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+        "components": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+        "variants": {"type": "array", "items": {"$ref": "#/$defs/asset"}},
+        "modes": {"type": "array", "items": {"$ref": "#/$defs/asset"}}
+      },
+      "additionalProperties": false
+    }
+  }
+}
