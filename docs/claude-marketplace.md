@@ -25,6 +25,15 @@ CLAUDE_CONFIG_DIR; these commands otherwise affect the current native profile.
 
 ```sh
 claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
+```
+
+On the measured POSIX surface, verify that the output is exactly
+`bea7e433f4f576068bcf2eec15317d7d73e5e065`. **Stop if it differs** and ask the
+owner to review that snapshot. The branch is mutable; this check is required
+before installation. Only after it matches, install:
+
+```sh
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 claude plugin list --json
 ```

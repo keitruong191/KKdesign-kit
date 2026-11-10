@@ -14,8 +14,14 @@ their former implementation gaps.
 
 | OS / CPU | Provider surface and observed version | Native evidence | Still pending |
 | --- | --- | --- | --- |
-| macOS ARM64 | Codex CLI 0.167.0, public Git review marketplace | Install, app-server skill discovery, update, enable/disable, remove/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
-| macOS ARM64 | Claude Code CLI 2.1.308, public Git review marketplace | Install, real-session skill discovery, update, enable/disable, uninstall/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
+| macOS ARM64 | Codex CLI 0.167.0, public Git review marketplace | WWA-11 remote snapshot: register/install, enabled inventory, fresh app-server discovery, installed-cache Setup/helpers, remove/unregister and preservation. WWA-08 historical loopback: update, enable/disable, remove/reinstall and two-consumer runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
+| macOS ARM64 | Claude Code CLI 2.1.308, public Git review marketplace | WWA-11 remote snapshot: register/install, enabled inventory, fresh session-init discovery, installed-cache Setup/helpers, uninstall/unregister and preservation. WWA-08 historical loopback: update, enable/disable, uninstall/reinstall and two-consumer runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
+
+WWA-11 uses the immutable remote snapshots in the source record (Claude installs
+through a versioned branch whose native HEAD is verified first). Update,
+enable/disable and reinstall remain WWA-08 evidence from synthetic versioned
+loopback Git sources; those operations were not rerun against the published
+WWA-11 snapshots. The rows keep these transport/revision scopes separate.
 
 Sources: [persistent source verification](verification/marketplace-sources.md),
 [Codex discovery](verification/codex-marketplace.md),
