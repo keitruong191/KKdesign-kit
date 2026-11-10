@@ -2,6 +2,16 @@
 
 ## Unreleased — agent Setup and marketplace integration
 
+### Persistent marketplace review sources
+
+- Publish separate built Codex and Claude Code review snapshots in the existing
+  public repository, with canonical revision, artifact hashes and file inventory.
+- Replace source placeholders with native commands for actual review refs;
+  record immutable distribution revisions and provider ref/lifecycle limits.
+- Verify remote native install, fresh-session discovery, cache relocation and
+  removal in clean profiles; keep authenticated menu/human/platform acceptance
+  separate from review-source availability.
+
 ### Marketplace onboarding and acceptance handoff
 
 - Replace README/installation standalone acquisition with marketplace → agent
@@ -12,8 +22,8 @@
   full acceptance or treating helper checks as authenticated agent behavior.
 - Document actionable consent/network/policy/cache/conflict recovery and a
   practical native/publication/non-dev acceptance checklist with safe feedback.
-  No verified public source/version exists yet; owner publication/review and
-  observed usability remain pending rather than fabricated install commands.
+  Persistent review sources are now supplied by WWA-11; production approval and
+  observed usability remain pending.
 
 
 - Add internal macOS Setup without existing Python/Node, using pinned CPython

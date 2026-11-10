@@ -6,17 +6,27 @@ The skill includes command guides, Python helpers, schemas and synthetic example
 
 ## Get started
 
-**Marketplace publication is pending.** Version `0.5.0a1` is the canonical
-review package version, not a publicly installable release. There is currently
-no verified published KKdesign marketplace source/version to give users. The
-owner must approve and publish a source, then verify that exact version through
-the native provider flow before user installation instructions can name it.
-No release, marketplace endpoint or directory listing is claimed here.
+Version `0.5.0a1` is available from author-operated **review/prerelease**
+marketplaces in this public repository. These channels support owner/tester
+review; production release approval and official directory listings remain
+pending. Use the provider you already have, with Git and HTTPS access to GitHub:
 
-For maintainer review, use the [Codex](docs/codex-marketplace.md) or
-[Claude Code](docs/claude-marketplace.md) native packaging instructions and the
-[acceptance handoff](docs/verification/onboarding.md). These instructions use
-review packages and isolated profiles; they are not a second installation channel.
+```sh
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/wwa11-codex-0.5.0a1
+codex plugin add kkdesign-kit@kkdesign-kit-codex
+```
+
+```sh
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
+```
+
+These named Git branches are mutable review channels, not immutable pins.
+See [source provenance and snapshot revisions](docs/marketplace-sources.md)
+for the exact canonical/distribution commits, integrity and tested pin syntax.
+The default repository branch is not the built marketplace. No source clone or
+build is an end-user step. Use a separate provider profile for review if you
+already have another KKdesign installation.
 
 Once a reviewed plugin is installed in your authorized local provider session:
 

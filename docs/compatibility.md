@@ -1,9 +1,8 @@
 # Compatibility and measured support
 
 No full user-ready provider/OS combination has completed acceptance yet.
-Implementation and coding checks are ready for review; public marketplace
-publication, authenticated agent journeys and observed non-dev usability remain
-pending. Use [onboarding](installation.md) and the
+Author-operated review sources are published; authenticated agent journeys,
+production release approval and observed non-dev usability remain pending. Use [onboarding](installation.md) and the
 [acceptance handoff](verification/onboarding.md) for the exact remaining work.
 A passing schema, helper or CI job does not establish native support.
 
@@ -15,10 +14,11 @@ their former implementation gaps.
 
 | OS / CPU | Provider surface and observed version | Native evidence | Still pending |
 | --- | --- | --- | --- |
-| macOS ARM64 | Codex CLI 0.167.0, local repo marketplace | Install, app-server skill discovery, update, enable/disable, remove/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; public source/version; non-dev observation |
-| macOS ARM64 | Claude Code CLI 2.1.308, local repo marketplace | Install, real-session skill discovery, update, enable/disable, uninstall/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; public source/version; non-dev observation |
+| macOS ARM64 | Codex CLI 0.167.0, public Git review marketplace | Install, app-server skill discovery, update, enable/disable, remove/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
+| macOS ARM64 | Claude Code CLI 2.1.308, public Git review marketplace | Install, real-session skill discovery, update, enable/disable, uninstall/reinstall; direct installed-cache Setup/helpers and shared-runtime preservation | Authenticated menu → human consent → Setup → workflow; non-dev observation |
 
-Sources: [Codex discovery](verification/codex-marketplace.md),
+Sources: [persistent source verification](verification/marketplace-sources.md),
+[Codex discovery](verification/codex-marketplace.md),
 [Claude discovery](verification/claude-marketplace.md),
 [two-consumer native lifecycle](verification/native-lifecycle.md),
 [macOS acquisition](verification/macos-runtime.md), and
@@ -50,7 +50,7 @@ handoffs. Other OS/CPU combinations are unverified and are not advertised.
 | Channel or surface | Current status |
 | --- | --- |
 | Maintainer repo/local marketplace review | Real native CLI checks above; builders produce canonical version 0.5.0a1 for isolated review |
-| Public author-operated marketplace | No verified published source/version; owner publication and exact native install verification pending |
+| Public author-operated marketplace | Version 0.5.0a1 review sources published; immutable provenance and exact remote native checks in [source verification](verification/marketplace-sources.md); production approval pending |
 | OpenAI public directory | No approved/published KKdesign listing verified; local-execution eligibility/review is separate from repo CLI checks |
 | Anthropic Directory / claude-plugins-official | Neither listing is verified; separate submission/review routes, neither implied by a private marketplace |
 | Codex IDE, desktop app, cloud and other Claude surfaces | No KKdesign native evidence here; do not infer coverage from CLI or another product's support |

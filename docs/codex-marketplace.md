@@ -15,27 +15,26 @@ acquire pinned Python internally without Python/Node on PATH; see
 Plugin loaded, runtime readiness and external tools unverified remain separate.
 Windows PowerShell acquisition is implemented with [native acceptance pending](verification/windows-runtime.md).
 Python-free helper startup uses the [verified OS entrypoints](../references/helpers.md); native end-to-end acceptance remains pending;
-this is not a public release or official listing.
+this review channel is not a production release or official listing.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
 ## Native maintainer review
 
-**User-ready publication is pending.** Version `0.5.0a1` is the local review
-payload. `<reviewed-marketplace-source>` below is a maintainer-supplied isolated
-catalog, not a published URL. See [onboarding](installation.md) and the measured
-[support matrix](compatibility.md); do not install from a guessed default-branch
-source or treat local review as public availability.
+Version `0.5.0a1` is available for owner/tester review from the persistent
+Git source below. This is an author-operated review/prerelease channel, not a
+production release or official directory listing. Git and GitHub HTTPS access
+are required. For isolated testing use a clean HOME, USERPROFILE and CODEX_HOME;
+these commands otherwise affect the current native profile.
 
-Use a clean isolated HOME and CODEX_HOME with a reviewed marketplace source.
-No published marketplace endpoint or public-directory approval is claimed.
-Register the source using native controls (the marketplace argument to plugin
-add is its name, not its repository URL):
-
-```text
-codex plugin marketplace add <reviewed-marketplace-source>
+```sh
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/wwa11-codex-0.5.0a1
 codex plugin add kkdesign-kit@kkdesign-kit-codex
-codex plugin list
+codex plugin list --json
 ```
+
+The branch is mutable. For immutable review use the distribution commit with
+`--ref` as recorded in [source provenance](marketplace-sources.md). The plugin
+add marketplace argument is the catalog name, not its repository URL.
 
 Start a new session in the selected product project, then invoke:
 
