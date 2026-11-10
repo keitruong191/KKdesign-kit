@@ -30,7 +30,12 @@
     "prototype",
     "learn",
     "extracted-package-verification",
-    "managed-helper-runtime"
+    "managed-helper-runtime",
+    "agent-setup-consent",
+    "macos-python-bootstrap",
+    "linux-python-bootstrap",
+    "windows-python-bootstrap",
+    "standalone-migration"
   ],
   "planned": [
     "optional-hooks"
@@ -67,6 +72,7 @@
     "requirements.txt",
     "agents/openai.yaml",
     "references/commands.md",
+    "references/setup.md",
     "references/project-kit.md",
     "references/design.md",
     "references/review.md",
@@ -78,6 +84,7 @@
     "references/review/report-template.md",
     "docs/review-attribution.md",
     "docs/compatibility.md",
+    "docs/claude-marketplace.md",
     "examples/review/flawed-design.json",
     "examples/review/expected-findings.json",
     "schemas/task.schema.json",
@@ -93,6 +100,12 @@
     "scripts/kkdesign_task.py",
     "scripts/kkdesign_review.py",
     "scripts/kkdesign_learn.py",
-    "scripts/figma_prototype.js"
+    "scripts/figma_prototype.js",
+    "docs/codex-marketplace.md",
+    "scripts/kkdesign_setup.py",
+    "scripts/kkdesign_setup_posix.sh",
+    "scripts/kkdesign_setup_windows.ps1",
+    "scripts/kkdesign_windows_security.ps1",
+    "scripts/kkdesign_migration.py"
   ]
 }

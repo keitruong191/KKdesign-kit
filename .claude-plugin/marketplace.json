@@ -1,0 +1,12 @@
+{
+  "name": "kkdesign-kit-marketplace",
+  "owner": {"name": "KKdesign-kit contributors"},
+  "plugins": [
+    {
+      "name": "kkdesign-kit",
+      "source": "./",
+      "version": "0.5.0a1",
+      "description": "Design workflows. Explicit agent Setup required; publication and native acceptance tracked separately."
+    }
+  ]
+}

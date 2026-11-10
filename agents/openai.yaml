@@ -1,4 +1,4 @@
 interface:
   display_name: "KKdesign-kit"
   short_description: "Portable design-kit menu and project contracts"
-  default_prompt: "Use $kkdesign-kit to show the command menu and availability."
+  default_prompt: "Open this skill to show the command menu and availability."

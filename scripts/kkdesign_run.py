@@ -6,20 +6,41 @@ import subprocess
 import sys
 
 sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import kkdesign_install as installer
+import kkdesign_setup as setup
 
 HELPERS = ('kkdesign_core', 'kkdesign_project', 'kkdesign_sources', 'kkdesign_task',
            'kkdesign_review', 'kkdesign_learn', 'kkdesign_install', 'materialize_example')
 
 
 def main():
-    if len(sys.argv) < 2 or sys.argv[1] not in HELPERS:
-        sys.stderr.write('Usage: python3 kkdesign_run.py {' + ','.join(HELPERS) + '} [arguments]\n')
-        return 2
+    explicit = len(sys.argv) > 1 and sys.argv[1] == '--package-root'
     root = Path(__file__).resolve().parent.parent
-    python = Path(sys.executable)
+    if explicit:
+        if len(sys.argv) < 4:
+            raise ValueError('An absolute package root and helper are required')
+        package = setup.package_root(Path(sys.argv[2]))
+        if package != root:
+            raise ValueError('Package root must own this dispatcher')
+        del sys.argv[1:3]
+    if len(sys.argv) < 2 or sys.argv[1] not in HELPERS:
+        sys.stderr.write('Usage: kkdesign_run.py [--package-root ABSOLUTE_SKILL_DIR] {' + ','.join(HELPERS) + '} [arguments]\n')
+        return 2
+    plugin_roots = [root]
+    if root.parent.name == 'skills':
+        plugin_roots.append(root.parent.parent)
+    is_plugin = explicit or any((plugin_root / name).is_file() for plugin_root in plugin_roots
+                    for name in ('.claude-plugin/plugin.json', '.codex-plugin/plugin.json', 'plugin.json'))
+    if is_plugin:
+        runtime = setup.trusted_runtime(Path.home(), (root / 'requirements.txt').read_bytes())
+        if runtime is None:
+            raise ValueError('Setup required: open the installed skill and choose Setup. No helper was run.')
+        python = installer.runtime_python(runtime)
+    else:
+        python = Path(sys.executable)
     adapter = root.parent.parent.name
-    if root.parent.name == 'skills' and adapter in installer.ADAPTERS.values():
+    if not is_plugin and root.parent.name == 'skills' and adapter in installer.ADAPTERS.values():
         base = root.parents[2]
         harness = next(key for key, value in installer.ADAPTERS.items() if value == adapter)
         state = base / '.kkdesign-kit/installations' / harness
@@ -44,7 +65,7 @@ def main():
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
     env.pop('PYTHONHOME', None)
     env.pop('PYTHONPATH', None)
-    return subprocess.call([str(python), '-B', str(root / 'scripts' / (sys.argv[1] + '.py')),
+    return subprocess.call([str(python), '-I', '-B', str(root / 'scripts' / (sys.argv[1] + '.py')),
                             *sys.argv[2:]], env=env)
 
 
@@ -53,4 +74,6 @@ if __name__ == '__main__':
         sys.exit(main())
     except (OSError, ValueError, KeyError) as exc:
         sys.stderr.write(str(exc) + '\n')
+        if isinstance(exc, setup.SetupError):
+            sys.stderr.write('Setup/repair required: ' + exc.action + '\n')
         sys.exit(1)

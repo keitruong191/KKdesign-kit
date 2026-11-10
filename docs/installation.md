@@ -1,163 +1,93 @@
-# Install and maintain KKdesign-kit
+# Marketplace onboarding and troubleshooting
 
-Requires Python 3.9+ on macOS, Linux or Windows and a separately installed,
-authenticated Codex CLI or Claude Code. Bootstrap and installer use only the
-Python standard library; the workflow runtime installs `requirements.txt`
-dependencies into an environment outside the skill. Runtime provisioning needs
-working `venv`/`ensurepip` and network/package-index access. Nothing installs
-Hoangsa, Impeccable, hooks or MCP configuration. See
-[compatibility](compatibility.md) for verification limits.
+## Installation availability
 
-## Bootstrap and manual installation
-
-The one-command bootstrap and public release are pending PR approval and
-release. No public URL is ready, so do not use a guessed `curl` command. Once
-the versioned ZIP and `.sha256` are actually published, add the exact pinned
-command here only after smoke-testing that exact command against the public
-artifact. The upcoming version is `0.5.0a1`; that does not mean it is available.
-
-For source acquisition into a new path:
+The distribution channel for new users is a provider-native marketplace plugin.
+Author-operated **review/prerelease** sources for version `0.5.0a1` are available
+in the existing public repository; production release approval and official
+listings remain pending. Git and HTTPS access to GitHub are needed for these
+native Git sources; the provider must already be installed. No manual source
+clone, build or Python installation is required to install the plugin.
 
 ```sh
-git clone https://github.com/keitruong191/KKdesign-kit.git "$HOME/KKdesign-kit-source"
-cd "$HOME/KKdesign-kit-source"
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
+codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
-
-Use the reviewed revision containing this installer change (PR reviewers: check
-out the PR branch). Never overwrite an existing checkout. The source directory
-contains the installer; `--project` selects only the destination, not where to
-find `scripts/` or `requirements.txt`.
-
-For a usable local-source route from the checkout root (or manual route after
-acquiring and extracting the trusted portable ZIP), install with the standard
-library installer:
 
 ```sh
-python3 -I -B scripts/kkdesign_install.py install --harness codex --scope project --project "/path/to/project with spaces" --runtime
-python3 -I -B scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/project with spaces"
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
 ```
 
-To acquire manually after release, obtain the versioned portable
-`kkdesign-kit-0.5.0a1.zip` and matching `.sha256` from a trusted release. Verify
-the ZIP checksum, extract it, then `cd` into its `kkdesign-kit/` directory and
-run the same installer commands. Quote paths containing spaces. On Windows use
-`py -3 -I -B scripts\kkdesign_install.py ...` with quoted native paths. Python
-3.9+ is required; if `python` points at Python 2 or is unavailable, use
-`python3` (macOS/Linux) or `py -3` (Windows). `curl` and network access are
-needed for bootstrap artifact retrieval; manual acquisition can use a browser.
-
-Select one harness and scope explicitly. Use `--harness claude-code` for Claude
-Code, or `--scope user` for a personal installation. The shell bootstrap takes
-`--harness`, `--scope`, and `--project`; its default is project scope at the
-current working directory. Run there, or pass an explicit quoted `--project`.
-The bootstrap performs an install; use the installer lifecycle commands below to update existing
-installations.
-`--runtime` provisions dependencies in the user's private cache at
-`~/.kkdesign-kit/runtimes/<requirements-sha256>/`, outside the destination
-repository and hash-managed skill. Both scopes need a writable user home.
-Bootstrap always enables this option; the stdlib manual installer keeps it
-optional. Without a recorded runtime, the launcher uses its current Python
-interpreter, which must already have `requirements.txt` installed. This also
-applies after updating a manual installation from `0.4.0a1`. No activation is
-needed. An explicitly recorded but mismatched/missing runtime is an error,
-never a reason to silently fall back to another interpreter.
-
-| Harness | User scope | Project scope | Invoke after restarting harness |
-|---|---|---|---|
-| Codex | `~/.agents/skills/kkdesign-kit` | `<project>/.agents/skills/kkdesign-kit` | `$kkdesign-kit` |
-| Claude Code | `~/.claude/skills/kkdesign-kit` | `<project>/.claude/skills/kkdesign-kit` | `/kkdesign-kit` |
-
-Restart the agent in the intended product project after installation. Bare
-invocation displays the command menu; use `$kkdesign-kit init` or
-`/kkdesign-kit init` to invoke a route. Menu availability is not a guarantee
-that the harness discovered the skill or that live design tools are ready.
-Codex gets display metadata from `agents/openai.yaml`; Claude Code uses the
-canonical frontmatter and native slash invocation. No plugin, settings merge or
-hook adapter is enabled.
-
-The installed `kkdesign_run.py` launcher resolves helpers relative to the
-absolute installed `SKILL_DIR`, never product CWD. Invoke it as
-`python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" HELPER args...`, with helper
-name without `.py`; no activation is needed.
-
-## Inspect, update, rollback, uninstall
-
-Use the same `--harness`, `--scope`, `--project` (and `--home` if overridden)
-for lifecycle operations:
+On the measured POSIX surface, verify that the output is exactly
+`bea7e433f4f576068bcf2eec15317d7d73e5e065`. **Stop if it differs** and ask the
+owner to review that snapshot. The branch is mutable; this check is required
+before installation. Only after it matches, install:
 
 ```sh
-python3 -I -B scripts/kkdesign_install.py inspect --harness codex --scope project --project "/path/to/project with spaces"
-python3 -I -B scripts/kkdesign_install.py update --harness codex --scope project --project "/path/to/project with spaces" --source "/path/to/new extracted/kkdesign-kit"
-python3 -I -B scripts/kkdesign_install.py rollback --harness codex --scope project --project "/path/to/project with spaces"
-python3 -I -B scripts/kkdesign_install.py uninstall --harness codex --scope project --project "/path/to/project with spaces"
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
-Identical payload bytes are unchanged; a different payload uses `update`.
-Updates retain one previous version. Rollback swaps current and previous, so it
-can be undone. Managed runtime environments live only in the user's private
-cache, shared across harnesses/projects with the same requirements. Project
-markers and project-supplied executable paths are not trusted as provenance.
-State records the corresponding trusted runtime; runtime-enabled updates and
-rollback reuse or provision it under a shared cache lock before commit.
-Uninstall removes owned skill/state records but deliberately retains the shared
-user cache. Remove a retained runtime manually only after confirming no other
-installation needs it. Project DESIGN.md, lessons, profiles, task
-history, unrelated settings and credentials are not managed.
+Codex is pinned to an immutable snapshot. Claude uses a mutable review branch;
+verify its cloned revision before installing as described in the source record. [Source provenance](marketplace-sources.md)
+records immutable snapshots and provider pin limitations. Use the
+[Codex guide](codex-marketplace.md) or [Claude Code guide](claude-marketplace.md)
+for scope, discovery and removal. The [handoff](verification/onboarding.md)
+tracks remaining authenticated/native human acceptance. No approved production
+release or directory listing is implied by this public review publication.
 
-The uninstall result reports `runtimeReady: false` and, when a cache exists,
-`retainedRuntimeRoot` to identify the preserved directory. The installer does
-not erase the external environment; manual removal is safe only after confirming
-it is no longer shared or needed.
+## In the installed agent
 
-The managed target is the harness skill directory in the table above. Installer
-ownership and lifecycle state are kept outside that discovery directory under
-`<BASE>/.kkdesign-kit/installations/<harness>/`, including `state.json` and
-`previous/`. Runtime bytes and creation markers live separately in the private
-user cache `~/.kkdesign-kit/runtimes/`, never in project installation state.
-Project-scope writes therefore include that user cache as well as the selected
-project's skill and ledger; personal scope uses the user base for both.
+1. In the provider's native plugin browser, select the review marketplace,
+   KKdesign-kit version and intended scope, or use the commands above. Install
+   using that provider's controls and reopen the session when required.
+2. Open `$kkdesign-kit:kkdesign-kit` in Codex or
+   `/kkdesign-kit:kkdesign-kit` in Claude Code. The namespaced skill was observed
+   in native discovery; authenticated menu rendering remains pending. The menu
+   includes Setup and reads instructions without Python or runtime provisioning.
+3. Choose the corresponding `Setup` command and your product project. The agent
+   checks the environment and distinguishes plugin loaded, runtime/helpers
+   readiness and external design-tool connection. If acquisition is needed it
+   explains what will be downloaded, the exact private user cache, network/write
+   access and execution, then waits for your permission. Declining stops it.
+4. Setup prepares pinned Python and dependencies internally, or verifies and
+   reuses compatible caches. No Python installation, terminal runtime commands,
+   environment activation or system settings changes are user steps. Only actual
+   helper validation allows a ready result. See [measured platform limits](compatibility.md).
+5. Choose `$kkdesign-kit:kkdesign-kit init` or
+   `/kkdesign-kit:kkdesign-kit init`. Give the agent the selected project and
+   [source configuration](source-adapters.md). Review the staged plan before
+   authorizing apply. Then choose a design/review workflow. Connect and authorize
+   external design tools separately when the workflow needs them.
 
-SHA-256 covers the installed skill tree and the transport checksum covers the
-ZIP. They detect corruption or modification but are not publisher signatures
-and do not establish authenticity. Acquire from a trusted source.
+## When something stops
 
-## Conflicts and troubleshooting
+| What you see | Next action |
+| --- | --- |
+| Marketplace/version cannot be found | Check the exact provider source/ref above, GitHub access and installed provider version; report a redacted error and the expected snapshot from the provenance record. Do not substitute the default branch. |
+| Skill/menu missing or multiple copies | Check the provider's installed/enabled inventory and selected scope, then open a fresh session. Give Setup the selected project so it can inspect user, project and ancestor duplicates. |
+| Consent declined or cancelled | Stop; no new runtime should be downloaded or executed. Choose Setup later if you decide to grant the disclosed permission. |
+| No local executor or host blocks execution | Use an authorized local provider surface or ask your administrator for an approved environment. Do not disable policy or change security settings. |
+| Download/package-index/network failure | Restore approved network/proxy access with your administrator, then retry Setup after resolving the cause. Do not switch installation channels. |
+| User cache cannot be written | Ask for writable storage owned by your user and report the redacted diagnostic. Do not use sudo/admin or change system Python/PATH. |
+| Runtime missing, changed, incompatible or unowned | Stop helper execution and choose Setup for diagnosis. A missing compatible cache needs fresh consent; suspicious existing caches need owner inspection and are preserved. Never trust a project-provided executable or delete unknown folders. |
+| Duplicate standalone installation | Setup lists verifiable ownership, locations and versions. Intact managed copies need separate migration consent for every copy; modified/unmanaged copies remain untouched for owner inspection. Refusal preserves them. Restart the provider after completed migration. |
+| Busy/interrupted operation | Preserve locks, caches, copies and migration archives for owner inspection; do not delete a lock while an owner may be active. |
+| Helpers ready, design tools unavailable | Connect/authenticate the design tool separately and grant only the needed project access. Runtime checks do not prove live rendering or human approval. |
 
-- `inspect` reports absent, managed, modified or unmanaged conflict and same-name
-  user/ancestor-project installs. Inspect conflicts before install/update/rollback;
-  admin-managed paths and external harness search roots may require checking in
-  the harness discovery UI.
-- No force-overwrite: move an unmanaged conflict safely or preserve local edits
-  outside the managed skill. A modified backup blocks lifecycle mutations.
-- If invoked from the wrong CWD, use the absolute installed `SKILL_DIR` and the
-  launcher; never construct `../scripts/...` paths from the product directory.
-- On Linux, the Python installation must include working `venv` and `ensurepip`
-  support (some distributions package these separately). If environment
-  activation fails, do not cascade through guessed activation paths: the
-  installed launcher uses the recorded runtime without activation. Resolve
-  missing provisioning prerequisites directly; never use `sudo` for a
-  user/project install.
-- If Python is missing or resolves to Python 2, use `python3` on macOS/Linux or
-  `py -3` on Windows. Runtime provisioning can fail if `venv`/`ensurepip` or
-  network/package-index access is unavailable; resolve that prerequisite rather
-  than activating arbitrary environments or suppressing the failure.
-- A path using `../` may require write permission on its parent directory.
-  Choose a project path you own or request the needed permission; do not retry
-  with `sudo`, which can create root-owned state and bypass normal user scope.
-- Symlinked installation ancestors or payload files are rejected. Choose a real
-  directory rather than a linked home/project path.
-- A managed runtime from an older, unreleased bootstrap under project
-  installation state is not trusted or reused. Preserve that directory for
-  inspection; do not redirect the launcher to it or copy its marker into the
-  user cache. Project-scope managed runtime provisioning refuses a destination
-  containing the private user-cache path; select a separate project instead.
-- Locking prevents concurrent mutations. After interruption preserve and inspect
-  target, `state.json`, `previous/`, staging and lock before recovery. Remove a
-  stale lock only after confirming no installer is running; staging can contain
-  recoverable previous data.
-- Skill not found: restart, check the native path, inspect conflicts, and check
-  workspace trust/managed policy. Installer success alone does not prove
-  discovery. Cloud harnesses and Desktop syncing are outside this CLI.
-- Missing external design tools are not installation failures. See
-  [project-kit lifecycle](project-kits.md); source reads do not certify live
-  rendering, accessibility, performance or human approval.
+Report the plugin version/revision, provider version/surface, OS/CPU, step and
+redacted error code using the [feedback template](verification/onboarding.md#feedback-record).
+Do not send tokens, private source IDs, personal paths, customer data or raw logs.
+
+## Updates and removal
+
+Use the provider's native update, enable/disable and uninstall controls in the
+provider guide. After an update and required restart, choose Setup to recheck
+compatibility. Matching requirements/runtime contracts reuse verified caches;
+changes request consent for a separate cache. Install/update/enable never grants
+that consent. Uninstall preserves project design data, lessons, task history and
+private shared runtime/bootstrap caches; provider cache retention is host-owned.
+Reinstall checks those caches again rather than trusting directory existence.
+
+Existing standalone maintenance is documented separately in
+[historical maintenance](legacy-maintenance.md). It does not manage native plugins.

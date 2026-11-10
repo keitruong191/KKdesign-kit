@@ -13,10 +13,10 @@ The installed launcher uses the provisioned external runtime without activation.
 Source config paths resolve relative to the config file, not the shell CWD.
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project init --project /chosen/project --sources /chosen/project/sources.json
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project plan --project /chosen/project --plan <PLAN_ID>
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project /chosen/project --plan <PLAN_ID>
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project validate --project /chosen/project
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project init --project /chosen/project --sources /chosen/project/sources.json
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project plan --project /chosen/project --plan <PLAN_ID>
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project apply --project /chosen/project --plan <PLAN_ID>
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project validate --project /chosen/project
 ```
 
 `init` scans declared sources and stages a plan. Inspect per-file changes,
@@ -85,9 +85,9 @@ Use scoped canonical lessons and review decisions before design execution.
 ## Refresh and migration
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project refresh --project /chosen/project --sources /chosen/project/sources.json
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project plan --project /chosen/project --plan <PLAN_ID>
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project apply --project /chosen/project --plan <PLAN_ID>
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project refresh --project /chosen/project --sources /chosen/project/sources.json
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project plan --project /chosen/project --plan <PLAN_ID>
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project apply --project /chosen/project --plan <PLAN_ID>
 ```
 
 An unchanged scan is idempotent: capture time alone is not a new revision. A
@@ -107,8 +107,8 @@ source declarations should move with the project or be explicitly migrated.
 ## Errors, interrupted writes and rollback
 
 ```sh
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project recover --project /chosen/project
-python3 -B "$SKILL_DIR/scripts/kkdesign_run.py" kkdesign_project rollback --project /chosen/project
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project recover --project /chosen/project
+/bin/sh "$SKILL_DIR/scripts/kkdesign_setup_posix.sh" --package-root "$SKILL_DIR" --helper kkdesign_project rollback --project /chosen/project
 ```
 
 Missing access and unsupported input must fail before mutation. Partial source

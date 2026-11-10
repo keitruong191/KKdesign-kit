@@ -21,7 +21,9 @@ DIRECTORIES = ('agents', 'references', 'docs', 'schemas', 'templates', 'examples
 SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
            'kkdesign_sources.py', 'figma_capture.js', 'materialize_example.py',
            'kkdesign_task.py', 'kkdesign_review.py', 'kkdesign_learn.py',
-           'figma_prototype.js', 'kkdesign_run.py')
+           'figma_prototype.js', 'kkdesign_run.py', 'kkdesign_setup.py',
+           'kkdesign_setup_posix.sh', 'kkdesign_setup_windows.ps1',
+           'kkdesign_windows_security.ps1', 'kkdesign_migration.py')
 
 
 def canonical(path):
@@ -39,7 +41,8 @@ def write_json(path, value):
 
 def no_links(path):
     for part in (path, *path.parents):
-        if part.is_symlink():
+        if part.is_symlink() or (os.name == 'nt' and part.exists()
+                                 and part.lstat().st_file_attributes & 0x400):
             raise ValueError('Symlink conflict: ' + str(part))
 
 
@@ -192,8 +195,13 @@ def runtime_root(home):
     return home / '.kkdesign-kit' / 'runtimes'
 
 
-def runtime_path(home, requirements):
-    return runtime_root(home) / hashlib.sha256(requirements).hexdigest()
+def runtime_path(home, requirements, contract=None):
+    digest = hashlib.sha256(requirements).hexdigest()
+    # Native contract namespaces coexist: updating one consumer must never
+    # overwrite a cache still used by another provider/version. Legacy
+    # standalone paths retain their historical dependency-only identity.
+    name = digest if contract is None else 'contract-' + str(contract) + '-' + digest
+    return runtime_root(home) / name
 
 
 def runtime_python(runtime):
@@ -204,8 +212,19 @@ def run_runtime(command):
     env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1')
     env.pop('PYTHONHOME', None)
     env.pop('PYTHONPATH', None)
-    result = subprocess.run([str(arg) for arg in command], env=env,
-                            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if '-m' in command and command[command.index('-m') + 1] == 'pip':
+        # User pip configuration must not redirect cache provisioning into a
+        # project, user site or system prefix. Network/index environment remains
+        # available for approved enterprise access; never change its config.
+        for name in ('PIP_TARGET', 'PIP_PREFIX', 'PIP_USER', 'PYTHONUSERBASE'):
+            env.pop(name, None)
+        env['PIP_CONFIG_FILE'] = os.devnull
+        env['PIP_REQUIRE_VIRTUALENV'] = 'true'
+    try:
+        result = subprocess.run([str(arg) for arg in command], env=env,
+                                stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, timeout=180)
+    except subprocess.TimeoutExpired as exc:
+        raise ValueError('Runtime command timed out; check network or local execution policy before retrying') from exc
     if result.returncode:
         raise ValueError('Runtime command failed: ' + str(command[0]) + '\n' +
                          result.stdout + result.stderr)
@@ -213,16 +232,16 @@ def run_runtime(command):
 
 
 @contextmanager
-def prepared_runtime(home, requirements):
+def prepared_runtime(home, requirements, contract=None):
     """Build/reuse only a user-private cache; project markers prove no provenance."""
     root = runtime_root(home)
-    runtime = runtime_path(home, requirements)
+    runtime = runtime_path(home, requirements, contract)
     no_links(runtime)
     root.mkdir(mode=0o700, parents=True, exist_ok=True)
     # Different installations can share this cache. Hold its lock through smoke
     # and ledger commit so failed creation cannot remove a runtime another uses.
     with locked(root):
-        marker = {'identifier': IDENTIFIER, 'requirementsSha256': runtime.name}
+        marker = {'identifier': IDENTIFIER, 'requirementsSha256': hashlib.sha256(requirements).hexdigest()}
         created = False
         if runtime.exists():
             no_links(runtime / 'runtime.json')

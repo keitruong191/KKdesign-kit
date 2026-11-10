@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Opt-in live B2 init/refresh probe in a disposable synthetic project.
+"""Historical standalone maintainer probe; not a marketplace helper entrypoint.
+
+Opt-in live B2 init/refresh probe in a disposable synthetic project.
 
 Raw output is private and must stay outside the checkout. Authentication is
 copied only from explicit files and removed with the temporary home. The model
