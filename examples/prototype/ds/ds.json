@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "tokens": [
+    {"id": "color.canvas", "name": "Canvas", "data": {"$type": "color", "$value": "#F5F7FA"}},
+    {"id": "color.surface", "name": "Surface", "data": {"$type": "color", "$value": "#FFFFFF"}},
+    {"id": "color.text.primary", "name": "Primary text", "data": {"$type": "color", "$value": "#182230"}},
+    {"id": "color.text.muted", "name": "Muted text", "data": {"$type": "color", "$value": "#596579"}},
+    {"id": "color.brand", "name": "Brand", "data": {"$type": "color", "$value": "#2457A6"}},
+    {"id": "color.border", "name": "Border", "data": {"$type": "color", "$value": "#D7DEE8"}},
+    {"id": "color.feedback.success", "name": "Success", "data": {"$type": "color", "$value": "#176B45"}},
+    {"id": "color.feedback.error", "name": "Error", "data": {"$type": "color", "$value": "#A33232"}},
+    {"id": "space.1", "name": "Space 1", "data": {"$type": "dimension", "$value": "4px"}},
+    {"id": "space.2", "name": "Space 2", "data": {"$type": "dimension", "$value": "8px"}},
+    {"id": "space.3", "name": "Space 3", "data": {"$type": "dimension", "$value": "12px"}},
+    {"id": "space.4", "name": "Space 4", "data": {"$type": "dimension", "$value": "16px"}},
+    {"id": "space.6", "name": "Space 6", "data": {"$type": "dimension", "$value": "24px"}},
+    {"id": "space.8", "name": "Space 8", "data": {"$type": "dimension", "$value": "32px"}},
+    {"id": "radius.control", "name": "Control radius", "data": {"$type": "dimension", "$value": "8px"}},
+    {"id": "radius.card", "name": "Card radius", "data": {"$type": "dimension", "$value": "12px"}},
+    {"id": "type.family.ui", "name": "UI type family", "data": {"$type": "fontFamily", "$value": "Arial, sans-serif"}},
+    {"id": "type.size.body", "name": "Body size", "data": {"$type": "dimension", "$value": "16px"}},
+    {"id": "type.size.label", "name": "Label size", "data": {"$type": "dimension", "$value": "14px"}},
+    {"id": "type.size.title", "name": "Title size", "data": {"$type": "dimension", "$value": "28px"}},
+    {"id": "type.weight.regular", "name": "Regular weight", "data": {"$type": "fontWeight", "$value": 400}},
+    {"id": "type.weight.strong", "name": "Strong weight", "data": {"$type": "fontWeight", "$value": 600}}
+  ],
+  "styles": [
+    {"id": "text.body", "name": "Body", "data": {"fontFamily": "Arial, sans-serif", "fontSize": 16, "fontWeight": 400, "lineHeight": 1.5, "color": "{color.text.primary}"}},
+    {"id": "text.label", "name": "Form label", "data": {"fontFamily": "Arial, sans-serif", "fontSize": 14, "fontWeight": 600, "lineHeight": 1.4, "color": "{color.text.primary}"}},
+    {"id": "text.page-title", "name": "Page title", "data": {"fontFamily": "Arial, sans-serif", "fontSize": 28, "fontWeight": 600, "lineHeight": 1.2, "color": "{color.text.primary}"}}
+  ],
+  "components": [
+    {"id": "button.primary", "name": "Primary Button", "data": {"kind": "button", "synthetic": true, "description": "High-emphasis action; 44px minimum height; brand fill; white text; control radius.", "tokens": ["color.brand", "space.4", "radius.control", "type.size.label", "type.weight.strong"]}},
+    {"id": "textfield.default", "name": "Default Text Field", "data": {"kind": "textfield", "synthetic": true, "description": "Labeled editable field; surface fill; border; 44px minimum height; control radius.", "tokens": ["color.surface", "color.border", "color.text.primary", "space.3", "radius.control", "type.size.body"]}},
+    {"id": "card.default", "name": "Default Card", "data": {"kind": "card", "synthetic": true, "description": "Surface container with subtle border and card radius.", "tokens": ["color.surface", "color.border", "space.6", "radius.card"]}}
+  ],
+  "variants": [
+    {"id": "button.primary/default", "name": "Primary Button Default", "data": {"componentId": "button.primary", "properties": {"state": "default", "emphasis": "primary"}}},
+    {"id": "textfield.default/empty", "name": "Text Field Empty", "data": {"componentId": "textfield.default", "properties": {"state": "empty"}}},
+    {"id": "textfield.default/filled", "name": "Text Field Filled", "data": {"componentId": "textfield.default", "properties": {"state": "filled"}}},
+    {"id": "card.default/content", "name": "Card With Content", "data": {"componentId": "card.default", "properties": {"content": "request-summary"}}}
+  ],
+  "modes": [
+    {"id": "theme.light", "name": "Light theme", "data": {"color.canvas": "{color.canvas}", "color.surface": "{color.surface}", "color.text.primary": "{color.text.primary}", "color.text.muted": "{color.text.muted}", "color.brand": "{color.brand}", "color.border": "{color.border}"}}
+  ]
+}

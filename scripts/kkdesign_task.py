@@ -12,7 +12,7 @@ sys.dont_write_bytecode = True
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'scripts'))
-from kkdesign_core import build_lesson_index, load, schema_errors
+from kkdesign_core import _validate_web_artifacts, build_lesson_index, load, schema_errors
 
 TASK_SCHEMA = ROOT / 'schemas/task.schema.json'
 EVIDENCE_SCHEMA = ROOT / 'schemas/task-evidence.schema.json'
@@ -32,13 +32,14 @@ def _safe_task_id(task_id):
     return task_id
 
 
-def _project_paths(project):
+def _project_paths(project, require_tasks=True):
     project = Path(project).resolve()
     design = project / 'design'
-    for path in (design, design / 'tasks', design / 'profiles', design / 'lessons-index.json'):
+    tasks = design / 'tasks'
+    for path in (design, tasks, design / 'profiles', design / 'lessons-index.json'):
         if path.is_symlink():
             raise ValueError('Project design path must not be a symlink: ' + str(path))
-    if not design.is_dir() or not (design / 'tasks').is_dir():
+    if not design.is_dir() or (require_tasks and not tasks.is_dir()):
         raise ValueError('Project design kit is not initialized: ' + str(design))
     return project, design
 
@@ -47,11 +48,8 @@ def _payload_from_evidence(document):
     return {key: value for key, value in document.items()
             if key not in ('$schema', 'schemaVersion', 'kind', 'record')}
 
-
-def check_task(project, task_id):
-    project, design = _project_paths(project)
-    task_dir, _, task = _task_record(design, task_id)
-    evidence_names = set()
+def _evidence_names(project, task_dir, task_id):
+    names = set()
     for path in sorted(item for item in task_dir.glob('*.json') if item.name != 'task.json'):
         if path.is_symlink() or not path.is_file():
             raise ValueError('Evidence path is missing or unsafe: ' + str(path))
@@ -65,7 +63,19 @@ def check_task(project, task_id):
         if record['payloadSha256'] != _canonical_hash(_payload_from_evidence(document)):
             raise ValueError(str(path.name) + ': evidence payload hash mismatch')
         _reference_check(task_dir, record['references'], project)
-        evidence_names.add(path.name)
+        names.add(path.name)
+    return names
+
+
+def check_task(project, task_id):
+    project, design = _project_paths(project)
+    task_dir, _, task = _task_record(design, task_id)
+    evidence_names = _evidence_names(project, task_dir, task_id)
+    artifact_errors = _validate_web_artifacts(
+        project, task,
+        require_delivery=task.get('status') in ('design_delivered', 'design_verified_review_pending'))
+    if artifact_errors:
+        raise ValueError('Invalid web artifacts: ' + '; '.join(artifact_errors))
     for check in task.get('handoff', {}).get('checks', []):
         cited = check.get('evidence') if isinstance(check, dict) else None
         if not isinstance(cited, list) or not cited or any(name not in evidence_names for name in cited):
@@ -87,10 +97,19 @@ def _validate_record(record, design, task_id):
     profile_id = record['productProfileId']
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]{0,79}', profile_id):
         raise ValueError('Invalid project-local product profile ID')
-    profile_path = design / 'profiles' / (profile_id + '.json')
-    if not profile_path.is_file() or profile_path.is_symlink():
-        raise ValueError('Task product profile is missing or unsafe: ' + profile_id)
-    profile = load(profile_path)
+    profile_files = sorted((design / 'profiles').glob('*.json'))
+    profiles = []
+    for candidate in profile_files:
+        if candidate.is_symlink() or not candidate.is_file():
+            raise ValueError('Task product profile is missing or unsafe: ' + profile_id)
+        candidate_profile = load(candidate)
+        if not isinstance(candidate_profile, dict):
+            raise ValueError('Task product profile must be an object: ' + candidate.name)
+        if candidate_profile.get('id') == profile_id:
+            profiles.append(candidate_profile)
+    if len(profiles) != 1:
+        raise ValueError('Task product profile must resolve to one project profile ID: ' + profile_id)
+    profile = profiles[0]
     if profile.get('platform') not in ('adaptive', record['platform']):
         raise ValueError('Task platform does not match its product profile')
     index_path = design / 'lessons-index.json'
@@ -141,14 +160,21 @@ def _validate_record(record, design, task_id):
 
 
 def begin(project, record_file):
-    project, design = _project_paths(project)
+    project, design = _project_paths(project, require_tasks=False)
     record = load(record_file)
     if not isinstance(record, dict):
         raise ValueError('Task record must be a JSON object')
     record['$schema'] = '../../schemas/task.schema.json'
     task_id = _safe_task_id(str(record.get('taskId', '')))
     _validate_record(record, design, task_id)
-    task_dir = design / 'tasks' / task_id
+    artifact_errors = _validate_web_artifacts(project, record)
+    if artifact_errors:
+        raise ValueError('Invalid web artifacts: ' + '; '.join(artifact_errors))
+    tasks_dir = design / 'tasks'
+    if tasks_dir.is_symlink():
+        raise ValueError('Project design path must not be a symlink: ' + str(tasks_dir))
+    tasks_dir.mkdir(exist_ok=True)
+    task_dir = tasks_dir / task_id
     if task_dir.exists() or task_dir.is_symlink():
         raise ValueError('Task already exists; refusing to overwrite: ' + task_id)
     task_dir.mkdir()
@@ -255,27 +281,34 @@ def update_handoff(project, task_id, handoff_file, status):
             raise ValueError('Handoff must include ' + key)
         if not isinstance(handoff[key], list):
             raise ValueError('Handoff field must be an array: ' + key)
-    evidence = check_task(project, task_id)
-    evidence_ids = {path.name for path in task_dir.glob('evidence-*.json')
-                    if path.is_file() and not path.is_symlink()}
+    evidence_ids = _evidence_names(project, task_dir, task_id)
+    evidence = {'evidenceRecords': len(evidence_ids)}
     for check in handoff['checks']:
         if not isinstance(check, dict) or not isinstance(check.get('evidence'), list) or not check['evidence']:
             raise ValueError('Each handoff check must cite task evidence; no check result is inferred')
         if any(cited not in evidence_ids for cited in check['evidence']):
             raise ValueError('Handoff check cites missing task evidence')
+    web_delivery = task.get('delivery') in ('html_prototype', 'react_prototype')
     if status != 'in_progress':
         mapping = handoff.get('requirementStateMapping')
         blocked = handoff.get('blockedDisposition')
         if not handoff['checks'] or evidence['evidenceRecords'] == 0:
             raise ValueError('Delivery requires checks backed by valid task evidence')
-        if not handoff['frameLinks'] and not (isinstance(blocked, str) and blocked.strip()):
-            raise ValueError('Delivery requires direct frame links or an explicit blockedDisposition')
-        if not mapping and not (isinstance(blocked, str) and blocked.strip()):
-            raise ValueError('Delivery requires requirementStateMapping or an explicit blockedDisposition')
+        if web_delivery:
+            if not isinstance(mapping, list) or not mapping:
+                raise ValueError('Web delivery requires requirementStateMapping')
+        else:
+            if not handoff['frameLinks'] and not (isinstance(blocked, str) and blocked.strip()):
+                raise ValueError('Delivery requires direct frame links or an explicit blockedDisposition')
+            if not mapping and not (isinstance(blocked, str) and blocked.strip()):
+                raise ValueError('Delivery requires requirementStateMapping or an explicit blockedDisposition')
         if not isinstance(mapping, list) and mapping is not None:
             raise ValueError('requirementStateMapping must be an array')
     task['handoff'] = handoff
     task['status'] = status
+    artifact_errors = _validate_web_artifacts(project, task, require_delivery=status != 'in_progress')
+    if artifact_errors:
+        raise ValueError('Invalid web artifacts: ' + '; '.join(artifact_errors))
     issues = schema_errors(task, TASK_SCHEMA)
     if issues:
         raise ValueError('Invalid updated task record: ' + '; '.join(issues))

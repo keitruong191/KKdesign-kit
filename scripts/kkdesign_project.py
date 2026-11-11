@@ -16,7 +16,7 @@ from urllib.parse import parse_qsl, unquote, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / 'scripts'))
-from kkdesign_core import build_lesson_index, load, local_path, validate_foundation
+from kkdesign_core import _validate_web_artifacts, build_lesson_index, load, local_path, validate_foundation
 
 CATEGORIES = ('tokens', 'styles', 'components', 'variants', 'modes')
 PLATFORMS = {'web', 'macos', 'ios', 'android', 'windows', 'adaptive'}
@@ -315,6 +315,14 @@ def _read_old_registry(project):
     return load(path) if path.is_file() else None
 
 
+def _design_contract_paths(design):
+    for directory, directories, files in os.walk(design):
+        if Path(directory) == design:
+            directories[:] = [name for name in directories if name != 'prototypes']
+        for name in directories + files:
+            yield Path(directory) / name
+
+
 def _asset_diff(old, new, project):
     delta = {}
     old_assets, new_assets = old.get('assets', {}), new.get('assets', {})
@@ -322,7 +330,7 @@ def _asset_diff(old, new, project):
     searchable = []
     design = Path(project) / 'design'
     if design.exists():
-        for path in design.rglob('*'):
+        for path in _design_contract_paths(design):
             if path.is_file():
                 _no_symlink(path, project)
                 if path.name != 'sources.json':
@@ -489,9 +497,10 @@ def _validate_candidate(project, files):
         design = project / 'design'
         if design.exists():
             _no_symlink(design, project)
-            for path in design.rglob('*'):
+            for path in _design_contract_paths(design):
                 _no_symlink(path, project)
-            shutil.copytree(design, candidate / 'design')
+            shutil.copytree(design, candidate / 'design',
+                            ignore=lambda directory, names: ['prototypes'] if Path(directory) == design else [])
         for name in ('PRODUCT.md', 'DESIGN.md'):
             source = project / name
             if source.exists():
@@ -502,6 +511,7 @@ def _validate_candidate(project, files):
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(record['content'].encode('utf-8'))
         references = []
+        artifact_errors = []
         for path in (candidate / 'design/profiles').glob('*.json'):
             try:
                 profile = load(path)
@@ -517,6 +527,13 @@ def _validate_candidate(project, files):
         for path in (candidate / 'design/tasks').rglob('*.json'):
             try:
                 document = load(path)
+                if document.get('delivery') in ('html_prototype', 'react_prototype'):
+                    delivered = document.get('status') in ('design_delivered', 'design_verified_review_pending')
+                    artifact_errors.extend(str(path.relative_to(candidate)) + ': ' + issue for issue in
+                                           _validate_web_artifacts(project, document, require_delivery=delivered))
+                    for artifact in document.get('handoff', {}).get('artifacts', []):
+                        references.extend((Path('.'), artifact.get(field)) for field in ('entry', 'instructions'))
+                        references.append((Path('.'), artifact.get('launch', {}).get('cwd')))
                 refs = document.get('record', {}).get('references', [])
                 refs += [ref for entry in document.get('lessonReview', {}).get('entries', [])
                          for ref in entry.get('evidence', [])]
@@ -551,7 +568,7 @@ def _validate_candidate(project, files):
                 destination.mkdir(parents=True, exist_ok=True)
         result = validate_project(candidate)
         return [error.replace(str(candidate), '<PROJECT>').replace(str(project), '<PROJECT>')
-                for error in result['errors']]
+                for error in artifact_errors + result['errors']]
 
 
 def _validate_plan_integrity(project, plan, plan_id):

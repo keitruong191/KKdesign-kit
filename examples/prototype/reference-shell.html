@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fixture Atlas — visual reference only</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --color-canvas: #F5F7FA;
+      --color-surface: #FFFFFF;
+      --color-text-primary: #182230;
+      --color-text-muted: #596579;
+      --color-brand: #2457A6;
+      --color-border: #D7DEE8;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --radius-control: 8px;
+      --radius-card: 12px;
+      --type-family-ui: Arial, sans-serif;
+      --type-size-body: 16px;
+      --type-size-label: 14px;
+      --type-size-title: 28px;
+      --type-weight-regular: 400;
+      --type-weight-strong: 600;
+      font-family: var(--type-family-ui);
+      color: var(--color-text-primary);
+      background: var(--color-canvas);
+      font-size: var(--type-size-body);
+      line-height: 1.5;
+      font-weight: var(--type-weight-regular);
+    }
+
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; }
+    .notice {
+      padding: var(--space-2) var(--space-4);
+      color: #fff;
+      background: var(--color-brand);
+      text-align: center;
+      font-size: var(--type-size-label);
+      font-weight: var(--type-weight-strong);
+    }
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-8);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .wordmark { font-size: 18px; font-weight: var(--type-weight-strong); letter-spacing: -0.02em; }
+    .topbar-note { color: var(--color-text-muted); font-size: var(--type-size-label); }
+    .workspace { display: flex; min-height: calc(100vh - 96px); }
+    nav {
+      width: 224px;
+      flex: 0 0 224px;
+      padding: var(--space-8) var(--space-4);
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+    }
+    .nav-heading {
+      margin: 0 0 var(--space-3);
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: var(--type-weight-strong);
+      letter-spacing: .06em;
+      text-transform: uppercase;
+    }
+    .nav-item { padding: 10px var(--space-3); border-radius: var(--radius-control); color: var(--color-text-muted); }
+    .nav-item.current { color: var(--color-brand); background: #EDF3FC; font-weight: var(--type-weight-strong); }
+    main { width: min(100%, 1056px); margin: 0 auto; padding: 48px 56px 64px; }
+    .page-head { margin-bottom: var(--space-6); }
+    h1 { margin: 0 0 var(--space-2); font-size: var(--type-size-title); line-height: 1.2; letter-spacing: -0.025em; font-weight: var(--type-weight-strong); }
+    .lead { margin: 0; color: var(--color-text-muted); }
+    .content-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(240px, .85fr); gap: var(--space-6); align-items: start; }
+    .card { padding: var(--space-6); background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+    h2 { margin: 0 0 var(--space-4); font-size: 18px; line-height: 1.35; font-weight: var(--type-weight-strong); }
+    .field { margin-bottom: var(--space-4); }
+    .field-label { margin-bottom: var(--space-2); font-size: var(--type-size-label); font-weight: var(--type-weight-strong); }
+    .input, .textarea {
+      width: 100%;
+      padding: 11px var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-control);
+      color: var(--color-text-primary);
+      font: inherit;
+    }
+    .input { min-height: 44px; }
+    .textarea { min-height: 136px; resize: none; }
+    .hint { margin: var(--space-2) 0 0; color: var(--color-text-muted); font-size: var(--type-size-label); }
+    .actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-6); }
+    .button { min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-control); font: inherit; font-size: var(--type-size-label); font-weight: var(--type-weight-strong); }
+    .button.secondary { border: 1px solid var(--color-border); color: var(--color-text-primary); background: var(--color-surface); }
+    .button.primary { border: 1px solid var(--color-brand); color: #fff; background: var(--color-brand); }
+    .side-title { margin-bottom: var(--space-2); }
+    .side-copy { margin: 0; color: var(--color-text-muted); }
+    .side-rule { height: 1px; margin: var(--space-4) 0; background: var(--color-border); }
+    .reference-caption { color: var(--color-text-muted); font-size: 12px; }
+    @media (max-width: 700px) {
+      .topbar { height: 56px; padding: 0 var(--space-4); }
+      .topbar-note { display: none; }
+      .workspace { min-height: calc(100vh - 88px); }
+      nav { width: 68px; flex-basis: 68px; padding: var(--space-4) var(--space-2); }
+      .nav-heading { display: none; }
+      .nav-item { padding: 10px var(--space-1); font-size: 11px; text-align: center; }
+      main { padding: var(--space-6) var(--space-4) 40px; }
+      .content-grid { grid-template-columns: 1fr; gap: var(--space-4); }
+      .card { padding: var(--space-4); }
+      h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="notice">Static visual reference — not an interactive demo</div>
+  <header class="topbar">
+    <div class="wordmark">Atlas workspace</div>
+    <div class="topbar-note">Internal workspace · synthetic fixture</div>
+  </header>
+  <div class="workspace">
+    <nav aria-label="Illustrative workspace navigation">
+      <p class="nav-heading">Workspace</p>
+      <div class="nav-item">Overview</div>
+      <div class="nav-item current">Requests</div>
+      <div class="nav-item">Reports</div>
+    </nav>
+    <main>
+      <div class="page-head">
+        <h1>New request</h1>
+        <p class="lead">Share an idea with your workspace team.</p>
+      </div>
+      <div class="content-grid">
+        <section class="card" aria-labelledby="form-title">
+          <h2 id="form-title">Request details</h2>
+          <div class="field">
+            <div class="field-label">Title</div>
+            <div class="input" id="request-title">Reduce duplicate weekly reports</div>
+          </div>
+          <div class="field">
+            <div class="field-label">Description</div>
+            <div class="textarea" id="request-description">Let workspace owners combine recurring reports into one weekly digest.</div>
+            <p class="hint">Describe the problem and the outcome you hope to achieve.</p>
+          </div>
+          <div class="actions" aria-label="Illustrative static actions">
+            <div class="button secondary">Cancel</div>
+            <div class="button primary">Review request</div>
+          </div>
+        </section>
+        <aside class="card" aria-labelledby="guidance-title">
+          <h2 class="side-title" id="guidance-title">A useful request</h2>
+          <p class="side-copy">Keep the title clear and explain what would improve for the people who use the workspace.</p>
+          <div class="side-rule"></div>
+          <p class="reference-caption">Fictional Atlas design-system reference: button.primary, textfield.default, card.default. Sample copy is synthetic.</p>
+        </aside>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

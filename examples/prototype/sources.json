@@ -1,0 +1,5 @@
+{
+  "sources": [
+    {"id": "atlas-demo", "provider": "local", "location": "ds"}
+  ]
+}

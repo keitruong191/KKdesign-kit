@@ -1,5 +1,72 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$defs": {
+    "projectRelativePath": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?![A-Za-z][A-Za-z0-9+.-]*:)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\\\).+$"
+    },
+    "webArtifact": {
+      "type": "object",
+      "required": [
+        "entry",
+        "instructions",
+        "launch"
+      ],
+      "properties": {
+        "entry": {
+          "$ref": "#/$defs/projectRelativePath"
+        },
+        "instructions": {
+          "$ref": "#/$defs/projectRelativePath"
+        },
+        "launch": {
+          "type": "object",
+          "required": [
+            "mode"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "file",
+                "command"
+              ]
+            },
+            "cwd": {
+              "$ref": "#/$defs/projectRelativePath"
+            },
+            "argv": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "const": "command"
+                  }
+                },
+                "required": [
+                  "mode"
+                ]
+              },
+              "then": {
+                "required": [
+                  "cwd",
+                  "argv"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
   "type": "object",
   "required": [
     "schemaVersion",
@@ -42,6 +109,9 @@
         "string",
         "null"
       ]
+    },
+    "delivery": {
+      "type": "string"
     },
     "productProfileId": {
       "type": [
@@ -138,7 +208,15 @@
       "additionalProperties": false
     },
     "handoff": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/webArtifact"
+          }
+        }
+      }
     }
   },
   "allOf": [
@@ -166,6 +244,111 @@
           "productProfileId": {
             "type": "string",
             "minLength": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery": {
+            "enum": [
+              "html_prototype",
+              "react_prototype"
+            ]
+          }
+        },
+        "required": [
+          "delivery"
+        ]
+      },
+      "then": {
+        "properties": {
+          "target": {
+            "required": [
+              "destination"
+            ],
+            "properties": {
+              "destination": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/projectRelativePath"
+                  },
+                  {
+                    "pattern": "^design/prototypes/[^/]+$"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery": {
+            "enum": [
+              "html_prototype",
+              "react_prototype"
+            ]
+          },
+          "status": {
+            "enum": [
+              "design_delivered",
+              "design_verified_review_pending"
+            ]
+          }
+        },
+        "required": [
+          "delivery",
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "handoff": {
+            "required": [
+              "artifacts"
+            ],
+            "properties": {
+              "artifacts": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "delivery": {
+            "const": "react_prototype"
+          }
+        },
+        "required": [
+          "delivery"
+        ]
+      },
+      "then": {
+        "properties": {
+          "handoff": {
+            "properties": {
+              "artifacts": {
+                "items": {
+                  "properties": {
+                    "launch": {
+                      "properties": {
+                        "mode": {
+                          "const": "command"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }

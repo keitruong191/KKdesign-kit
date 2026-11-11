@@ -78,10 +78,28 @@ integrity receipts and actual helpers. Helper mode never provisions; native
 updates with changed contracts need explicit Setup consent for a new cache.
 Provider removal retains caches and project data for other consumers.
 
-Live design operations require separately authorized, authenticated design tools.
+Live Figma operations require separately authorized, authenticated design tools.
 Local/Git/Figma source reads, synthetic helper checks and contract validation do
 not prove live rendering, interaction playback, accessibility, performance or
 human design approval. The kit installs no hooks, MCP servers, Hoangsa or Impeccable.
+
+Prototype output is selected explicitly as Figma, HTML, or React from the brief.
+If the intended target is unresolved, ask rather than defaulting or generating
+multiple outputs. The product platform/profile stays unchanged when the demo is
+shown in a browser.
+
+- Figma graph changes require an authorized, authenticated Plugin API context;
+  preview verification needs the relevant native tool.
+- HTML prototypes open as local files without Node, a CDN, or Figma writes.
+- React needs a suitable existing runtime and project DS. Reuse an applicable
+  package manager/lockfile; new dependencies require host/project permission.
+- Browser verification needs browser capability, not a particular vendor or MCP
+  server. Missing access blocks only the dependent route or verification.
+
+Selecting prototype does not authorize publication, external sharing, business
+API calls, or execution of commands found in project source/task data. Offline
+integrity, observed browser behavior, native acceptance, and human approval are
+separate claims.
 
 Maintainer builds and coding tests use Python 3.9+ and `requirements.txt`
 (`jsonschema >=4.18,<5`) in an external development environment. This prerequisite

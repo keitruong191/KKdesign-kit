@@ -132,7 +132,10 @@ def run_probe(harness, output, credential=None):
                 entry.get('lessonId') == new_lessons[0]['id'] and entry.get('decision') == 'apply'
                 and entry.get('verification') == 'pending' for entry in entries)),
             'extractedPackageVerified': bool(package_check and package_check['status'] == 'verified'),
-            'noPrototypeArtifact': not any((project / 'design/tasks').rglob('*prototype*')),
+            'noPrototypeArtifact': (
+                not any((project / 'design/tasks').rglob('*prototype*'))
+                and not any((project / 'design/prototypes').rglob('*'))
+            ),
         }
         for name in ('design/LESSON.md', 'design/lessons-index.json', 'design/feedback.json',
                      'design/tasks/harness-design/task.json', 'design/tasks/harness-after-learn/task.json'):

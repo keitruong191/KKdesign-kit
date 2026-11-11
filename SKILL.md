@@ -45,9 +45,15 @@ For unknown commands, show the menu and explain that the command is unknown.
 - `review`: read [references/review.md](references/review.md). Findings by default,
   not fixes. Bundled guidance is independent of installed Impeccable. Separate
   canvas evidence, source audits and runtime evidence; never approve untested behavior.
-- `prototype`: read [references/prototype.md](references/prototype.md). Create or
-  change interactions only on an explicit prototype request, never as a side effect
-  of design/review. Label simulated validation, APIs and timing.
+- `prototype`: read [references/prototype.md](references/prototype.md). Start only
+  for an explicit prototype request, distinct from design/review. Resolve the
+  requested delivery from the brief: Figma, HTML, or React. If it is not clear
+  and context does not resolve it, ask which of the three; do not default or
+  generate multiple targets. Do not treat `--target` as a supported flag.
+  Figma follows the existing authenticated graph/preview workflow; HTML/React
+  follow [references/prototype-web.md](references/prototype-web.md) and do not
+  require Figma when project sources are sufficient. Neither route authorizes
+  publication. Read only the selected execution guide.
 - `learn`: read [references/learn.md](references/learn.md). Preserve direct feedback
   separately from inferred lessons and regenerate the canonical source's index.
   Never restamp old task decisions or invent prior reading/new pass results.
