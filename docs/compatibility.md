@@ -56,7 +56,7 @@ handoffs. Other OS/CPU combinations are unverified and are not advertised.
 | Channel or surface | Current status |
 | --- | --- |
 | Maintainer repo/local marketplace review | Builders target canonical version 0.5.0a2; native measurements remain version- and surface-specific |
-| Public author-operated marketplace | Version 0.5.0a2 uses new review refs; consult the [published source record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md) for actual snapshot/native results; production approval pending |
+| Public author-operated marketplace | Version 0.5.0a2 uses new review refs; consult [`keitruong191`'s release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22), section **0.5.0a2 distribution commits** (not comments), for actual snapshot/native results; production approval pending |
 | OpenAI public directory | No approved/published KKdesign listing verified; local-execution eligibility/review is separate from repo CLI checks |
 | Anthropic Directory / claude-plugins-official | Neither listing is verified; separate submission/review routes, neither implied by a private marketplace |
 | Codex IDE, desktop app, cloud and other Claude surfaces | No KKdesign native evidence here; do not infer coverage from CLI or another product's support |

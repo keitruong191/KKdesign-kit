@@ -16,7 +16,8 @@ Copyable commands are in [Codex](codex-marketplace.md),
 Branches are mutable Git refs, even when named for a version. The immutable
 snapshot/provenance record is in each distribution root's `PROVENANCE.json`;
 the final distribution commit IDs and native measurements are recorded in
-[the source repository's published verification record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md).
+[the release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits**, authored by `keitruong191` (not comments).
 
 ## Snapshot identity and artifact integrity
 

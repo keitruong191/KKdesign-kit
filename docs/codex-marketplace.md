@@ -34,7 +34,8 @@ codex plugin list --json
 
 This versioned branch is mutable, not an immutable pin. For an immutable review,
 use the Codex distribution commit for `0.5.0a2` from the owner's
-[published verification record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md)
+[release description authored by `keitruong191`](https://github.com/keitruong191/KKdesign-kit/pull/22)
+(section **0.5.0a2 distribution commits**, not comments)
 as the `--ref` value instead. Stop if that version has no published snapshot.
 Snapshot documents cannot embed their own future commit. The plugin-add
 marketplace argument is the catalog name, not its repository URL.

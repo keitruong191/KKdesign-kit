@@ -29,7 +29,9 @@ git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-ma
 ```
 
 Compare that output with the Claude distribution commit for `0.5.0a2` in the
-owner's [published verification record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md).
+owner's [release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits**. Use only the description authored by
+`keitruong191`, not public comments.
 **Stop if that version has no published commit or the output differs.** Ask the
 owner for the release record rather than using an older snapshot's SHA. This
 branch is mutable; only after the recorded commit matches, install:

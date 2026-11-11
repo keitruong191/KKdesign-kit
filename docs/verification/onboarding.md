@@ -9,7 +9,8 @@ permission to release, tag, submit a listing or merge main.
 
 WWA-11 established historical `0.5.0a1` review availability. Current
 `0.5.0a2` uses new provider refs in [source provenance](../marketplace-sources.md).
-Consult the owner's [published record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md)
+Consult the [`keitruong191`-authored release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits** (not comments),
 for exact commands, immutable
 snapshots and measured pin limitations. The default branch is not the built
 marketplace. Review-channel availability does not establish production release
@@ -58,7 +59,8 @@ The remote probe's expected plugin version comes from its source checkout's
 `manifest.json`. Use a matching historical checkout when reproducing an older
 version; do not run old snapshot arguments against the current version and infer
 a publication failure. Immutable revisions come from the owner's
-[published source record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md),
+[release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits**, authored by `keitruong191` (not comments),
 not the snapshot-era copy of a verification page.
 
 For a direct project-start check after consented Setup in a disposable test home,
