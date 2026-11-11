@@ -205,6 +205,78 @@ class InstallationTests(unittest.TestCase):
         self.assertNotIn('unrelated-private.json', files)
         self.assertNotIn('scripts/unrelated.py', files)
 
+    def test_private_resource_files_are_excluded_without_dropping_public_assets(self):
+        source = self.source_copy()
+        (source / 'bundle.json').unlink()
+        private_names = (
+            'docs/.env.local', 'references/.hoangsa/session.md',
+            'examples/prototype/node_modules/vendor/package.json',
+            'templates/__pycache__/private.pyc', 'schemas/credentials.json',
+            'agents/id_ed25519', 'docs/private.pem', 'references/debug.log',
+        )
+        private_marker = b'SYNTHETIC_PRIVATE_RESOURCE_CANARY'
+        for name in private_names:
+            path = source / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(private_marker)
+        public_name = 'docs/public-extension-guide.md'
+        public_marker = b'Public extension documentation.'
+        (source / public_name).write_bytes(public_marker)
+        archive = self.base / 'public-resources.zip'
+        kit.package(source, archive)
+        with zipfile.ZipFile(archive) as packaged:
+            self.assertEqual(packaged.read('kkdesign-kit/' + public_name), public_marker)
+            for name in private_names:
+                self.assertNotIn('kkdesign-kit/' + name, packaged.namelist())
+            for name in packaged.namelist():
+                self.assertNotIn(private_marker, packaged.read(name), name)
+            packaged.extractall(self.base / 'public-resources')
+        self.assertEqual(kit.verify(self.base / 'public-resources/kkdesign-kit')['status'],
+                         'verified')
+
+    def test_required_private_resource_fails_before_creating_archive(self):
+        source = self.source_copy()
+        (source / 'bundle.json').unlink()
+        private_name = 'docs/.env.local'
+        (source / private_name).write_text('SYNTHETIC_PRIVATE_RESOURCE_CANARY')
+        manifest = json.loads((source / 'manifest.json').read_text())
+        manifest['requiredResources'].append(private_name)
+        (source / 'manifest.json').write_text(json.dumps(manifest))
+        archive = self.base / 'required-private.zip'
+        with self.assertRaisesRegex(ValueError, 'Missing required resource: docs/.env.local'):
+            kit.package(source, archive)
+        self.assertFalse(archive.exists())
+
+    def test_receipted_private_resource_cannot_be_repacked(self):
+        source = self.source_copy()
+        private_name = 'docs/.env.local'
+        (source / private_name).write_text('SYNTHETIC_PRIVATE_RESOURCE_CANARY')
+        bundle = json.loads((source / 'bundle.json').read_text())
+        bundle['files'][private_name] = kit.hashes(source)[private_name]
+        (source / 'bundle.json').write_text(json.dumps(bundle))
+        archive = self.base / 'receipted-private.zip'
+        with self.assertRaisesRegex(ValueError, 'Private package resource: docs/.env.local'):
+            kit.package(source, archive)
+        self.assertFalse(archive.exists())
+
+    def test_receipted_private_ancestor_cannot_be_repacked(self):
+        source = self.source_copy()
+        for index, directory in enumerate(('credentials', 'private.zip')):
+            with self.subTest(directory=directory):
+                candidate = self.base / ('private-ancestor-' + str(index))
+                shutil.copytree(source, candidate)
+                private_name = 'docs/' + directory + '/session.txt'
+                private_path = candidate / private_name
+                private_path.parent.mkdir()
+                private_path.write_text('SYNTHETIC_PRIVATE_RESOURCE_CANARY')
+                bundle = json.loads((candidate / 'bundle.json').read_text())
+                bundle['files'][private_name] = kit.hashes(candidate)[private_name]
+                (candidate / 'bundle.json').write_text(json.dumps(bundle))
+                archive = self.base / ('private-ancestor-' + str(index) + '.zip')
+                with self.assertRaisesRegex(ValueError, 'Private package resource:'):
+                    kit.package(candidate, archive)
+                self.assertFalse(archive.exists())
+
     def test_symlink_conflicts_and_concurrent_mutation(self):
         self.act('install')
         target, state = kit.locations('codex', 'project', self.home, self.project)
