@@ -22,7 +22,7 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python scripts/materialize_example.py --output .demo
       - run: python scripts/kkdesign_core.py validate --design .demo/design
-      - run: python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.5.0a1.zip
+      - run: python scripts/kkdesign_install.py package --output ../kkdesign-kit-0.5.0a2.zip
   bootstrap-smoke:
     strategy:
       fail-fast: false

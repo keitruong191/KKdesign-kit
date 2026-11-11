@@ -5,6 +5,11 @@ Production approval, authenticated menus/consent/workflows, non-dev observation
 and unmeasured platforms remain pending. This record does not grant release,
 tag, official submission or main/integration merge authority.
 
+This is the retained **0.5.0a1 historical record**. Its exact identities,
+commands and measurements are not the current version's install targets.
+Reproduce these commands only from a corresponding `0.5.0a1` source checkout;
+the current probe derives its expected version from the current manifest.
+
 ## Exact source revisions
 
 - Canonical workflow/build source: `a9a51940746e6940e038792a1e4a7e9f7e2d2587`.

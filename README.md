@@ -119,8 +119,8 @@ installed-package smoke, use the [handoff](docs/verification/onboarding.md).
 Choose fresh output and extraction paths. Existing archives are not overwritten.
 
 ```sh
-python3 -I -B scripts/kkdesign_install.py package --output ../kkdesign-kit-0.5.0a1.zip
-python3 -m zipfile -e ../kkdesign-kit-0.5.0a1.zip ../kkdesign-kit-extracted
+python3 -I -B scripts/kkdesign_install.py package --output ../kkdesign-kit-0.5.0a2.zip
+python3 -m zipfile -e ../kkdesign-kit-0.5.0a2.zip ../kkdesign-kit-extracted
 python3 -I -B ../kkdesign-kit-extracted/kkdesign-kit/scripts/kkdesign_install.py verify --source ../kkdesign-kit-extracted/kkdesign-kit
 ```
 

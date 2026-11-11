@@ -3,38 +3,46 @@
 ## Installation availability
 
 The distribution channel for new users is a provider-native marketplace plugin.
-Author-operated **review/prerelease** sources for version `0.5.0a1` are available
+Author-operated **review/prerelease** sources for version `0.5.0a2` are available
 in the existing public repository; production release approval and official
 listings remain pending. Git and HTTPS access to GitHub are needed for these
 native Git sources; the provider must already be installed. No manual source
 clone, build or Python installation is required to install the plugin.
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/codex-0.5.0a2
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
 
 ```sh
-claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
 git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
 ```
 
-On the measured POSIX surface, verify that the output is exactly
-`bea7e433f4f576068bcf2eec15317d7d73e5e065`. **Stop if it differs** and ask the
-owner to review that snapshot. The branch is mutable; this check is required
-before installation. Only after it matches, install:
+Compare that output with the Claude distribution commit for `0.5.0a2` in the
+owner's [published verification record](https://github.com/keitruong191/KKdesign-kit/blob/main/docs/verification/marketplace-sources.md).
+**Stop if that version has no published commit or the output differs.** Ask the
+owner for its release record, not an older snapshot's SHA. This branch is
+mutable; only after the recorded commit matches, install:
 
 ```sh
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
-Codex is pinned to an immutable snapshot. Claude uses a mutable review branch;
-verify its cloned revision before installing as described in the source record. [Source provenance](marketplace-sources.md)
-records immutable snapshots and provider pin limitations. Use the
-[Codex guide](codex-marketplace.md) or [Claude Code guide](claude-marketplace.md)
-for scope, discovery and removal. The [handoff](verification/onboarding.md)
-tracks remaining authenticated/native human acceptance. No approved production
-release or directory listing is implied by this public review publication.
+Both versioned branch commands use mutable review channels. For an immutable
+Codex installation, replace `--ref` with its `0.5.0a2` distribution commit from
+the published record. Claude's measured client requires a branch plus the
+clone-revision check. [Source provenance](marketplace-sources.md) explains these
+limits. Use the [Codex guide](codex-marketplace.md) or
+[Claude Code guide](claude-marketplace.md) for scope, discovery and removal.
+The [handoff](verification/onboarding.md) tracks remaining authenticated/native
+human acceptance. No approved production release or directory listing is implied.
+
+If already registered at an older snapshot, the marketplace names stay the
+same: intentionally remove the old plugin and marketplace registration through
+provider controls before adding the new source and installing again. Product
+data and private runtimes remain separate; choose Setup to verify/reuse the
+compatible cache. Refreshing an immutable pin cannot select a newer commit.
 
 ## In the installed agent
 

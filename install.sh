@@ -2,7 +2,7 @@
 # Install KKdesign-kit from a pinned portable release; no checkout or Git required.
 set -eu
 
-VERSION=0.5.0a1
+VERSION=0.5.0a2
 IDENTIFIER=kkdesign-kit
 REPOSITORY=keitruong191/KKdesign-kit
 
@@ -84,7 +84,7 @@ python3 -I -B - "$archive" "$checksum" <<'PY'
 import hashlib, pathlib, re, sys
 archive, checksum = map(pathlib.Path, sys.argv[1:])
 text = checksum.read_text(encoding='ascii').strip()
-match = re.fullmatch(r'([0-9a-fA-F]{64})[ \t]+(?:\\)?(?:[ *])?kkdesign-kit-0\.5\.0a1\.zip', text)
+match = re.fullmatch(r'([0-9a-fA-F]{64})[ \t]+(?:\\)?(?:[ *])?kkdesign-kit-0\.5\.0a2\.zip', text)
 if not match:
     raise SystemExit('install.sh: malformed release SHA-256 checksum file.')
 actual = hashlib.sha256(archive.read_bytes()).hexdigest()

@@ -1,7 +1,7 @@
 {
   "name": "KKdesign-kit",
   "identifier": "kkdesign-kit",
-  "version": "0.5.0a1",
+  "version": "0.5.0a2",
   "status": "workflow-preview",
   "targets": [
     "codex",
