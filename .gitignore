@@ -8,3 +8,30 @@ __pycache__/
 dist/
 *.zip
 .kkdesign-kit/
+
+# Local assistant state and sessions, not shipped plugin descriptors.
+.hoangsa/
+.claude/
+.codex/
+/CLAUDE.md
+
+# Dependency trees and local diagnostics.
+node_modules/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage/
+htmlcov/
+*.log
+
+# Local credentials and CLI profiles.
+.npmrc
+.pypirc
+.netrc
+.git-credentials
+.ssh/
+.aws/
+.azure/
+.config/gcloud/
