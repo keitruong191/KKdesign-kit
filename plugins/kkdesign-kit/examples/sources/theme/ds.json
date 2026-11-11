@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "tokens": [
+    {"id": "color.brand", "name": "Brand", "data": {"$type": "color", "$value": "#8B3D2E"}}
+  ],
+  "styles": [],
+  "components": [],
+  "variants": [],
+  "modes": [
+    {"id": "dark", "name": "Dark", "data": {"explicit": true}}
+  ]
+}

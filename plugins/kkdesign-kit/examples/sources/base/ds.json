@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0.0",
+  "tokens": [
+    {"id": "color.brand", "name": "Brand", "data": {"$type": "color", "$value": "#2457A6"}}
+  ],
+  "styles": [
+    {"id": "text.body", "name": "Body", "data": {"fontFamily": "Example Sans", "fontSize": 16}}
+  ],
+  "components": [
+    {"id": "button.primary", "name": "Primary Button", "data": {"kind": "button", "synthetic": true}}
+  ],
+  "variants": [],
+  "modes": []
+}

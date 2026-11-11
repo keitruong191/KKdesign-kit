@@ -1,0 +1,17 @@
+{
+  "$schema": "../../schemas/task-evidence.schema.json",
+  "schemaVersion": "1.0.0",
+  "kind": "task-evidence",
+  "record": {
+    "taskId": "demo",
+    "evidenceType": "snapshot",
+    "historicalStatus": "historical",
+    "description": "Synthetic fixture only.",
+    "payloadSha256": "911ba8a22a9e7176cc300c37dcb206b45a96aa8296fc89442374299432676a4a",
+    "references": [
+      "task.json"
+    ]
+  },
+  "description": "Synthetic empty evidence snapshot, no verification claim.",
+  "checks": []
+}

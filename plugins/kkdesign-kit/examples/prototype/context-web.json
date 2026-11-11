@@ -1,0 +1,35 @@
+{
+  "product": {"name": "Fictional Atlas", "platforms": ["web"]},
+  "sources": [
+    {"id": "atlas-product", "location": "feature-brief.md", "observedAt": "2026-11-11"},
+    {"id": "atlas-web-reference", "location": "reference-shell.html", "observedAt": "2026-11-11"}
+  ],
+  "requirements": [
+    {
+      "id": "request-capture", "topic": "internal-request-capture",
+      "value": "An internal teammate can submit a title and description for a request, review it, and receive a clear local prototype outcome.",
+      "status": "confirmed", "platforms": ["web"],
+      "scope": "Fixture Atlas web prototype only; submission is local simulation, not a service integration.",
+      "sourceIds": ["atlas-product"],
+      "recheckWhen": "When the Fixture Atlas synthetic feature brief changes"
+    },
+    {
+      "id": "web-reference-viewport", "topic": "prototype-reference-viewport",
+      "value": "Use 1280 by 800 CSS pixels as the web fixture comparison viewport.",
+      "status": "confirmed", "platforms": ["web"],
+      "scope": "Synthetic prototype verification input only; not a supported product breakpoint.",
+      "sourceIds": ["atlas-web-reference"],
+      "recheckWhen": "When the synthetic web reference or fixture viewport changes"
+    }
+  ],
+  "visualReferences": [
+    {
+      "id": "atlas-web-shell", "location": "reference-shell.html", "status": "observed",
+      "scope": "Synthetic web shell, typography, spacing, and form presentation reference; not implemented product UI.",
+      "sourceIds": ["atlas-web-reference"], "sourceId": "atlas-web-reference",
+      "recheckWhen": "When the reference shell or its DS fixture changes"
+    }
+  ],
+  "runtimeConstraints": [],
+  "lessons": []
+}

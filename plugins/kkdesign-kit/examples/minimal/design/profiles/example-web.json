@@ -1,0 +1,30 @@
+{
+  "$schema": "../schemas/product-profile.schema.json",
+  "schemaVersion": "1.0.0",
+  "kind": "product-profile",
+  "id": "example-web",
+  "product": "Fictional example",
+  "platform": "web",
+  "status": "draft",
+  "scope": "Synthetic contract fixture only.",
+  "sources": [
+    {
+      "id": "product",
+      "location": "PRODUCT.md",
+      "revision": null,
+      "observedAt": "2026-11-06",
+      "sha256": "f926e0af6b120cce895e429adf6026cbb75bdb585c5579e9644c021022f1ff13"
+    }
+  ],
+  "decisions": [
+    {
+      "id": "viewport",
+      "topic": "viewport",
+      "value": null,
+      "status": "open",
+      "scope": "No default viewport is invented.",
+      "sourceIds": [],
+      "recheckWhen": "Read the actual project brief before design."
+    }
+  ]
+}
