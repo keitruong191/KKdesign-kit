@@ -45,6 +45,113 @@ def local_path(base, reference, boundary):
     return target
 
 
+def _validate_web_artifacts(project, task, require_delivery=False):
+    """Return web artifact contract errors without launching or modifying anything."""
+    if task.get('delivery') not in ('html_prototype', 'react_prototype'):
+        return []
+
+    project = Path(project).resolve()
+    task_id = task.get('taskId')
+    expected_root = 'design/prototypes/' + str(task_id)
+    errors = []
+
+    def relative_path(value, label):
+        if not isinstance(value, str) or not value or '\\' in value:
+            errors.append(label + ': expected a project-relative path')
+            return None
+        parsed = urlsplit(value)
+        if parsed.scheme or parsed.netloc or parsed.query or parsed.fragment:
+            errors.append(label + ': URLs are not project-relative paths')
+            return None
+        path = Path(value)
+        if path.is_absolute() or any(part == '..' for part in value.split('/')):
+            errors.append(label + ': absolute paths and traversal are not allowed')
+            return None
+        if path.as_posix() != value or value == '':
+            errors.append(label + ': expected a normalized project-relative path')
+            return None
+        return path
+
+    def checked_path(path, label, want):
+        current = project
+        for part in path.parts:
+            current = current / part
+            if current.is_symlink():
+                errors.append(label + ': symlink paths are not allowed')
+                return None
+            if want == 'optional-directory' and current.exists() and not current.is_dir():
+                errors.append(label + ': expected a directory')
+                return None
+        resolved = (project / path).resolve()
+        if not resolved.is_relative_to(project):
+            errors.append(label + ': path escapes project')
+            return None
+        if want == 'file' and not resolved.is_file():
+            errors.append(label + ': expected an existing file')
+        elif want == 'directory' and not resolved.is_dir():
+            errors.append(label + ': expected an existing directory')
+
+        return resolved
+
+    destination = task.get('target', {}).get('destination') if isinstance(task.get('target'), dict) else None
+    root_path = relative_path(destination, 'target.destination')
+    if root_path is None:
+        return errors
+    if destination != expected_root or len(root_path.parts) != 3:
+        errors.append('target.destination: must be exactly ' + expected_root)
+        return errors
+    artifact_root = checked_path(root_path, 'target.destination', 'optional-directory')
+
+    handoff = task.get('handoff')
+    artifacts = handoff.get('artifacts') if isinstance(handoff, dict) else None
+    if artifacts is None:
+        artifacts = []
+    if not isinstance(artifacts, list):
+        errors.append('handoff.artifacts: expected an array')
+        return errors
+    if require_delivery and not artifacts:
+        errors.append('handoff.artifacts: web delivery requires at least one artifact')
+    if artifact_root is None:
+        return errors
+
+    for index, artifact in enumerate(artifacts):
+        label = 'handoff.artifacts[' + str(index) + ']'
+        if not isinstance(artifact, dict):
+            errors.append(label + ': expected an object')
+            continue
+        for field in ('entry', 'instructions'):
+            rel = relative_path(artifact.get(field), label + '.' + field)
+            if rel is None:
+                continue
+            resolved = checked_path(rel, label + '.' + field, 'file')
+            if resolved is not None and not resolved.is_relative_to(artifact_root):
+                errors.append(label + '.' + field + ': must be inside target.destination')
+            if field == 'entry' and task.get('delivery') == 'html_prototype' and rel.suffix.lower() not in ('.html', '.htm'):
+                errors.append(label + '.entry: HTML delivery requires an HTML entry')
+
+        launch = artifact.get('launch')
+        if not isinstance(launch, dict):
+            errors.append(label + '.launch: expected an object')
+            continue
+        mode = launch.get('mode')
+        if mode not in ('file', 'command'):
+            errors.append(label + '.launch.mode: expected file or command')
+        if task.get('delivery') == 'react_prototype' and mode != 'command':
+            errors.append(label + '.launch.mode: React delivery requires command mode')
+        if 'cwd' in launch:
+            cwd = relative_path(launch['cwd'], label + '.launch.cwd')
+            if cwd is not None:
+                checked_path(cwd, label + '.launch.cwd',
+                             'directory' if mode == 'command' else 'optional')
+        elif mode == 'command':
+            errors.append(label + '.launch.cwd: command mode requires a working directory')
+        if mode == 'command':
+            argv = launch.get('argv')
+            if not isinstance(argv, list) or not argv or any(not isinstance(arg, str) for arg in argv):
+                errors.append(label + '.launch.argv: command mode requires a nonempty string array')
+    return errors
+
+
 def build_lesson_index(design):
     design = Path(design).resolve()
     source = design / 'LESSON.md'
@@ -237,6 +344,10 @@ def validate_foundation(design, schemas=None):
                 errors.append(str(path) + ': active task has template identity')
             if doc.get('taskId') != path.parent.name:
                 errors.append(str(path) + ': taskId differs from directory')
+            if doc.get('delivery') in ('html_prototype', 'react_prototype'):
+                delivered = doc.get('status') in ('design_delivered', 'design_verified_review_pending')
+                errors.extend(str(path) + ': ' + issue for issue in
+                              _validate_web_artifacts(design.parent, doc, require_delivery=delivered))
             if doc.get('productProfileId') not in profiles:
                 errors.append(str(path) + ': unknown productProfileId')
             else:

@@ -8,6 +8,7 @@ import subprocess
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import kkdesign_project as project
+import kkdesign_task as tasks
 
 
 class ProjectLifecycleTests(unittest.TestCase):
@@ -70,6 +71,82 @@ class ProjectLifecycleTests(unittest.TestCase):
         second = self.plan(refresh=True)
         project.apply_plan(self.root, second['id'])
         self.assertEqual((profile.read_bytes(), lesson.read_bytes()), before)
+
+    def test_refresh_preserves_delivered_react_artifacts_and_ignores_runtime_dependencies(self):
+        self.write_source('one', [{'id': 'color.primary', 'name': 'Primary', 'data': {'value': '#123456'}}])
+        initial = self.plan()
+        project.apply_plan(self.root, initial['id'])
+        design = self.root / 'design'
+        record = project.load(design / 'task-template.json')
+        index = project.load(design / 'lessons-index.json')
+        profile = project.load(design / 'profiles/adaptive.json')
+        record.update({
+            'kind': 'design-task', 'status': 'in_progress', 'taskId': 'react-refresh',
+            'objective': 'Offline artifact integrity fixture, not browser acceptance.',
+            'platform': 'web', 'productProfileId': profile['id'], 'delivery': 'react_prototype',
+            'target': {'destination': 'design/prototypes/react-refresh'},
+            'sourceDecisions': [{'surface': 'fixture', 'sourceId': 'ds', 'assetIds': ['color.primary']}],
+            'designPlan': {
+                'platformProfileId': 'web', 'layoutDecisions': [{'decision': 'Synthetic fixture layout.'}],
+                'stateDispositions': [{'state': 'default', 'disposition': 'planned'}],
+                'referenceExamples': []},
+            'lessonReview': {
+                'status': 'reviewed', 'sourceHash': index['sourceHash'],
+                'entries': [{'lessonId': lesson['id'], 'decision': 'apply',
+                             'reason': 'Apply the initialized project lesson to this fixture.',
+                             'verification': 'pending', 'evidence': []} for lesson in index['lessons']]}
+        })
+        record_path = self.root / 'react-record.json'
+        record_path.write_text(json.dumps(record), encoding='utf-8')
+        tasks.begin(self.root, record_path)
+        artifact = design / 'prototypes/react-refresh'
+        artifact.mkdir(parents=True)
+        entry = artifact / 'App.jsx'
+        entry.write_text('export const fixture = true;\n', encoding='utf-8')
+        (artifact / 'README.md').write_text('Offline integrity fixture only.\n', encoding='utf-8')
+        (artifact / 'package.json').write_text('{"private":true}\n', encoding='utf-8')
+        dependency = self.root.parent / 'runtime-command'
+        dependency.write_text('color.primary: dependency content must not be a project contract.\n', encoding='utf-8')
+        binaries = artifact / 'node_modules/.bin'
+        binaries.mkdir(parents=True)
+        (binaries / 'vite').symlink_to(dependency)
+        payload = self.root / 'fixture-evidence.json'
+        payload.write_text('{"scope":"offline integrity fixture, no browser observation"}', encoding='utf-8')
+        tasks.add_evidence(self.root, 'react-refresh', 'audit', 'Synthetic integrity fixture.',
+                           payload, ['../../prototypes/react-refresh/App.jsx'])
+        handoff = self.root / 'fixture-handoff.json'
+        handoff.write_text(json.dumps({
+            'frameLinks': [], 'createdNodeIds': [], 'modifiedNodeIds': [], 'remainingGaps': [],
+            'checks': [{'evidence': ['evidence-0001.json']}],
+            'requirementStateMapping': [{'requirement': 'fixture', 'state': 'default'}],
+            'artifacts': [{'entry': 'design/prototypes/react-refresh/App.jsx',
+                           'instructions': 'design/prototypes/react-refresh/README.md',
+                           'launch': {'mode': 'command', 'cwd': 'design/prototypes/react-refresh',
+                                      'argv': ['npm', 'run', 'dev']}}]
+        }), encoding='utf-8')
+        tasks.update_handoff(self.root, 'react-refresh', handoff, 'design_delivered')
+        task_path = design / 'tasks/react-refresh/task.json'
+        before = task_path.read_bytes(), entry.read_bytes(), dependency.read_bytes()
+        self.write_source('one', [{'id': 'color.primary', 'name': 'Primary', 'data': {'value': '#abcdef'}}])
+
+        refresh = self.plan(refresh=True)
+        self.assertEqual(refresh['candidateErrors'], [])
+        affected = next(item for item in refresh['affectedReferences'] if item['id'] == 'color.primary')
+        self.assertIn('design/tasks/react-refresh/task.json', affected['files'])
+        self.assertNotIn('design/prototypes/react-refresh/node_modules/.bin/vite', affected['files'])
+        project.inspect_plan(self.root, refresh['id'])
+        project.apply_plan(self.root, refresh['id'])
+        self.assertEqual((task_path.read_bytes(), entry.read_bytes(), dependency.read_bytes()), before)
+        self.assertTrue((binaries / 'vite').is_symlink())
+        self.assertEqual(tasks.check_task(self.root, 'react-refresh')['status'], 'checked')
+        self.assertEqual(project.validate_project(self.root)['status'], 'pass')
+
+        entry.unlink()
+        invalid = self.plan(refresh=True)
+        self.assertTrue(invalid['candidateErrors'])
+        with self.assertRaises(ValueError):
+            project.apply_plan(self.root, invalid['id'])
+        self.assertEqual(task_path.read_bytes(), before[0])
 
     def test_relocation_requires_reason_and_records_migration(self):
         first = self.plan(); project.apply_plan(self.root, first['id'])

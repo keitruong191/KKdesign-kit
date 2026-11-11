@@ -2,6 +2,20 @@
 
 ## Unreleased — agent Setup and marketplace integration
 
+### DS-first interactive prototypes
+
+- Select Figma, standalone HTML, or React explicitly for prototype requests;
+  preserve design/review boundaries and the selected product platform/profile.
+- Add bounded project artifacts, inert launch metadata, artifact-only handoff,
+  and shared task/evidence validation without requiring Figma for web delivery.
+- Preserve user-owned React runtime trees during refresh while validating actual
+  delivered artifacts. Include synthetic token/spec and optional code-DS inputs.
+- Record real browser-flow verification separately from native harness/Figma
+  acceptance, remaining native scope failures, and human design approval.
+- Isolate dispatcher-backed prototype tests from developer HOME/cache using the
+  existing verified-runtime fixture and Windows ACL setup. Retain fail-closed
+  startup and distinguish artifact rejection from an unconfigured runtime.
+
 ### Persistent marketplace review sources
 
 - Publish separate built Codex and Claude Code review snapshots in the existing

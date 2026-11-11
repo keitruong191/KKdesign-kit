@@ -2,7 +2,7 @@
 
 A design-system skill for Codex and Claude Code. Use it to prepare project design context, execute and review design tasks, create explicitly requested prototypes, and retain evidence-backed lessons.
 
-The skill includes command guides, Python helpers, schemas and synthetic examples. Live canvas edits and prototype playback use your separately configured design tools.
+The skill includes command guides, Python helpers, schemas and synthetic examples. Prototype delivery is explicitly selected as Figma, HTML, or React: Figma retains its authenticated graph/preview workflow; HTML/React use a project-local web artifact workflow. Live canvas changes require separately authorized design tools; browser verification requires browser capability.
 
 ## Get started
 
@@ -73,11 +73,20 @@ an onboarding fallback.
 | `refresh` | Compare source changes and stage an update while preserving project history. | [Project setup](references/project-kit.md) |
 | `design` | Resolve scope and lesson decisions, execute with authorized tools, then inspect saved structure and rendered output. | [Design](references/design.md) |
 | `review` | Report UX, visual and design-system findings. Make edits only when requested. | [Review](references/review.md) |
-| `prototype` | Create or change explicitly requested interactions and verify actual navigation. | [Prototype](references/prototype.md) |
+| `prototype` | Create or change an explicitly requested Figma, HTML, or React prototype; select one target from the brief. | [Prototype](references/prototype.md) |
 | `learn` | Capture feedback separately from inferred lessons; preserve stable IDs, supersession and historical sources. | [Learning](references/learn.md) |
 | `package` | Build a portable ZIP with a versioned manifest and checksums. | [Packaging](references/packaging.md) |
 
 Design and review never create prototype interactions as a side effect. Review guidance is bundled with [upstream attribution and licenses](docs/review-attribution.md); no installed Impeccable or Hoangsa is required. Installation does not enable hooks or configure external tools.
+
+If a prototype request does not identify Figma, HTML, or React and context does
+not resolve it, ask the user; there is no `--target` flag and no default renderer.
+HTML runs locally without Node or CDN. React requires an environment suitable
+for the selected runtime and design system; use the project's applicable
+package manager/lockfile where possible, and add dependencies only with
+permission. Browser verification is a separate capability. Missing capability
+blocks only the dependent operation; neither route silently falls back to
+another target. Prototype invocation does not authorize publishing.
 
 ## Set up a project
 
@@ -123,7 +132,7 @@ Packaging collects reusable skill resources from the skill directory. It does no
 
 Contract validation checks saved schemas, references, hashes and task records. It cannot establish rendered quality, playable navigation, native accessibility or performance.
 
-For design work, inspect the actual destination, read back saved properties and view rendered output. For prototypes, check effective timing in the design tool and run the requested transitions, including back/cancel with valid history. Label simulated data, APIs, validation and timing. Human design approval remains separate.
+For design work, inspect the actual destination, read back saved properties and view rendered output. For Figma prototypes, inspect persisted graph data and run the requested preview transitions, including back/cancel with valid history. For HTML/React prototypes, launch using the recorded instructions, exercise the agreed scenarios in a browser, and retain actual observations; a source file or offline integrity check is not runtime evidence. Label simulated data, APIs, validation and timing. Human design approval remains separate.
 
 For repository development, use a dependency-equipped Python environment.
 The source checkout also carries the plugin descriptor, so its launcher

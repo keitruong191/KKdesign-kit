@@ -54,3 +54,45 @@ for stable IDs, deduplication, evidence and explicit supersession.
 Task evidence has `$schema`, `schemaVersion`, `kind=task-evidence`, and `record`. Keep the original payload at its original keys. `record.payloadSha256` hashes the payload excluding those four wrapper fields, serialized as UTF-8 JSON with `sort_keys=True`, `ensure_ascii=False`, `separators=(',', ':')`. Metadata identifies task, evidence type, historical status, description and references. A wrapper migration must compare the original and migrated payloads.
 
 Reference paths are relative to the record's documented base, stay inside the project, and must exist. Remote evidence is HTTPS and is recorded without network verification.
+
+## Prototype delivery
+
+Prototype work is explicit and separate from design/review. The existing Figma
+delivery is `figma_design`; web tasks select `html_prototype` or
+`react_prototype` explicitly. If the requested output is unresolved, ask rather
+than choosing a target or creating multiple outputs. The product `platform` and
+profile remain the product's, even when a web browser is used to present a demo.
+`productProfileId` is the selected profile document's declared `id`, not its filename.
+Web prototypes reuse the existing `design-task` lifecycle and evidence wrappers;
+they do not define a second schema family or change historical records or the
+shared pending template. Web task records declare an explicit web `delivery` and
+the exact project-relative `target.destination` `design/prototypes/<taskId>`.
+The source decisions record important design system mappings and provenance
+(`surface`, real project `sourceId`, `assetIds`, `revisionOrHash`,
+`implementation` as `reuse-code` or `recreated`, optional `codeReference`, and
+notes). Missing provenance is recorded as a scoped exception, not fabricated
+identity or proof of conformance.
+
+Web handoffs retain the common fields `frameLinks`, `createdNodeIds`,
+`modifiedNodeIds`, `checks`, `remainingGaps`, and `requirementStateMapping`.
+Canvas-only arrays may be empty for web; do not invent links or node IDs. A
+delivered web handoff additionally requires nonempty `handoff.artifacts`:
+project-relative `entry` and `instructions` files under the target artifact
+root, plus launch metadata (`file` or `command`; React uses `command`). Command
+launch metadata includes a nonempty string `argv` and project-relative `cwd`.
+Artifact paths and `cwd` are project-root-relative; evidence references retain
+their task-directory base. Artifact files must exist, remain within the project,
+and not traverse symlinks. Path metadata is never permission to execute it.
+
+Project refresh treats `design/prototypes` as user-owned runtime output, not as
+managed design contracts or a dependency tree to scan/copy. Asset impact review
+uses the task's recorded source decisions. Candidate validation still checks
+artifact metadata against the actual project and materializes only declared
+artifact/evidence references; missing or unsafe artifacts continue to block it.
+
+Offline check/foundation validation establishes schema and artifact integrity
+only. It does not establish that a browser ran, interactions work, a design
+system conforms, or a human approved the result. Delivered web tasks need
+evidence-cited checks and requirement/state mappings; `blockedDisposition` does
+not replace those requirements. Incomplete or unverified work remains
+`in_progress`. Figma keeps its existing graph workflow and non-web delivery gate.
