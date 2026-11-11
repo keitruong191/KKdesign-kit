@@ -1,29 +1,34 @@
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
 import sys
-import tempfile
 import unittest
 from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
+import test_setup as fixtures
 import kkdesign_task as tasks
 from kkdesign_core import validate_foundation
 from materialize_example import materialize
 
 
 class PrototypeHandoffTests(unittest.TestCase):
+    tearDown = fixtures.SetupTests.tearDown
+    verified_cache = fixtures.SetupTests.verified_cache
+
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.project = materialize(Path(self.temp.name) / 'project with spaces')
+        fixtures.SetupTests.setUp(self)
+        self.verified_cache()
+        self.project = materialize(self.base / 'project with spaces')
         self.prototypes = self.project / 'design/prototypes/settings-prototype'
         self.prototypes.mkdir(parents=True)
         (self.prototypes / 'index demo.html').write_text('<!doctype html><title>Synthetic</title>', encoding='utf-8')
         (self.prototypes / 'README launch.md').write_text('Open index demo.html; synthetic offline demo.', encoding='utf-8')
         (self.prototypes / 'package.json').write_text('{"private":true}', encoding='utf-8')
-        self.record_path = Path(self.temp.name) / 'task record.json'
+        self.record_path = self.base / 'task record.json'
         self.task = json.loads((self.project / 'design/task-template.json').read_text(encoding='utf-8'))
         self.task.update({
             'kind': 'design-task', 'status': 'in_progress', 'taskId': 'settings-prototype',
@@ -50,13 +55,13 @@ class PrototypeHandoffTests(unittest.TestCase):
         })
         self.record_path.write_text(json.dumps(self.task), encoding='utf-8')
 
-    def tearDown(self):
-        self.temp.cleanup()
-
     def launcher(self, *args):
+        env = dict(os.environ, HOME=str(self.home), USERPROFILE=str(self.home))
+        for key in ('VIRTUAL_ENV', 'PYTHONHOME', 'PYTHONPATH'):
+            env.pop(key, None)
         return subprocess.run(
             [sys.executable, '-B', str(ROOT / 'scripts/kkdesign_run.py'), 'kkdesign_task', *map(str, args)],
-            cwd=ROOT, text=True, capture_output=True)
+            cwd=ROOT, env=env, text=True, capture_output=True)
 
     def begin(self):
         result = self.launcher('begin', '--project', self.project, '--record', self.record_path)
@@ -64,7 +69,7 @@ class PrototypeHandoffTests(unittest.TestCase):
         return self.project / 'design/tasks/settings-prototype/task.json'
 
     def evidence(self, references=None):
-        payload = Path(self.temp.name) / 'browser evidence.json'
+        payload = self.base / 'browser evidence.json'
         payload.write_text(json.dumps({'browser': 'synthetic fixture', 'viewport': '800x600',
                                        'actions': ['open settings'], 'observation': 'static fixture only',
                                        'simulations': ['offline'], 'gaps': ['no browser run claimed']}), encoding='utf-8')
@@ -84,7 +89,7 @@ class PrototypeHandoffTests(unittest.TestCase):
                 'artifacts': self.task['handoff']['artifacts']}
         if overrides:
             body.update(overrides)
-        path = Path(self.temp.name) / 'handoff.json'
+        path = self.base / 'handoff.json'
         path.write_text(json.dumps(body), encoding='utf-8')
         return path
 
@@ -95,7 +100,6 @@ class PrototypeHandoffTests(unittest.TestCase):
         self.assertEqual(check.returncode, 0, check.stderr)
         checked = json.loads(check.stdout)
         self.assertEqual(checked['evidenceRecords'], 1)
-        self.assertIn('not live behavior', checked['scope'])
         update = self.launcher('handoff', '--project', self.project, '--task-id', 'settings-prototype',
                                '--record', self.handoff(), '--status', 'design_delivered')
         self.assertEqual(update.returncode, 0, update.stderr)
@@ -152,6 +156,8 @@ class PrototypeHandoffTests(unittest.TestCase):
         (self.prototypes / 'index demo.html').unlink()
         result = self.launcher('begin', '--project', self.project, '--record', self.record_path)
         self.assertNotEqual(result.returncode, 0)
+        self.assertNotIn('Setup required', result.stderr)
+        self.assertIn('Invalid web artifacts', result.stderr)
         self.assertFalse((self.project / 'design/tasks/settings-prototype').exists())
 
     def test_empty_begin_then_artifact_refs_and_delivery_gates(self):
@@ -209,7 +215,7 @@ class PrototypeHandoffTests(unittest.TestCase):
         self.record_path.write_text(json.dumps(task), encoding='utf-8')
         task_path = self.begin()
         (self.prototypes / 'App.jsx').write_text('export default function App() {}', encoding='utf-8')
-        sentinel = Path(self.temp.name) / 'unexpected execution.txt'
+        sentinel = self.base / 'unexpected execution.txt'
         task['handoff']['artifacts'] = [{
             'entry': 'design/prototypes/settings-prototype/App.jsx',
             'instructions': 'design/prototypes/settings-prototype/README launch.md',

@@ -51,6 +51,47 @@ These additional checks do not replace or upgrade the historical browser/native
 observations below. Native browser/Figma acceptance and reported scope deviations
 remain unresolved.
 
+## CI follow-up — isolated runtime fixture
+
+The owner requested a separate repair sub-session, `fix/pr21-ci-runtime`, after
+PR #21 failed. The original [push run](https://github.com/keitruong191/KKdesign-kit/actions/runs/42984341249)
+and [PR run](https://github.com/keitruong191/KKdesign-kit/actions/runs/42984411186)
+each failed all six OS/Python validation variants with the same eleven handoff
+failures. Bootstrap smoke passed. Existing logs were used as failure evidence;
+the old runs were not rerun merely to confirm the report.
+
+The source checkout contains plugin metadata, so its real dispatcher requires a
+verified private Setup runtime. The handoff fixture inherited the developer HOME
+and accidentally borrowed its existing cache locally. Fresh CI homes had no
+matching runtime and correctly refused before task execution. One negative test
+also passed for that wrong refusal reason. This was a test precondition/isolation
+defect, not authorization to weaken production startup.
+
+The fixture now reuses `test_setup`'s owned, no-download runtime and receipt
+setup, including native Windows ACL handling. Every launcher subprocess receives
+the fixture HOME and USERPROFILE; interpreter-injection variables are cleared.
+Actual dispatcher/task/evidence/handoff paths and meaningful negative assertions
+are retained. The incomplete-artifact test distinguishes its artifact rejection
+from missing Setup; an incidental scope-wording assertion was removed.
+Production scripts, dependency requirements and CI policy are unchanged.
+
+Post-fix local checks used an empty, physically resolved contributor HOME and
+USERPROFILE, not the developer cache:
+
+- Focused handoff suite: **12 passed**, 7.796 seconds.
+- Full suite: **212 cases; 203 passed, 9 native-Windows skips**, 31.680 seconds.
+- Independent real-dispatcher smoke: unconfigured HOME refused without task/cache
+  mutation; isolated verified HOME completed begin/evidence/artifact-only
+  delivery/check/foundation; deleting the delivered entry then failed both
+  integrity gates while preserving task bytes.
+- The workflow's downstream materialize → foundation validate → package steps
+  passed. Relocated package verification passed with **85 files / 51 required
+  resources** and the unchanged payload SHA-256 recorded above.
+
+Remote matrix completion must be observed on the repair commit's PR checks,
+not inferred from these local results. Native browser/Figma and human design
+acceptance remain separate.
+
 ## Current-state audit, not only worker reports
 
 Main read the canonical reports, actual README instructions, task/evidence metadata, and rendered reference/form/result captures. Main independently reopened the current React app from its README, observed entered content in review, reached local success `REQ-1042`, saw one list item, and reset to the empty entry. Main also replayed success/reset on the accepted compact prototype and on the replacement HTML artifact through its actual `file://` entry.

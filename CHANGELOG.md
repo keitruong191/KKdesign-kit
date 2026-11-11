@@ -12,6 +12,9 @@
   delivered artifacts. Include synthetic token/spec and optional code-DS inputs.
 - Record real browser-flow verification separately from native harness/Figma
   acceptance, remaining native scope failures, and human design approval.
+- Isolate dispatcher-backed prototype tests from developer HOME/cache using the
+  existing verified-runtime fixture and Windows ACL setup. Retain fail-closed
+  startup and distinguish artifact rejection from an unconfigured runtime.
 
 ### Persistent marketplace review sources
 
