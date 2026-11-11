@@ -1,0 +1,20 @@
+{
+  "interface": {
+    "displayName": "KKdesign-kit Codex"
+  },
+  "name": "kkdesign-kit-codex",
+  "plugins": [
+    {
+      "category": "Productivity",
+      "name": "kkdesign-kit",
+      "policy": {
+        "authentication": "ON_USE",
+        "installation": "AVAILABLE"
+      },
+      "source": {
+        "path": "./plugins/kkdesign-kit",
+        "source": "local"
+      }
+    }
+  ]
+}

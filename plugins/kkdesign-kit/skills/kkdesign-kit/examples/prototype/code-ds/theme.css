@@ -1,0 +1,86 @@
+/* Recreated from examples/prototype/ds/ds.json (theme.light). */
+:root {
+  --atlas-color-canvas: #F5F7FA;
+  --atlas-color-surface: #FFFFFF;
+  --atlas-color-text-primary: #182230;
+  --atlas-color-text-muted: #596579;
+  --atlas-color-brand: #2457A6;
+  --atlas-color-border: #D7DEE8;
+  --atlas-color-feedback-success: #176B45;
+  --atlas-color-feedback-error: #A33232;
+  --atlas-space-1: 4px;
+  --atlas-space-2: 8px;
+  --atlas-space-3: 12px;
+  --atlas-space-4: 16px;
+  --atlas-space-6: 24px;
+  --atlas-space-8: 32px;
+  --atlas-radius-control: 8px;
+  --atlas-radius-card: 12px;
+  --atlas-type-family-ui: Arial, sans-serif;
+  --atlas-type-size-body: 16px;
+  --atlas-type-size-label: 14px;
+  --atlas-type-size-title: 28px;
+  --atlas-type-weight-regular: 400;
+  --atlas-type-weight-strong: 600;
+}
+
+.atlas-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--atlas-space-3) var(--atlas-space-4);
+  border: 0;
+  border-radius: var(--atlas-radius-control);
+  background: var(--atlas-color-brand);
+  color: var(--atlas-color-surface);
+  font: var(--atlas-type-weight-strong) var(--atlas-type-size-label)/1.4 var(--atlas-type-family-ui);
+  cursor: pointer;
+}
+
+.atlas-button:focus-visible,
+.atlas-field__input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--atlas-color-brand) 35%, transparent);
+  outline-offset: 2px;
+}
+
+.atlas-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.atlas-field {
+  display: grid;
+  gap: var(--atlas-space-2);
+  color: var(--atlas-color-text-primary);
+  font-family: var(--atlas-type-family-ui);
+}
+
+.atlas-field__label {
+  font-size: var(--atlas-type-size-label);
+  font-weight: var(--atlas-type-weight-strong);
+  line-height: 1.4;
+}
+
+.atlas-field__input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: var(--atlas-space-3);
+  border: 1px solid var(--atlas-color-border);
+  border-radius: var(--atlas-radius-control);
+  background: var(--atlas-color-surface);
+  color: var(--atlas-color-text-primary);
+  font: var(--atlas-type-weight-regular) var(--atlas-type-size-body)/1.5 var(--atlas-type-family-ui);
+}
+
+.atlas-card {
+  box-sizing: border-box;
+  padding: var(--atlas-space-6);
+  border: 1px solid var(--atlas-color-border);
+  border-radius: var(--atlas-radius-card);
+  background: var(--atlas-color-surface);
+  color: var(--atlas-color-text-primary);
+  font: var(--atlas-type-weight-regular) var(--atlas-type-size-body)/1.5 var(--atlas-type-family-ui);
+}
