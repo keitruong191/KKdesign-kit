@@ -17,12 +17,12 @@ jobs:
           python-version: '3.12'
       - name: Build deterministic portable package and checksum
         run: |
-          python scripts/kkdesign_install.py package --output ../release-assets/kkdesign-kit-0.5.0a1.zip
-          python -c "import hashlib,pathlib; p=pathlib.Path('../release-assets/kkdesign-kit-0.5.0a1.zip'); p.with_suffix(p.suffix+'.sha256').write_text(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\\n')"
+          python scripts/kkdesign_install.py package --output ../release-assets/kkdesign-kit-0.5.0a2.zip
+          python -c "import hashlib,pathlib; p=pathlib.Path('../release-assets/kkdesign-kit-0.5.0a2.zip'); p.with_suffix(p.suffix+'.sha256').write_text(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name+'\\n')"
           cp install.sh ../release-assets/
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: kkdesign-kit-0.5.0a1-release-assets
+          name: kkdesign-kit-0.5.0a2-release-assets
           path: ../release-assets/
           if-no-files-found: error
           retention-days: 7
@@ -38,7 +38,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1, Node 24
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: kkdesign-kit-0.5.0a1-release-assets
+          name: kkdesign-kit-0.5.0a2-release-assets
           path: release-assets
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0, Node 24
         with:
@@ -53,7 +53,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: kkdesign-kit-0.5.0a1-release-assets
+          name: kkdesign-kit-0.5.0a2-release-assets
           path: release-assets
       - name: Create a new draft only; never overwrite a release
         env:
@@ -61,8 +61,8 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_COMMIT: ${{ github.sha }}
         run: |
-          if gh release view v0.5.0a1 >/dev/null 2>&1; then
-            echo 'Release v0.5.0a1 already exists; refusing to overwrite it.' >&2
+          if gh release view v0.5.0a2 >/dev/null 2>&1; then
+            echo 'Release v0.5.0a2 already exists; refusing to overwrite it.' >&2
             exit 1
           fi
-          gh release create v0.5.0a1 release-assets/* --target "$RELEASE_COMMIT" --draft --title 'KKdesign-kit 0.5.0a1' --notes 'Portable package and pinned bootstrap. Publish only after owner approval and release verification.'
+          gh release create v0.5.0a2 release-assets/* --target "$RELEASE_COMMIT" --draft --title 'KKdesign-kit 0.5.0a2' --notes 'Portable package and pinned bootstrap. Publish only after owner approval and release verification.'

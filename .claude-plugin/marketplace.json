@@ -5,7 +5,7 @@
     {
       "name": "kkdesign-kit",
       "source": "./",
-      "version": "0.5.0a1",
+      "version": "0.5.0a2",
       "description": "Design workflows. Explicit agent Setup required; publication and native acceptance tracked separately."
     }
   ]

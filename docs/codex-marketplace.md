@@ -20,22 +20,25 @@ Linux acquisition is implemented; [native Linux acceptance](verification/linux-r
 
 ## Native maintainer review
 
-Version `0.5.0a1` is available for owner/tester review from the persistent
+Version `0.5.0a2` is available for owner/tester review from the persistent
 Git source below. This is an author-operated review/prerelease channel, not a
 production release or official directory listing. Git and GitHub HTTPS access
 are required. For isolated testing use a clean HOME, USERPROFILE and CODEX_HOME;
 these commands otherwise affect the current native profile.
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref review/codex-0.5.0a2
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 codex plugin list --json
 ```
 
-This command pins the immutable distribution commit. The corresponding mutable
-review branch is `review/wwa11-codex-0.5.0a1`; both point at the snapshot in
-[source provenance](marketplace-sources.md). The plugin
-add marketplace argument is the catalog name, not its repository URL.
+This versioned branch is mutable, not an immutable pin. For an immutable review,
+use the Codex distribution commit for `0.5.0a2` from the owner's
+[release description authored by `keitruong191`](https://github.com/keitruong191/KKdesign-kit/pull/22)
+(section **0.5.0a2 distribution commits**, not comments)
+as the `--ref` value instead. Stop if that version has no published snapshot.
+Snapshot documents cannot embed their own future commit. The plugin-add
+marketplace argument is the catalog name, not its repository URL.
 
 Start a new session in the selected product project, then invoke:
 

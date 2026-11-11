@@ -7,10 +7,11 @@ permission to release, tag, submit a listing or merge main.
 
 ## Publication observation
 
-WWA-11 supersedes the historical WWA-10 no-source observation: author-operated
-review/prerelease sources now exist in the public repository for both providers,
-at version `0.5.0a1`. See [source provenance](../marketplace-sources.md) and
-[remote native evidence](marketplace-sources.md) for exact commands, immutable
+WWA-11 established historical `0.5.0a1` review availability. Current
+`0.5.0a2` uses new provider refs in [source provenance](../marketplace-sources.md).
+Consult the [`keitruong191`-authored release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits** (not comments),
+for exact commands, immutable
 snapshots and measured pin limitations. The default branch is not the built
 marketplace. Review-channel availability does not establish production release
 approval, authenticated menu/Setup or observed non-dev usability.
@@ -50,9 +51,17 @@ Actual installed-package execution probes:
 | `python -B scripts/smoke_posix_setup.py --incomplete-python '<absolute-Linux-interpreter>'` | Same native Linux smoke after independently confirming this actual system Python lacks venv or ensurepip. Do not fake the interpreter or remove system modules. |
 | `python -B scripts/smoke_windows_setup.py --inspect-artifacts` | Downloads and checks both pinned Windows archives and contents without executing Windows bytes; portable integrity only. |
 | `python -B scripts/smoke_windows_setup.py` | On each native Windows CPU: actual Windows PowerShell acquisition/helpers/reuse, spaces/CWD, trust rejection/preservation. Skips or syntax parsing on another OS are not Windows acceptance. |
-| `python -B scripts/smoke_remote_marketplaces.py --output '<new-outside-source>/remote' --codex-ref e108483e7756e3ad4167531b524667a5f0beadb9 --claude-ref review/wwa11-claude-0.5.0a1 --claude-sha bea7e433f4f576068bcf2eec15317d7d73e5e065` | Persistent public Git sources: separate clean profiles, exact clone revisions before install, enabled inventory/fresh discovery without model calls, real Setup/helpers and removal/preservation. See [results](marketplace-sources.md). |
+| `python -B scripts/smoke_remote_marketplaces.py --output '<new-outside-source>/remote' --codex-ref "$CODEX_DISTRIBUTION_SHA" --claude-ref review/claude-0.5.0a2 --claude-sha "$CLAUDE_DISTRIBUTION_SHA"` | Set both SHA variables from the owner's published `0.5.0a2` source record first. Persistent public Git sources: separate clean profiles, exact clone revisions before install, enabled inventory/fresh discovery without model calls, real Setup/helpers and removal/preservation. |
 | `python -B scripts/smoke_native_lifecycle.py --output '<new-outside-source>/lifecycle'` | On native macOS/GNU Linux with both provider CLIs: isolated Git smart-HTTP marketplaces, native install/update/enable/disable/remove/reinstall, real shared runtimes and surviving consumers/project data. No model credentials or human interaction. |
 | `python -B scripts/smoke_standalone_migration.py` | POSIX relocated plugin Setup: actual synthetic managed migration, retained ledgers/backups/project data, both provider layouts. Historical copies are test fixtures, not fallback installation. |
+
+The remote probe's expected plugin version comes from its source checkout's
+`manifest.json`. Use a matching historical checkout when reproducing an older
+version; do not run old snapshot arguments against the current version and infer
+a publication failure. Immutable revisions come from the owner's
+[release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
+section **0.5.0a2 distribution commits**, authored by `keitruong191` (not comments),
+not the snapshot-era copy of a verification page.
 
 For a direct project-start check after consented Setup in a disposable test home,
 set `SKILL_DIR` to either extracted skill directory above and `PROJECT_ROOT` to
@@ -117,7 +126,7 @@ only with non-private facts:
 ```text
 Case: native-agent / usability / acquisition / lifecycle / migration
 Date: YYYY-MM-DD
-Plugin version: 0.5.0a1 (example; record actual)
+Plugin version: 0.5.0a2 (example; record actual)
 Catalog: approved public source + immutable revision, or "isolated review source"
 Provider: name, version, surface; user/project scope
 Platform: OS version, CPU; Linux distro/libc when applicable

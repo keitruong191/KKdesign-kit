@@ -35,7 +35,8 @@ class BootstrapTests(unittest.TestCase):
         self.home.mkdir()
         self.assets = self.base / 'assets'
         self.assets.mkdir()
-        self.archive = self.assets / 'kkdesign-kit-0.5.0a1.zip'
+        version = kit.read_json(ROOT / 'manifest.json')['version']
+        self.archive = self.assets / ('kkdesign-kit-' + version + '.zip')
         kit.package(ROOT, self.archive)
         digest = hashlib.sha256(self.archive.read_bytes()).hexdigest()
         (self.assets / (self.archive.name + '.sha256')).write_text(

@@ -66,6 +66,7 @@ def private_state(root):
 def probe(output, codex_ref, claude_ref, claude_sha):
     if output.absolute().resolve().is_relative_to(ROOT):
         raise ValueError('Output must be outside source')
+    expected_version = kit.read_json(ROOT / 'manifest.json')['version']
     providers = {name: shutil.which(name) for name in ('codex', 'claude')}
     if not all(providers.values()):
         raise ValueError('Both provider CLIs must already be installed')
@@ -137,8 +138,8 @@ def probe(output, codex_ref, claude_ref, claude_sha):
         rows = inventory['installed'] if name == 'codex' else inventory
         selected = [row for row in rows if row.get('pluginId', row.get('id')) == identifier]
         assert len(selected) == 1 and selected[0]['enabled'] is True, inventory
-        assert selected[0]['version'] == '0.5.0a1', selected
-        plugin = config / 'plugins/cache' / market / 'kkdesign-kit/0.5.0a1'
+        assert selected[0]['version'] == expected_version, selected
+        plugin = config / 'plugins/cache' / market / 'kkdesign-kit' / expected_version
         skill = plugin / 'skills/kkdesign-kit' if name == 'codex' else plugin
         kit.verify(skill)
         # Fresh process, no source override and no user/model prompt.

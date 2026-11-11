@@ -74,12 +74,12 @@ establish runtime readiness or permission to install or publish.
 ## Historical release workflow
 
 The repository's manually dispatched `Approved portable release` workflow runs
-only from `main` after PR review/merge. It builds the `0.5.0a1` ZIP and transport
+only from `main` after PR review/merge. It builds the `0.5.0a2` ZIP and transport
 `.sha256` outside the source, uploads temporary workflow artifacts, and exercises
 actual loopback HTTP downloads on Ubuntu and macOS for both harnesses/scopes,
 fresh-shell helpers, update, rollback and uninstall. The final job uses the
 `release-approval` environment: configure required reviewers in repository
-settings before dispatch. It creates a new **draft** release for `v0.5.0a1` and
+settings before dispatch. It creates a new **draft** release for `v0.5.0a2` and
 refuses an existing release; it never overwrites assets. Draft creation is not
 publication. This PR does not authorize dispatch, tag creation or publication.
 This historical workflow is not the marketplace release path. Do not dispatch it

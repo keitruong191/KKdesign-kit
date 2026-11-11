@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — agent Setup and marketplace integration
+## 0.5.0a2 — DS-first interactive prototype prerelease
 
 ### DS-first interactive prototypes
 
@@ -15,6 +15,8 @@
 - Isolate dispatcher-backed prototype tests from developer HOME/cache using the
   existing verified-runtime fixture and Windows ACL setup. Retain fail-closed
   startup and distinguish artifact rejection from an unconfigured runtime.
+
+## 0.5.0a1 — Marketplace and Setup preview history
 
 ### Persistent marketplace review sources
 
