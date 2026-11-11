@@ -6,23 +6,23 @@ The skill includes command guides, Python helpers, schemas and synthetic example
 
 ## Get started
 
-Version `0.5.0a1` is available from author-operated **review/prerelease**
+Version `0.5.0a2` is available from author-operated **review/prerelease**
 marketplaces in this public repository. These channels support owner/tester
 review; production release approval and official directory listings remain
 pending. Use the provider you already have, with Git and HTTPS access to GitHub:
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref e108483e7756e3ad4167531b524667a5f0beadb9
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref f49151a3b21501f52843385f5fce769009df39d2
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
 
 ```sh
-claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/wwa11-claude-0.5.0a1'
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
 git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
 ```
 
 On the measured POSIX surface, verify that the output is exactly
-`bea7e433f4f576068bcf2eec15317d7d73e5e065`. **Stop if it differs** and ask the
+`ec7fd565558b8adb065557382aa68d547dec13c6`. **Stop if it differs** and ask the
 owner to review that snapshot. The branch is mutable; this check is required
 before installation. Only after it matches, install:
 
@@ -31,11 +31,19 @@ claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
 Codex uses an immutable commit pin; Claude uses a mutable review branch.
-See [source provenance and snapshot revisions](docs/marketplace-sources.md)
-for the exact canonical/distribution commits, integrity and tested pin syntax.
+See [source provenance and snapshot revisions](docs/marketplace-sources.md) and
+the [`keitruong191`-authored release description](https://github.com/keitruong191/KKdesign-kit/pull/22)
+(section **0.5.0a2 distribution commits**, not comments) for exact identities,
+integrity and measured pin limits. The release description is authoritative if a
+copied evidence page differs.
 The default repository branch is not the built marketplace. No source clone or
 build is an end-user step. Use a separate provider profile for review if you
 already have another KKdesign installation.
+
+For an existing older pin, follow the [explicit source migration](docs/installation.md#installation-availability):
+use provider controls to remove the old plugin and marketplace registration,
+then register the new source and install it. An immutable pin does not advance
+itself. Project data and private runtimes remain separate from the plugin.
 
 Once a reviewed plugin is installed in your authorized local provider session:
 
