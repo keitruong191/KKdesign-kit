@@ -11,10 +11,14 @@ marketplaces in this public repository. These channels support owner/tester
 review; production release approval and official directory listings remain
 pending. Use the provider you already have, with Git and HTTPS access to GitHub:
 
+### Codex
+
 ```sh
 codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref f49151a3b21501f52843385f5fce769009df39d2
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
+
+### Claude Code
 
 ```sh
 claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
@@ -40,10 +44,21 @@ The default repository branch is not the built marketplace. No source clone or
 build is an end-user step. Use a separate provider profile for review if you
 already have another KKdesign installation.
 
-For an existing older pin, follow the [explicit source migration](docs/installation.md#installation-availability):
-use provider controls to remove the old plugin and marketplace registration,
-then register the new source and install it. An immutable pin does not advance
-itself. Project data and private runtimes remain separate from the plugin.
+### Upgrade from an older pin
+
+An existing marketplace registration does not automatically move to the a2
+source. In the provider profile that owns the older installation:
+
+1. Use provider controls to remove the old plugin, then its marketplace
+   registration.
+2. Repeat the installation steps above with the a2 source, including Claude's
+   expected-HEAD check before installing.
+3. Open a new provider session and run Setup to verify or reuse the runtime.
+
+Project data and private runtimes are separate from the plugin. Do not delete
+them to change the marketplace source; compatible verified runtimes can be reused.
+
+### Start using the skill
 
 Once a reviewed plugin is installed in your authorized local provider session:
 
@@ -67,8 +82,12 @@ Use provider controls to update, enable, disable or remove the plugin.
 
 See [installation and troubleshooting](docs/installation.md), the measured
 [support matrix](docs/compatibility.md), and [Setup](references/setup.md).
-Authenticated agent and non-dev observation are still pending; partial native
-checks do not establish a fully accepted user journey. Existing standalone users
+Native CLI checks on macOS ARM64 verified fresh public-source installs, skill
+discovery, Setup/helpers and explicit a1-to-a2 source migration for both
+providers, including compatible runtime reuse and project-data preservation.
+See the [publication verification record](docs/verification/marketplace-sources.md).
+Authenticated agent and non-dev observation remain pending; these checks do not
+establish a fully accepted user journey. Existing standalone users
 should choose Setup's consented migration flow; standalone installation is not
 an onboarding fallback.
 
@@ -86,6 +105,25 @@ an onboarding fallback.
 | `package` | Build a portable ZIP with a versioned manifest and checksums. | [Packaging](references/packaging.md) |
 
 Design and review never create prototype interactions as a side effect. Review guidance is bundled with [upstream attribution and licenses](docs/review-attribution.md); no installed Impeccable or Hoangsa is required. Installation does not enable hooks or configure external tools.
+
+## Create an interactive prototype
+
+After Setup and project initialization, explicitly request `prototype` and name
+the delivery target. Work follows the selected project's design system rather
+than substituting a generic UI kit:
+
+1. Supply the feature brief, users, entry/end, required states, main and
+   alternative flows, back/cancel behavior, and acceptance criteria. Identify
+   simulated data and behavior.
+2. Inspect actual DS sources and record reuse or recreation decisions in the
+   shared task plan. Keep the product's platform/profile unchanged when a
+   browser is only the demo surface.
+3. Build the agreed scope, exercise its scenarios, and hand off launch/demo
+   instructions, task records, evidence and remaining gaps. HTML/React artifacts
+   live under `design/prototypes/<taskId>`, separate from task/evidence records.
+
+Use the [shared prototype workflow](references/prototype.md) and the
+[HTML/React implementation and handoff guide](references/prototype-web.md).
 
 If a prototype request does not identify Figma, HTML, or React and context does
 not resolve it, ask the user; there is no `--target` flag and no default renderer.
