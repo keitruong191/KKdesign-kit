@@ -34,22 +34,22 @@ take the Codex commit for `0.5.0a2` from the published record and use it as
 Claude Code 2.1.308 accepts a named `#ref` branch and rejects raw SHAs as
 nonexistent branch names. Do not create a fake SHA-named branch.
 
-For Claude on the measured POSIX surface, register and inspect the native clone
-before plugin install:
+For Claude on the measured POSIX surface, keep registration, the expected-HEAD
+gate and installation in one fail-fast chain:
 
 ```sh
-claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
-git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
-```
-
-Install only when that HEAD equals the Claude distribution commit recorded for
-`0.5.0a2` in the published source record. Stop if the version is absent or the
-commit differs; obtain owner review rather than guessing. After it matches:
-
-```sh
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2' --scope user &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
-claude plugin list --json
 ```
+
+The expected SHA is the Claude `0.5.0a2` distribution commit in the owner's
+published record. A Git failure or mismatching HEAD blocks installation. Stop
+if that version is absent or the clone differs; obtain owner review rather
+than bypassing the gate. Do not run install separately after an add/check
+failure. An existing older source needs the
+[explicit upgrade and scope flow](claude-marketplace.md#upgrade-an-existing-installation),
+not this fresh-install recipe.
 
 This verifies registration-time identity, not immutable client-side pinning.
 Inspect HEAD again after marketplace update. Native commands affect the chosen

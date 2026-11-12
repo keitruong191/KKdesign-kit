@@ -23,51 +23,109 @@ You need Codex or Claude Code, Git, and HTTPS access to GitHub. Choose your
 provider below and run its commands in a terminal. You do not need to clone or
 build this repository.
 
-<details>
-<summary>Codex</summary>
+**Choose [New installation](#new-installation) for a clean profile, or
+[Upgrade an existing installation](#upgrade-an-existing-installation) if you
+already installed KKdesign-kit.** Run upgrades in the profile that owns the
+installation. An old marketplace registration does not automatically select a2.
+
+Commands below use a POSIX shell. Keep each `&&` chain intact: if marketplace
+registration fails, do not run the install command separately. Codex's
+`already added from a different source` and Claude's
+`source doesn't match its extraKnownMarketplaces entry` mean the old source
+remains registered; use the upgrade path instead.
+
+### New installation
+
+#### Codex
 
 ```sh
-codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref f49151a3b21501f52843385f5fce769009df39d2
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref f49151a3b21501f52843385f5fce769009df39d2 &&
 codex plugin add kkdesign-kit@kkdesign-kit-codex
 ```
 
 This installs from an immutable distribution commit. Open a new Codex session
 after installation.
 
-</details>
+#### Claude Code
 
-<details>
-<summary>Claude Code</summary>
-
-Register the marketplace and check the downloaded revision:
-
-```sh
-claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
-git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
-```
-
-Before installing, the output must be exactly:
-
-```text
-ec7fd565558b8adb065557382aa68d547dec13c6
-```
-
-**Stop if it differs** and ask the owner to review the snapshot. Claude uses a
-mutable branch, so this check is required. The path command above was measured
-on POSIX; see [installation guidance](docs/installation.md) for support limits.
-Only after the revision matches, install:
+The following user-scope install checks the downloaded branch's commit before
+installing. If Git fails or the commit differs, `test` fails and installation
+does not run. Stop and ask the owner to review the snapshot; do not bypass the
+check or run the final command separately.
 
 ```sh
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2' --scope user &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
 claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
 ```
 
-Open a new Claude Code session after installation.
+Claude uses a mutable branch, not an immutable client-side pin. Open a new
+Claude Code session after installation. See [installation guidance](docs/installation.md)
+for measured platform limits.
 
-</details>
+### Upgrade an existing installation
 
-These commands use built marketplace snapshots, not the repository's default
-branch. If you already have a different KKdesign installation, use a separate
-provider profile for review.
+This is an explicit source migration, not a refresh of the old pin. Review the
+current inventory before removal. Project design data and private runtimes are
+separate from the plugin: do not delete them to change sources.
+
+#### Codex upgrade
+
+```sh
+codex plugin list --json
+codex plugin marketplace list
+```
+
+After confirming this profile owns the old installation:
+
+```sh
+codex plugin remove kkdesign-kit@kkdesign-kit-codex &&
+codex plugin marketplace remove kkdesign-kit-codex &&
+codex plugin marketplace add https://github.com/keitruong191/KKdesign-kit.git --ref f49151a3b21501f52843385f5fce769009df39d2 &&
+codex plugin add kkdesign-kit@kkdesign-kit-codex
+```
+
+The final installed path must end in `kkdesign-kit/0.5.0a2`. Refreshing an old
+immutable pin with `marketplace upgrade` does not select the new commit.
+
+#### Claude Code upgrade
+
+```sh
+claude plugin list --json
+claude plugin marketplace list --json
+```
+
+**The recipe below is only for a user-scope plugin and user-scope marketplace
+declaration.** If inventory also contains `project` or `local` copies, follow
+the [Claude scope guidance](docs/claude-marketplace.md#upgrade-an-existing-installation)
+from each owning project; do not remove all scopes or edit managed settings.
+Plugin scope and marketplace declaration scope can differ.
+
+The safe upgrade ends **disabled**, even if the old version was enabled.
+Fresh installation can enable a previously disabled plugin; keep the final
+disable step and do not open a new session until it succeeds.
+
+```sh
+claude plugin uninstall kkdesign-kit@kkdesign-kit-marketplace --scope user --keep-data &&
+claude plugin marketplace remove kkdesign-kit-marketplace --scope user &&
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2' --scope user &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user &&
+claude plugin disable kkdesign-kit@kkdesign-kit-marketplace --scope user
+```
+
+Check `claude plugin list --json` for user-scope `0.5.0a2` with
+`enabled: false`. If you want to use the plugin now, enable it explicitly:
+
+```sh
+claude plugin enable kkdesign-kit@kkdesign-kit-marketplace --scope user
+```
+
+After either provider's upgrade, open a new session and run Setup when enabled
+to verify or reuse the compatible runtime. These commands use built marketplace
+snapshots, not the repository's default branch. Existing standalone users
+should use [Setup's consented migration flow](references/setup.md), not reinstall
+standalone as an onboarding fallback.
 
 Exact commits and checksums are recorded in the
 [`keitruong191`-authored PR #22 description](https://github.com/keitruong191/KKdesign-kit/pull/22),
@@ -75,24 +133,8 @@ under **0.5.0a2 distribution commits**, not public comments. That description is
 authoritative if a copied evidence page differs. See
 [source provenance and pin limits](docs/marketplace-sources.md) for details.
 
-<details>
-<summary>Already installed? Upgrade from an older pin</summary>
-
-An older registration does not automatically move to the a2 source. In the
-provider profile that owns the installation:
-
-1. Remove the old plugin, then its marketplace registration using provider controls.
-2. Follow the installation steps above with the a2 source, including Claude's
-   revision check before installation.
-3. Open a new provider session and run Setup to verify or reuse the runtime.
-
-Your project data and private runtimes are separate from the plugin. Do not
-delete them to change the marketplace source; compatible verified runtimes can
-be reused. Existing standalone users should use
-[Setup's consented migration flow](references/setup.md), not reinstall standalone
-as an onboarding fallback.
-
-</details>
+Detailed native lifecycle and scope instructions:
+[Codex](docs/codex-marketplace.md) · [Claude Code](docs/claude-marketplace.md).
 
 ## First project
 

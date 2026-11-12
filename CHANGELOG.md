@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### Marketplace upgrade guidance
+
+- Separate new installation from existing-source migration in the README and
+  provider guides. Chain registration and installation with `&&` so a failed
+  source change cannot silently reinstall the old snapshot.
+- Gate Claude installation on the expected a2 clone commit. Explain plugin
+  versus marketplace declaration scopes; the user-scope upgrade retains plugin
+  data and ends disabled until explicitly enabled.
+- Extend the opt-in remote marketplace probe with prior-source inputs for real
+  old-to-new migration, disabled-state handling and compatible runtime reuse.
+  These source-only changes do not rebuild or republish frozen a1/a2 snapshots.
+
 ### Publication privacy
 
 - Remove internal development sessions from the tracked source tree while

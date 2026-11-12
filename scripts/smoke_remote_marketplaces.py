@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Opt-in persistent Git marketplace probe, with isolated profiles and no model calls.
 
+Fresh mode tests target installs. Migration mode also accepts the all-or-none
+--from-codex-ref, --from-claude-ref, --from-claude-sha, and --from-version flags.
 Requires both installed provider CLIs, Python 3.9+ with requirements.txt and
 approved network access. Logs stay in a new private directory outside source.
 Setup consent here applies only to this disposable synthetic probe.
@@ -63,7 +65,14 @@ def private_state(root):
     return result
 
 
-def probe(output, codex_ref, claude_ref, claude_sha):
+def probe(output, codex_ref, claude_ref, claude_sha, from_codex_ref=None,
+          from_claude_ref=None, from_claude_sha=None, from_version=None):
+    migration = from_codex_ref is not None
+    if not re.fullmatch(r'[0-9a-f]{40}', codex_ref) or not re.fullmatch(r'[0-9a-f]{40}', claude_sha):
+        raise ValueError('Expected immutable target SHA required')
+    if migration and (not re.fullmatch(r'[0-9a-f]{40}', from_codex_ref)
+                      or not re.fullmatch(r'[0-9a-f]{40}', from_claude_sha)):
+        raise ValueError('Expected immutable old-source SHA required')
     if output.absolute().resolve().is_relative_to(ROOT):
         raise ValueError('Output must be outside source')
     expected_version = kit.read_json(ROOT / 'manifest.json')['version']
@@ -112,37 +121,104 @@ def probe(output, codex_ref, claude_ref, claude_sha):
         def native(label, *args):
             return run(label, [providers[name], 'plugin', *args])
 
+        def revisions(label):
+            clones = [path.parent for path in config.rglob('.git')]
+            values = [run(label + '-' + str(i), ['git', '-C', path, 'rev-parse', 'HEAD']).strip()
+                      for i, path in enumerate(clones)]
+            assert values, 'No native Git marketplace clone found'
+            (base / 'native-revisions.json').write_text(json.dumps(values, indent=2) + '\n')
+            return values
+
+        def inventory():
+            value = json.loads(native('inventory', 'list', '--json'))
+            rows = value['installed'] if name == 'codex' else value
+            return value, rows
+
+        def assert_plugin(expected, enabled):
+            value, rows = inventory()
+            selected = [row for row in rows if row.get('pluginId', row.get('id')) == identifier]
+            assert len(selected) == 1 and selected[0]['enabled'] is enabled, value
+            assert selected[0]['version'] == expected, selected
+
+        def setup(label, package, consent, reused=None):
+            prefix = ['/bin/sh', package / 'scripts/kkdesign_setup_posix.sh',
+                      '--package-root', package]
+            if consent:
+                prefix += ['--consent']
+            stdout = run(label, prefix, dict(env, PATH='/nonexistent'))
+            completion = json.loads(stdout.strip().splitlines()[-1])
+            assert completion['phase'] == 'complete', completion
+            result = completion['result']
+            assert result.get('status') == 'ready', result
+            if reused is not None:
+                assert result.get('reused') is reused, result
+            return result
+
         run('version', [providers[name], '--version'])
-        ref = codex_ref if name == 'codex' else claude_ref
-        if name == 'codex':
-            native('register', 'marketplace', 'add', REPOSITORY, '--ref', ref, '--json')
-        else:
-            native('register', 'marketplace', 'add', REPOSITORY + '#' + ref, '--scope', 'user')
         market = 'kkdesign-kit-codex' if name == 'codex' else 'kkdesign-kit-marketplace'
         identifier = 'kkdesign-kit@' + market
-        # Record the actual native clone revision, including when the CLI only
-        # accepts a named branch. A branch name itself is never an immutable pin.
-        clones = [path.parent for path in config.rglob('.git')]
-        revisions = [run('clone-' + str(i), ['git', '-C', path, 'rev-parse', 'HEAD']).strip()
-                     for i, path in enumerate(clones)]
-        assert revisions, 'No native Git marketplace clone found'
-        (base / 'native-revisions.json').write_text(json.dumps(revisions, indent=2) + '\n')
-        expected = codex_ref if name == 'codex' else claude_sha
-        assert re.fullmatch(r'[0-9a-f]{40}', expected), 'Expected immutable SHA required'
-        assert expected in revisions, revisions
+
+        if migration:
+            old_ref = from_codex_ref if name == 'codex' else from_claude_ref
+            old_sha = from_codex_ref if name == 'codex' else from_claude_sha
+            if name == 'codex':
+                native('register-old', 'marketplace', 'add', REPOSITORY, '--ref', old_ref, '--json')
+            else:
+                native('register-old', 'marketplace', 'add', REPOSITORY + '#' + old_ref, '--scope', 'user')
+            assert revisions('old-clone') == [old_sha], 'Old marketplace clone SHA mismatch'
+            old_args = ['add' if name == 'codex' else 'install', identifier]
+            if name == 'claude':
+                old_args += ['--scope', 'user']
+            native('install-old', *old_args)
+            assert_plugin(from_version, True)
+            old_plugin = config / 'plugins/cache' / market / 'kkdesign-kit' / from_version
+            old_skill = old_plugin / 'skills/kkdesign-kit' if name == 'codex' else old_plugin
+            descriptor = '.codex-plugin/plugin.json' if name == 'codex' else '.claude-plugin/plugin.json'
+            assert kit.read_json(old_plugin / descriptor)['version'] == from_version
+            assert kit.read_json(old_skill / 'manifest.json')['version'] == from_version
+            setup('setup-old', old_skill, True)
+            private_before = private_state(home / '.kkdesign-kit')
+            if name == 'claude':
+                native('disable-old', 'disable', identifier, '--scope', 'user')
+                assert_plugin(from_version, False)
+                native('uninstall-old', 'uninstall', identifier, '--scope', 'user', '--keep-data')
+                native('remove-old-marketplace', 'marketplace', 'remove', market, '--scope', 'user')
+            else:
+                native('remove-old', 'remove', identifier)
+                native('unregister-old', 'marketplace', 'remove', market)
+            assert kit.hashes(product) == before
+            assert private_state(home / '.kkdesign-kit') == private_before
+        else:
+            private_before = None
+
+        if name == 'codex':
+            native('register', 'marketplace', 'add', REPOSITORY, '--ref', codex_ref, '--json')
+        else:
+            native('register', 'marketplace', 'add', REPOSITORY + '#' + claude_ref, '--scope', 'user')
+        revisions_target = revisions('target-clone')
+        expected_sha = codex_ref if name == 'codex' else claude_sha
+        assert re.fullmatch(r'[0-9a-f]{40}', expected_sha), 'Expected immutable SHA required'
+        assert revisions_target == [expected_sha], revisions_target
         args = ['add' if name == 'codex' else 'install', identifier]
         if name == 'claude':
             args += ['--scope', 'user']
         native('install', *args)
-        inventory = json.loads(native('inventory', 'list', '--json'))
-        rows = inventory['installed'] if name == 'codex' else inventory
-        selected = [row for row in rows if row.get('pluginId', row.get('id')) == identifier]
-        assert len(selected) == 1 and selected[0]['enabled'] is True, inventory
-        assert selected[0]['version'] == expected_version, selected
+        if name == 'claude' and migration:
+            native('disable-target', 'disable', identifier, '--scope', 'user')
+            assert_plugin(expected_version, False)
         plugin = config / 'plugins/cache' / market / 'kkdesign-kit' / expected_version
         skill = plugin / 'skills/kkdesign-kit' if name == 'codex' else plugin
-        kit.verify(skill)
-        # Fresh process, no source override and no user/model prompt.
+        descriptor = '.codex-plugin/plugin.json' if name == 'codex' else '.claude-plugin/plugin.json'
+        assert kit.read_json(plugin / descriptor)['version'] == expected_version
+        assert kit.read_json(skill / 'manifest.json')['version'] == expected_version
+        assert_plugin(expected_version, not (name == 'claude' and migration))
+        if migration:
+            assert kit.hashes(product) == before
+            assert private_state(home / '.kkdesign-kit') == private_before
+        # migration install remains disabled until explicitly enabled for smoke.
+        if name == 'claude' and migration:
+            native('enable-target-smoke', 'enable', identifier, '--scope', 'user')
+            assert_plugin(expected_version, True)
         command = ([providers[name], 'app-server'] if name == 'codex' else
                    [providers[name], '--print', '--input-format', 'stream-json',
                     '--output-format', 'stream-json', '--verbose', '--no-session-persistence',
@@ -173,17 +249,24 @@ def probe(output, codex_ref, claude_ref, claude_sha):
                 process.stdout.close()
         print(name + ' fresh-session discovery: pass (no model prompt)', flush=True)
         package_before = kit.hashes(skill)
-        # Runtime/entrypoint evidence is direct execution, not agent/human acceptance.
+        if migration:
+            setup('setup-target-reuse', skill, False, reused=True)
+        else:
+            setup('setup', skill, True)
+            private_before = private_state(home / '.kkdesign-kit')
         helper_env = dict(env, PATH='/nonexistent')
         prefix = ['/bin/sh', skill / 'scripts/kkdesign_setup_posix.sh', '--package-root', skill]
-        run('setup', prefix + ['--consent'], helper_env)
         run('helper', prefix + ['--helper', 'kkdesign_install', 'verify', '--source', skill], helper_env)
-        private_before = private_state(home / '.kkdesign-kit')
         assert kit.hashes(skill) == package_before
-        native('remove', 'remove' if name == 'codex' else 'uninstall', identifier)
-        inventory = json.loads(native('removed-inventory', 'list', '--json'))
-        assert not (inventory['installed'] if name == 'codex' else inventory), inventory
-        native('unregister', 'marketplace', 'remove', market)
+        assert private_state(home / '.kkdesign-kit') == private_before
+        if name == 'codex':
+            native('remove', 'remove', identifier)
+            native('unregister', 'marketplace', 'remove', market)
+        else:
+            native('uninstall', 'uninstall', identifier, '--scope', 'user', '--keep-data')
+            native('remove-marketplace', 'marketplace', 'remove', market, '--scope', 'user')
+        inventory_value, rows = inventory()
+        assert not any(row.get('pluginId', row.get('id')) == identifier for row in rows), inventory_value
         assert kit.hashes(product) == before
         assert private_state(home / '.kkdesign-kit') == private_before
         assert sentinel.read_text() == 'Synthetic shared-state preservation sentinel\n'
@@ -199,9 +282,21 @@ def main():
     parser.add_argument('--codex-ref', required=True)
     parser.add_argument('--claude-ref', required=True)
     parser.add_argument('--claude-sha', required=True, help='Expected immutable distribution commit; checked before install')
+    parser.add_argument('--from-codex-ref')
+    parser.add_argument('--from-claude-ref')
+    parser.add_argument('--from-claude-sha')
+    parser.add_argument('--from-version')
     args = parser.parse_args()
-    probe(args.output, args.codex_ref, args.claude_ref, args.claude_sha)
+    migration_values = (args.from_codex_ref, args.from_claude_ref,
+                        args.from_claude_sha, args.from_version)
+    if any(value is not None for value in migration_values) and not all(
+            value is not None for value in migration_values):
+        parser.error('migration requires all of --from-codex-ref, --from-claude-ref, '
+                     '--from-claude-sha, and --from-version')
+    probe(args.output, args.codex_ref, args.claude_ref, args.claude_sha, *migration_values)
 
 
 if __name__ == '__main__':
     main()
+
+
