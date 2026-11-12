@@ -1,5 +1,48 @@
 # Marketplace source verification
 
+## Upgrade guidance verification — 2026-11-12
+
+Source-only guide/probe changes; published a1/a2 snapshots were not rebuilt or
+republished. Measured on macOS ARM64 with Codex CLI 0.167.0 and Claude Code
+2.1.308. All native runs used anonymous isolated profiles and synthetic product
+data, without model prompts or primary-profile changes.
+
+| Check | Observed result |
+| --- | --- |
+| Exact README shell recipes | Both fresh-install chains and both a1 → a2 upgrade chains completed successfully. Installed inventories reported a2; Claude's upgrade ended disabled. Synthetic project data was unchanged. |
+| Claude expected-HEAD rejection | The documented a2 `test` gate ran against a real a1 marketplace clone, exited 1 and did not install a plugin; installed inventory remained empty. |
+| Remote fresh-install probe | Both providers passed exact clone/version checks, native discovery, actual Setup/helpers and removal with private/project fingerprints unchanged. |
+| Remote migration probe | Both providers passed old/new clone checks, installed a1 then migrated to a2, reused the verified runtime without renewed consent and preserved full private/project fingerprints. Claude was disabled before removal, disabled after a2 install, then explicitly enabled only for smoke discovery. |
+| Incomplete migration arguments | A lone `--from-version` was rejected with exit 2 before the output directory or any profile was created. |
+| Full source unit suite | 216 cases: 207 passed, 9 native-Windows skips, no failures; empty HOME, 49.752 seconds. |
+| Guide navigation | 77 local file/anchor targets resolved across the six install/onboarding guides. A local Markdown browser preview exposed upgrade directly, followed the Claude scope link to the correct heading and rendered the scoped disabled-upgrade recipe. This is not GitHub-rendering or non-dev usability acceptance. |
+
+The first new probe run exposed an assertion bug: Setup emits a `complete`
+event with the actual ready/reused result nested under `result`. The probe now
+checks that event and nested result; both fresh and migration probes then
+completed. Raw logs remain private outside source.
+
+The default remote probe still tests fresh installation. To reproduce a1 → a2
+migration from this source checkout, use an external Python environment with
+`requirements.txt` and a new private output directory:
+
+```sh
+python -B scripts/smoke_remote_marketplaces.py \
+  --output '<new-private-directory-outside-source>' \
+  --codex-ref f49151a3b21501f52843385f5fce769009df39d2 \
+  --claude-ref review/claude-0.5.0a2 \
+  --claude-sha ec7fd565558b8adb065557382aa68d547dec13c6 \
+  --from-codex-ref e108483e7756e3ad4167531b524667a5f0beadb9 \
+  --from-claude-ref review/wwa11-claude-0.5.0a1 \
+  --from-claude-sha bea7e433f4f576068bcf2eec15317d7d73e5e065 \
+  --from-version 0.5.0a1
+```
+
+All four prior-source arguments must be supplied together. The target version
+comes from the source manifest. Installed helper execution and schema checks
+do not prove authenticated agent interaction, design-tool behavior, human
+approval or unmeasured platforms.
+
 ## 0.5.0a2 — author-operated prerelease, 2026-11-11
 
 The owner requested this publication after PR #21 merged. The authoritative

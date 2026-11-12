@@ -15,7 +15,7 @@ Windows PowerShell acquisition is implemented with [native acceptance pending](v
 Python-free helper startup uses the [verified OS entrypoints](../references/helpers.md); native end-to-end acceptance remains pending. No production release or official listing is claimed.
 Linux acquisition is implemented; [native Linux acceptance](verification/linux-runtime.md) remains pending.
 
-## Native maintainer review
+## Fresh installation
 
 Version `0.5.0a2` is available for owner/tester review from the persistent
 Git source below. This is an author-operated review/prerelease channel, not a
@@ -23,32 +23,74 @@ production release or official directory listing. Git and GitHub HTTPS access
 are required. For isolated testing use a clean HOME, USERPROFILE and
 CLAUDE_CONFIG_DIR; these commands otherwise affect the current native profile.
 
-```sh
-claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2'
-git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD
-```
-
-Compare that output with the Claude distribution commit for `0.5.0a2` in the
-owner's [release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
-section **0.5.0a2 distribution commits**. Use only the description authored by
-`keitruong191`, not public comments.
-**Stop if that version has no published commit or the output differs.** Ask the
-owner for the release record rather than using an older snapshot's SHA. This
-branch is mutable; only after the recorded commit matches, install:
+Claude Code 2.1.308 treats `#ref` as a branch and rejects raw-SHA refs. The
+versioned branch is mutable, so verify the cloned marketplace's HEAD against
+the immutable Claude distribution commit recorded by the owner in
+[release PR #22](https://github.com/keitruong191/KKdesign-kit/pull/22), section
+**0.5.0a2 distribution commits**, authored by `keitruong191` (not comments).
+That published record is authoritative; the expected a2 commit is
+`ec7fd565558b8adb065557382aa68d547dec13c6`. Stop if the release record does
+not identify that commit or if any command below fails. Keep source registration,
+the HEAD gate and installation in one fail-fast chain:
 
 ```sh
-claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2' --scope user &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user &&
 claude plugin list --json
 ```
 
-The `#ref` is part of Claude's Git source syntax; quote it. This branch is
-mutable, not an immutable pin. [Source provenance](marketplace-sources.md)
-records the exact distribution snapshot and measured native pin limitations.
-Claude Code 2.1.308 rejects raw commit SHAs here: it tries to clone a branch
-with that name. Before installing, verify the cloned marketplace as described
-in the published record. Snapshot documents cannot contain their own future
-distribution commit; use the owner's current source/release record, not an older
-in-plugin measurement. No immutable client-side pin is claimed for this command.
+The `#ref` is quoted because it is part of Claude's Git source syntax. A failed
+add or mismatching HEAD blocks every later command; never run install separately.
+No immutable client-side pin is claimed. [Source provenance](marketplace-sources.md)
+records the snapshot and measured native pin limitations.
+If add reports `source doesn't match its extraKnownMarketplaces entry`, the old
+source remains registered. Stop and use the scoped upgrade flow, not a separate
+install command.
+
+
+## Upgrade an existing installation
+
+Inventory first with `claude plugin list --json` and
+`claude plugin marketplace list`. Use the recipe below only when both the
+installed plugin declaration and its marketplace source are user-scoped and
+you intend to migrate that installation to a2. It uninstalls only the user
+plugin while keeping its data, replaces only the user marketplace source, gates
+installation on the recorded a2 HEAD, and leaves the newly installed plugin
+disabled:
+
+```sh
+claude plugin uninstall kkdesign-kit@kkdesign-kit-marketplace --scope user --keep-data &&
+claude plugin marketplace remove kkdesign-kit-marketplace --scope user &&
+claude plugin marketplace add 'https://github.com/keitruong191/KKdesign-kit.git#review/claude-0.5.0a2' --scope user &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
+claude plugin install kkdesign-kit@kkdesign-kit-marketplace --scope user &&
+claude plugin disable kkdesign-kit@kkdesign-kit-marketplace --scope user
+```
+
+Do not open a new session until the chain finishes and the disable step
+succeeds. A fresh install does not preserve the old enabled/disabled state;
+after reviewing the installed version, explicitly enable it with
+`claude plugin enable kkdesign-kit@kkdesign-kit-marketplace --scope user` only
+if you choose to do so.
+Check `claude plugin list --json` for the intended scope, version `0.5.0a2` and
+`enabled: false` before choosing whether to enable. If disable fails, finish
+that step before opening another session.
+
+
+Plugin installation scope and marketplace declaration scope can differ. Use
+`claude plugin list --json` to identify plugin scopes/project paths, then inspect
+the owning user/project/local settings for the marketplace declaration;
+`marketplace list` reports the source but is not proof of declaration scope.
+If inventory shows project/local declarations, use the corresponding native
+`--scope project` or `--scope local` controls from the owning project. Do not
+blindly replace every `user` in this recipe: remove only the plugin scope and
+the marketplace declaration you intend to migrate. Managed entries require an
+administrator. Do not blanket-remove declarations or marketplaces of another
+scope. Keep project/design data, retained plugin data, and private runtime/state
+separate.
+
+## In the installed agent
 
 Start a new Claude session in the selected product project and invoke:
 
@@ -68,16 +110,24 @@ and external tools unverified. Explicit Setup follows the shared consent flow;
 only a successful helper check establishes runtime ready. Do not invoke the
 standalone installer or create another skill copy.
 
-Use native lifecycle controls, including:
+### Same-source refresh and lifecycle
 
-```text
-claude plugin marketplace update kkdesign-kit-marketplace
+For a refresh of the already-registered same source (not a source migration or
+pin upgrade), use native lifecycle controls:
+
+For a source already registered at the a2 branch, verify HEAD again before
+updating the plugin:
+
+```sh
+claude plugin marketplace update kkdesign-kit-marketplace &&
+test "$(git -C "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/marketplaces/kkdesign-kit-marketplace" rev-parse HEAD)" = ec7fd565558b8adb065557382aa68d547dec13c6 &&
 claude plugin update kkdesign-kit@kkdesign-kit-marketplace --scope user
-claude plugin disable kkdesign-kit@kkdesign-kit-marketplace --scope user
-claude plugin enable kkdesign-kit@kkdesign-kit-marketplace --scope user
-claude plugin uninstall kkdesign-kit@kkdesign-kit-marketplace --scope user
-claude plugin marketplace remove kkdesign-kit-marketplace
 ```
+
+The update follows the registered source's current state; it does not change a
+mutable branch registration into the a2 distribution. To migrate an existing
+user installation to that distribution, use the scoped recipe above. Do not
+assume fresh installation preserves a prior enabled/disabled state.
 
 Provider-owned plugin files are separate from project `design/`, lessons, task
 history and any private user runtime cache. No uninstall hook is bundled.

@@ -52,12 +52,15 @@ Actual installed-package execution probes:
 | `python -B scripts/smoke_windows_setup.py --inspect-artifacts` | Downloads and checks both pinned Windows archives and contents without executing Windows bytes; portable integrity only. |
 | `python -B scripts/smoke_windows_setup.py` | On each native Windows CPU: actual Windows PowerShell acquisition/helpers/reuse, spaces/CWD, trust rejection/preservation. Skips or syntax parsing on another OS are not Windows acceptance. |
 | `python -B scripts/smoke_remote_marketplaces.py --output '<new-outside-source>/remote' --codex-ref "$CODEX_DISTRIBUTION_SHA" --claude-ref review/claude-0.5.0a2 --claude-sha "$CLAUDE_DISTRIBUTION_SHA"` | Set both SHA variables from the owner's published `0.5.0a2` source record first. Persistent public Git sources: separate clean profiles, exact clone revisions before install, enabled inventory/fresh discovery without model calls, real Setup/helpers and removal/preservation. |
+| `python -B scripts/smoke_remote_marketplaces.py --output '<new-outside-source>/migration' --codex-ref "$CODEX_DISTRIBUTION_SHA" --claude-ref review/claude-0.5.0a2 --claude-sha "$CLAUDE_DISTRIBUTION_SHA" --from-codex-ref e108483e7756e3ad4167531b524667a5f0beadb9 --from-claude-ref review/wwa11-claude-0.5.0a1 --from-claude-sha bea7e433f4f576068bcf2eec15317d7d73e5e065 --from-version 0.5.0a1` | Set target SHA variables from the owner's a2 record as above. Explicit a1 → a2 migration for both providers: old/new clone checks, native removal/source replacement, Claude disabled-upgrade choice, then explicit smoke-only enable for discovery, real runtime reuse without renewed consent and private/project preservation. All four `--from-*` arguments are required together. |
 | `python -B scripts/smoke_native_lifecycle.py --output '<new-outside-source>/lifecycle'` | On native macOS/GNU Linux with both provider CLIs: isolated Git smart-HTTP marketplaces, native install/update/enable/disable/remove/reinstall, real shared runtimes and surviving consumers/project data. No model credentials or human interaction. |
 | `python -B scripts/smoke_standalone_migration.py` | POSIX relocated plugin Setup: actual synthetic managed migration, retained ledgers/backups/project data, both provider layouts. Historical copies are test fixtures, not fallback installation. |
 
-The remote probe's expected plugin version comes from its source checkout's
-`manifest.json`. Use a matching historical checkout when reproducing an older
-version; do not run old snapshot arguments against the current version and infer
+The remote probe's target plugin version comes from its source checkout's
+`manifest.json`. Its default mode tests fresh installation; migration mode
+adds a separately verified prior version through all four `--from-*` inputs.
+Use a matching historical checkout only when reproducing a fresh historical
+install; do not pass an old target snapshot to the current probe and infer
 a publication failure. Immutable revisions come from the owner's
 [release PR description](https://github.com/keitruong191/KKdesign-kit/pull/22),
 section **0.5.0a2 distribution commits**, authored by `keitruong191` (not comments),
