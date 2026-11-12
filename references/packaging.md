@@ -27,7 +27,8 @@ Output must be outside the installed skill. Existing files are never overwritten
 The archive contains a single `kkdesign-kit/` directory and `bundle.json` with
 SHA-256 for every payload file. Installed-plugin helper invocation requires the verified private runtime, with
 no system Python, activation or special CWD. Creating a portable artifact does
-not install a plugin or authorize a standalone distribution fallback. No project data, credentials or local configuration is collected.
+not install a plugin or authorize a standalone distribution fallback. Resource
+selection and its privacy limits are described below.
 
 ## Verify after clean extraction
 
@@ -96,9 +97,28 @@ verification, not evidence of public release availability or native discovery.
 ## Public skill versus private project kit
 
 This command packages only the reusable skill's allowlisted scripts and public
-resource directories. It never walks the selected project, its `design/`, source
-captures, credentials or surrounding workspace. Private project kits and task
-evidence remain in their owner-selected project. Do not place private material in
-the public skill's `docs/`, `examples/` or other resource directories. A project
-archive/export needs its own explicit content scope and distribution authorization;
-`package` does not grant either and never uploads an artifact.
+resource directories. It never walks the selected product project or surrounding
+workspace. Private project kits and task evidence stay in their selected project.
+
+Within `agents/`, `references/`, `docs/`, `schemas/`, `templates/` and `examples/`,
+collection skips hidden files/directories, dependency/cache/build trees, known
+credential filenames, key containers, logs, ZIPs and Python bytecode. Excluded
+directories are pruned before traversal; their contents are not read or deleted.
+Public provider descriptors/catalogs are handled separately by the native
+builders and remain included. A required resource that matches an exclusion
+fails packaging rather than silently producing an incomplete kit.
+
+For an existing receipted bundle, integrity is checked first. Private entries
+inside those resource directories then refuse repackaging; the command does not
+repair the receipt or silently remove its listed files.
+
+This is a path-based guard, not a secret-content scanner. A secret in an ordinary
+public-looking filename can still be collected. Keep private captures, profiles,
+credentials and raw task evidence out of all public resource directories; build
+from reviewed clean input and inspect every output inventory. Git ignore rules
+alone do not define the archive's contents.
+
+Local assistant state and development sessions belong outside Git tracking.
+Ignoring a path does not remove existing tracked files or historical commits.
+A project archive/export needs its own explicit content scope and distribution
+authorization; `package` grants neither and never uploads an artifact.

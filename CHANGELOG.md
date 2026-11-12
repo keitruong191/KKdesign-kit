@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Publication privacy
+
+- Remove internal development sessions from the tracked source tree while
+  preserving local copies and Git history. Ignore local assistant state,
+  credential/profile files, dependency trees and diagnostics.
+- Prune private/local resource paths from canonical package collection, retain
+  ordinary public extensions, and fail when a required resource is excluded.
+  Reject private resource entries in intact receipted bundles before repackaging.
+- Keep published a1/a2 distribution refs and provenance unchanged. This is
+  source-only hardening, not a rebuilt or republished `0.5.0a2` snapshot.
+
 ## 0.5.0a2 — DS-first interactive prototype prerelease
 
 ### DS-first interactive prototypes

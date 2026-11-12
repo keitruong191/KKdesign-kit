@@ -86,6 +86,9 @@ Hashes verify bytes, not publisher identity or human approval.
 Before publication inspect the builder allowlist and every output path, scan
 for private data/credentials/local paths, verify both extracted skill bundles,
 and verify that only the built catalog/plugin tree plus provenance is staged.
+The canonical collector's [privacy exclusions](../references/packaging.md#public-skill-versus-private-project-kit)
+apply inside resource directories as well as at the source root. They are not
+a secret-content scanner; Git ignore rules alone do not make an artifact safe.
 Use a new review ref if one already exists; inspect history first and never
 force-push or overwrite another publisher's work. Publish only those new refs,
 without merging main/integration or creating releases/tags. Follow-up evidence

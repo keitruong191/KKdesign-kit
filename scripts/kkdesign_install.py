@@ -24,6 +24,14 @@ SCRIPTS = ('kkdesign_install.py', 'kkdesign_core.py', 'kkdesign_project.py',
            'figma_prototype.js', 'kkdesign_run.py', 'kkdesign_setup.py',
            'kkdesign_setup_posix.sh', 'kkdesign_setup_windows.ps1',
            'kkdesign_windows_security.ps1', 'kkdesign_migration.py')
+_PRIVATE_DIRECTORIES = frozenset((
+    'node_modules', '__pycache__', 'venv', 'build', 'dist', 'coverage', 'htmlcov',
+))
+_PRIVATE_FILENAMES = frozenset((
+    'credentials', 'credentials.json', 'auth.json', 'application_default_credentials.json',
+    'id_rsa', 'id_dsa', 'id_ecdsa', 'id_ed25519', 'kubeconfig',
+))
+_PRIVATE_SUFFIXES = ('.pyc', '.pyo', '.log', '.zip', '.pem', '.key', '.p12', '.pfx')
 
 
 def canonical(path):
@@ -59,6 +67,26 @@ def hashes(root):
     return result
 
 
+def _private_resource(name):
+    for part in Path(name).parts:
+        folded = part.casefold()
+        if (part.startswith('.') or folded in _PRIVATE_DIRECTORIES
+                or folded in _PRIVATE_FILENAMES or folded.endswith(_PRIVATE_SUFFIXES)):
+            return True
+    return False
+
+
+def _public_resources(directory):
+    for entry in directory.iterdir():
+        if _private_resource(entry.name):
+            continue
+        no_links(entry)
+        if entry.is_dir():
+            yield from _public_resources(entry)
+        elif entry.is_file():
+            yield entry
+
+
 def payload(source):
     """Allowlisted public resources only; never collect arbitrary project files."""
     no_links(source)
@@ -70,15 +98,18 @@ def payload(source):
         if bundle.get('identifier') != IDENTIFIER or actual != bundle.get('files'):
             raise ValueError('Bundle integrity mismatch')
         names = list(actual)
+        for name in names:
+            if Path(name).parts[0] in DIRECTORIES and _private_resource(name):
+                raise ValueError('Private package resource: ' + name)
     else:
         names = list(SINGLE_FILES) + ['scripts/' + name for name in SCRIPTS]
         for directory in DIRECTORIES:
             base = source / directory
             no_links(base)
-            for entry in base.rglob('*'):
-                no_links(entry)
-                if entry.is_file():
-                    names.append(entry.relative_to(source).as_posix())
+            if not base.is_dir():
+                continue
+            for entry in _public_resources(base):
+                names.append(entry.relative_to(source).as_posix())
     result = {}
     for name in sorted(names):
         path = source / name
